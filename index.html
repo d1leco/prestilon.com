@@ -4,384 +4,298 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PRESTIGE — Reset Password</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; background: #030712; font-family: ui-sans-serif, system-ui, sans-serif; }
-    .bg-grid {
-      background-image:
-        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
-      background-size: 48px 48px;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #030712;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
     }
+    .wrap { width: 100%; max-width: 380px; }
+    .logo {
+      display: flex; flex-direction: column; align-items: center; margin-bottom: 40px;
+    }
+    .logo-icon {
+      width: 64px; height: 64px; border-radius: 16px;
+      background: linear-gradient(135deg, #06b6d4, #2563eb);
+      box-shadow: 0 0 40px rgba(6,182,212,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 16px;
+    }
+    .logo-title {
+      font-family: 'Share Tech Mono', monospace;
+      letter-spacing: 0.25em; font-size: 20px; font-weight: 700; color: #fff;
+    }
+    .card {
+      background: rgba(17,24,39,0.9);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 32px;
+    }
+    .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .card-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.3);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .card-title { font-size: 18px; font-weight: 700; color: #fff; }
+    .card-sub { font-size: 12px; color: #6b7280; margin-top: 2px; }
+    .field {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; border-radius: 12px;
+      border: 1px solid rgba(55,65,81,0.6);
+      background: rgba(17,24,39,0.8);
+      margin-bottom: 12px;
+    }
+    .field input {
+      flex: 1; background: transparent; color: #fff;
+      font-size: 14px; border: none; outline: none;
+    }
+    .field input::placeholder { color: #6b7280; }
+    .field svg { flex-shrink: 0; }
+    .toggle { background: none; border: none; cursor: pointer; color: #6b7280; display: flex; padding: 0; }
+    .btn {
+      width: 100%; padding: 14px;
+      border-radius: 12px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, #0891b2, #2563eb);
+      color: #fff; font-weight: 600; font-size: 14px;
+      box-shadow: 0 4px 20px rgba(6,182,212,0.2);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 4px;
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .error {
+      display: none; align-items: flex-start; gap: 10px;
+      padding: 12px 16px; border-radius: 12px; margin-top: 12px;
+      background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+      color: #f87171; font-size: 14px;
+    }
+    .center-card { text-align: center; }
+    .big-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .desc { font-size: 14px; color: #9ca3af; line-height: 1.5; }
+    .hint { font-size: 12px; color: #6b7280; margin-top: 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .spin { animation: spin 1s linear infinite; }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .fade-up { animation: fadeUp 0.35s ease-out both; }
-    input:focus { outline: none; }
-    button { transition: opacity 0.2s; }
-    button:active { transform: scale(0.98); }
   </style>
 </head>
 <body>
-
-<div class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gray-950 bg-grid">
-  <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none"
-       style="background:rgba(6,182,212,0.05);"></div>
-  <div id="app" class="relative z-10 w-full max-w-sm fade-up"></div>
+<div class="wrap">
+  <div class="logo">
+    <div class="logo-icon">P</div>
+    <div class="logo-title">PRESTIGE</div>
+  </div>
+  <div id="app"></div>
 </div>
 
 <script>
 const SUPABASE_URL      = 'https://ryftlimrjhhoymyfzusq.supabase.co'
 const SUPABASE_ANON_KEY = 'sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86'
-
 let accessToken = ''
-let password    = ''
-let confirm     = ''
 
 function sbHeaders(token) {
   return {
     'Content-Type': 'application/json',
-    'apikey':        SUPABASE_ANON_KEY,
-    'Authorization': `Bearer ${token ?? SUPABASE_ANON_KEY}`,
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': `Bearer ${token || SUPABASE_ANON_KEY}`,
   }
 }
 
-function strengthInfo(pw) {
-  let score = 0
-  if (pw.length >= 8)           score++
-  if (pw.length >= 12)          score++
-  if (/[A-Z]/.test(pw))         score++
-  if (/[0-9]/.test(pw))         score++
-  if (/[^A-Za-z0-9]/.test(pw))  score++
-  if (score <= 1) return { score, label: 'Weak',   color: '#ef4444' }
-  if (score <= 2) return { score, label: 'Fair',   color: '#f59e0b' }
-  if (score <= 3) return { score, label: 'Good',   color: '#facc15' }
-  return              { score, label: 'Strong', color: '#22c55e' }
-}
+// ── Pages ──────────────────────────────────────────────────────
 
-function logoHTML() {
-  return `
-    <div class="flex flex-col items-center mb-10">
-      <div class="w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl mb-4"
-           style="background:linear-gradient(135deg,#06b6d4,#2563eb);box-shadow:0 0 40px rgba(6,182,212,0.3)">
-        <span style="color:#fff;font-weight:700;font-size:1.5rem">P</span>
-      </div>
-      <h1 style="font-family:'Share Tech Mono',monospace;letter-spacing:0.25em;font-size:1.25rem;font-weight:700;color:#fff">PRESTIGE</h1>
+function showParsing() {
+  document.getElementById('app').innerHTML = `
+    <div class="card center-card">
+      <svg class="spin" style="margin:0 auto 16px;display:block" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      <p style="color:#9ca3af;font-size:14px">Verifying reset link...</p>
     </div>`
 }
 
-function showPage(html) {
-  document.getElementById('app').innerHTML = logoHTML() + html
-}
-
-function showParsing() {
-  showPage(`
-    <div class="rounded-2xl border border-gray-800 p-8 text-center" style="background:rgba(17,24,39,0.8)">
-      <svg class="spin mx-auto mb-4" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round">
-        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-      </svg>
-      <p style="color:#9ca3af;font-size:0.875rem">Verifying reset link...</p>
-    </div>`)
-}
-
 function showInvalid() {
-  showPage(`
-    <div class="rounded-2xl border p-8 text-center" style="border-color:rgba(239,68,68,0.2);background:rgba(17,24,39,0.8)">
-      <div class="w-16 h-16 mx-auto mb-5 rounded-full flex items-center justify-center"
-           style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3)">
+  document.getElementById('app').innerHTML = `
+    <div class="card center-card">
+      <div class="big-icon" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3)">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2">
           <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
       </div>
-      <h2 style="font-size:1.25rem;font-weight:700;color:#fff;margin-bottom:0.5rem">Invalid link</h2>
-      <p style="color:#9ca3af;font-size:0.875rem;margin-bottom:1.75rem">
-        This password reset link is invalid or has already been used.<br>Please request a new one.
-      </p>
-      <p style="color:#6b7280;font-size:0.75rem">You can close this tab.</p>
-    </div>`)
+      <div class="title">Invalid link</div>
+      <div class="desc">This password reset link is invalid or has already been used. Please request a new one.</div>
+      <div class="hint">You can close this tab.</div>
+    </div>`
 }
 
 function showExpired() {
-  showPage(`
-    <div class="rounded-2xl border p-8 text-center" style="border-color:rgba(245,158,11,0.2);background:rgba(17,24,39,0.8)">
-      <div class="w-16 h-16 mx-auto mb-5 rounded-full flex items-center justify-center"
-           style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3)">
+  document.getElementById('app').innerHTML = `
+    <div class="card center-card">
+      <div class="big-icon" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3)">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2">
           <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
       </div>
-      <h2 style="font-size:1.25rem;font-weight:700;color:#fff;margin-bottom:0.5rem">Link expired</h2>
-      <p style="color:#9ca3af;font-size:0.875rem;margin-bottom:1.75rem">
-        This reset link has expired (valid for 1 hour).<br>Please request a new password reset.
-      </p>
-      <p style="color:#6b7280;font-size:0.75rem">You can close this tab.</p>
-    </div>`)
+      <div class="title">Link expired</div>
+      <div class="desc">This reset link has expired (valid for 1 hour). Please request a new password reset.</div>
+      <div class="hint">You can close this tab.</div>
+    </div>`
 }
 
 function showDone() {
-  showPage(`
-    <div class="rounded-2xl border p-8 text-center" style="border-color:rgba(34,197,94,0.2);background:rgba(17,24,39,0.8)">
-      <div class="w-16 h-16 mx-auto mb-5 rounded-full flex items-center justify-center"
-           style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3)">
+  document.getElementById('app').innerHTML = `
+    <div class="card center-card">
+      <div class="big-icon" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3)">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
           <polyline points="22 4 12 14.01 9 11.01"/>
         </svg>
       </div>
-      <h2 style="font-size:1.25rem;font-weight:700;color:#fff;margin-bottom:0.5rem">Password updated!</h2>
-      <p style="color:#9ca3af;font-size:0.875rem;margin-bottom:0.5rem">Your password has been changed successfully.</p>
-      <p style="color:#6b7280;font-size:0.875rem">You can now sign in with your new password.</p>
-    </div>`)
+      <div class="title">Password updated!</div>
+      <div class="desc">Your password has been changed successfully. You can now sign in with your new password.</div>
+    </div>`
 }
 
-// ── Form rendered ONCE — then only DOM patches, NO re-render ──
+// ── Form — rendered once, NO dynamic updates while typing ──────
 
 function showForm() {
-  showPage(`
-    <div class="rounded-2xl border border-gray-800 p-8" style="background:rgba(17,24,39,0.8)">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-        <div style="width:40px;height:40px;border-radius:12px;background:rgba(6,182,212,0.1);
-                    border:1px solid rgba(6,182,212,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+  document.getElementById('app').innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
         </div>
         <div>
-          <h2 style="font-size:1.125rem;font-weight:700;color:#fff;margin:0">Set new password</h2>
-          <p style="color:#6b7280;font-size:0.75rem;margin:2px 0 0">Secured by email confirmation</p>
+          <div class="card-title">Set new password</div>
+          <div class="card-sub">Secured by email confirmation</div>
         </div>
       </div>
 
-      <!-- New password -->
-      <div id="pw-wrap" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;
-                  border:1px solid rgba(55,65,81,0.6);background:rgba(17,24,39,0.8);margin-bottom:4px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" style="flex-shrink:0">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      <div class="field">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
         </svg>
-        <input id="pw-input" type="password" placeholder="New password" autocomplete="new-password"
-               style="flex:1;background:transparent;color:#fff;font-size:0.875rem;border:none" />
-        <button id="toggle-pw" type="button" style="color:#6b7280;border:none;background:none;cursor:pointer;display:flex;padding:0">
-          <svg id="eye-pw" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <input id="pw" type="password" placeholder="New password" autocomplete="new-password" />
+        <button class="toggle" id="tpw" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
           </svg>
         </button>
       </div>
 
-      <!-- Strength bar -->
-      <div id="strength-wrap" style="display:none;margin-top:8px">
-        <div style="display:flex;gap:4px">
-          <div id="bar1" style="height:4px;flex:1;border-radius:9999px;background:#374151;transition:background 0.3s"></div>
-          <div id="bar2" style="height:4px;flex:1;border-radius:9999px;background:#374151;transition:background 0.3s"></div>
-          <div id="bar3" style="height:4px;flex:1;border-radius:9999px;background:#374151;transition:background 0.3s"></div>
-          <div id="bar4" style="height:4px;flex:1;border-radius:9999px;background:#374151;transition:background 0.3s"></div>
-          <div id="bar5" style="height:4px;flex:1;border-radius:9999px;background:#374151;transition:background 0.3s"></div>
-        </div>
-        <p id="strength-label" style="text-align:right;font-size:0.75rem;margin-top:2px"></p>
-      </div>
-
-      <!-- Confirm password -->
-      <div id="cf-wrap" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;
-                  border:1px solid rgba(55,65,81,0.6);background:rgba(17,24,39,0.8);margin-top:12px;margin-bottom:12px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" style="flex-shrink:0">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      <div class="field">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
         </svg>
-        <input id="cf-input" type="password" placeholder="Confirm new password" autocomplete="new-password"
-               style="flex:1;background:transparent;color:#fff;font-size:0.875rem;border:none" />
-        <button id="toggle-cf" type="button" style="color:#6b7280;border:none;background:none;cursor:pointer;display:flex;padding:0">
-          <svg id="eye-cf" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <input id="cf" type="password" placeholder="Confirm new password" autocomplete="new-password" />
+        <button class="toggle" id="tcf" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
           </svg>
         </button>
       </div>
 
-      <!-- Requirements -->
-      <ul style="list-style:none;padding:0;margin:0 0 16px 4px;display:flex;flex-direction:column;gap:4px">
-        <li style="display:flex;align-items:center;gap:8px;font-size:0.75rem">
-          <span id="req-len"   style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:#4b5563;transition:background 0.2s"></span>
-          <span style="color:#6b7280">At least 8 characters</span>
-        </li>
-        <li style="display:flex;align-items:center;gap:8px;font-size:0.75rem">
-          <span id="req-upper" style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:#4b5563;transition:background 0.2s"></span>
-          <span style="color:#6b7280">One uppercase letter</span>
-        </li>
-        <li style="display:flex;align-items:center;gap:8px;font-size:0.75rem">
-          <span id="req-num"   style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:#4b5563;transition:background 0.2s"></span>
-          <span style="color:#6b7280">One number</span>
-        </li>
-        <li style="display:flex;align-items:center;gap:8px;font-size:0.75rem">
-          <span id="req-spec"  style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:#4b5563;transition:background 0.2s"></span>
-          <span style="color:#6b7280">One special character</span>
-        </li>
-      </ul>
-
-      <!-- Submit -->
-      <button id="submit-btn" type="button"
-              style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
-                     padding:14px;border-radius:12px;border:none;cursor:pointer;
-                     background:linear-gradient(135deg,#0891b2,#2563eb);color:#fff;
-                     font-weight:600;font-size:0.875rem;
-                     box-shadow:0 4px 20px rgba(6,182,212,0.2)">
+      <button class="btn" id="sbtn" type="button">
         <span>Update Password</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
           <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
         </svg>
       </button>
 
-      <!-- Error -->
-      <div id="error-box" style="display:none;align-items:flex-start;gap:10px;margin-top:8px;
-                                  padding:12px 16px;border-radius:12px;
-                                  background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);
-                                  color:#f87171;font-size:0.875rem">
+      <div class="error" id="err">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" style="flex-shrink:0;margin-top:2px">
           <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
-        <span id="error-text"></span>
+        <span id="err-txt"></span>
       </div>
-    </div>`)
+    </div>`
 
-  // Events bound ONCE after form is in DOM
-  document.getElementById('pw-input').addEventListener('input', e => {
-    password = e.target.value
-    updateStrength()
-    updateRequirements()
-    hideError()
-  })
-
-  document.getElementById('cf-input').addEventListener('input', e => {
-    confirm = e.target.value
-    hideError()
-  })
-
-  document.getElementById('toggle-pw').addEventListener('click', () => {
-    const inp = document.getElementById('pw-input')
-    const txt = inp.type === 'text'
-    inp.type = txt ? 'password' : 'text'
-    document.getElementById('eye-pw').innerHTML = txt
-      ? `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`
-      : `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-         <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-         <line x1="1" y1="1" x2="23" y2="23"/>`
-  })
-
-  document.getElementById('toggle-cf').addEventListener('click', () => {
-    const inp = document.getElementById('cf-input')
-    const txt = inp.type === 'text'
-    inp.type = txt ? 'password' : 'text'
-    document.getElementById('eye-cf').innerHTML = txt
-      ? `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`
-      : `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-         <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-         <line x1="1" y1="1" x2="23" y2="23"/>`
-  })
-
-  document.getElementById('submit-btn').addEventListener('click', handleSubmit)
-}
-
-// ── DOM patch helpers ──────────────────────────────────────────
-
-function updateStrength() {
-  const wrap = document.getElementById('strength-wrap')
-  if (!password) { wrap.style.display = 'none'; return }
-  wrap.style.display = 'block'
-  const { score, label, color } = strengthInfo(password)
-  for (let i = 1; i <= 5; i++) {
-    document.getElementById(`bar${i}`).style.background = i <= score ? color : '#374151'
+  // Toggle show/hide — does NOT affect input value or focus
+  document.getElementById('tpw').onclick = () => {
+    const i = document.getElementById('pw')
+    i.type = i.type === 'text' ? 'password' : 'text'
   }
-  const lc = score <= 1 ? '#f87171' : score <= 2 ? '#fbbf24' : score <= 3 ? '#facc15' : '#4ade80'
-  const sl = document.getElementById('strength-label')
-  sl.textContent = label
-  sl.style.color = lc
-}
+  document.getElementById('tcf').onclick = () => {
+    const i = document.getElementById('cf')
+    i.type = i.type === 'text' ? 'password' : 'text'
+  }
 
-function updateRequirements() {
-  const dot = (id, ok) => document.getElementById(id).style.background = ok ? '#4ade80' : '#4b5563'
-  dot('req-len',   password.length >= 8)
-  dot('req-upper', /[A-Z]/.test(password))
-  dot('req-num',   /[0-9]/.test(password))
-  dot('req-spec',  /[^A-Za-z0-9]/.test(password))
+  document.getElementById('sbtn').onclick = handleSubmit
 }
 
 function showError(msg) {
-  const box = document.getElementById('error-box')
-  box.style.display = 'flex'
-  document.getElementById('error-text').textContent = msg
+  const e = document.getElementById('err')
+  e.style.display = 'flex'
+  document.getElementById('err-txt').textContent = msg
 }
-
-function hideError() {
-  const box = document.getElementById('error-box')
-  if (box) box.style.display = 'none'
-}
-
-function setLoading(on) {
-  const btn = document.getElementById('submit-btn')
-  btn.disabled = on
-  btn.style.opacity = on ? '0.5' : '1'
-  btn.style.cursor  = on ? 'not-allowed' : 'pointer'
-  btn.innerHTML = on
-    ? `<svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
-         <path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg><span>Saving...</span>`
-    : `<span>Update Password</span>
-       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
-         <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`
-}
-
-// ── Submit ─────────────────────────────────────────────────────
 
 async function handleSubmit() {
-  hideError()
-  if (password.length < 8)      { showError('Password must be at least 8 characters'); return }
-  if (password !== confirm)      { showError('Passwords do not match'); return }
-  const { score } = strengthInfo(password)
-  if (score < 2)                 { showError('Password is too weak. Use uppercase, numbers or symbols.'); return }
+  const pw = document.getElementById('pw').value
+  const cf = document.getElementById('cf').value
+  const err = document.getElementById('err')
+  err.style.display = 'none'
 
-  setLoading(true)
+  if (pw.length < 8)  { showError('Password must be at least 8 characters'); return }
+  if (pw !== cf)       { showError('Passwords do not match'); return }
+
+  const btn = document.getElementById('sbtn')
+  btn.disabled = true
+  btn.innerHTML = `
+    <svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+      <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+    </svg><span>Saving...</span>`
+
   try {
     const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      method:  'PUT',
+      method: 'PUT',
       headers: sbHeaders(accessToken),
-      body:    JSON.stringify({ password }),
+      body: JSON.stringify({ password: pw }),
     })
     if (!res.ok) {
       const j = await res.json().catch(() => ({}))
-      showError(j.message ?? 'Failed to update password')
-      setLoading(false)
+      showError(j.message || 'Failed to update password')
+      btn.disabled = false
+      btn.innerHTML = `<span>Update Password</span>`
       return
     }
     showDone()
   } catch {
     showError('Network error. Please try again.')
-    setLoading(false)
+    btn.disabled = false
+    btn.innerHTML = `<span>Update Password</span>`
   }
 }
 
 // ── Init ───────────────────────────────────────────────────────
 
 ;(async () => {
-  const hash    = window.location.hash.substring(1)
-  const params  = new URLSearchParams(hash)
-  const type    = params.get('type')
-  const token   = params.get('access_token')
-  const refresh = params.get('refresh_token')
+  const p     = new URLSearchParams(window.location.hash.substring(1))
+  const type  = p.get('type')
+  const token = p.get('access_token')
+  const ref   = p.get('refresh_token')
 
   if (!token || type !== 'recovery') { showInvalid(); return }
-
   showParsing()
 
   try {
     const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
-      method:  'POST',
+      method: 'POST',
       headers: sbHeaders(),
-      body:    JSON.stringify({ refresh_token: refresh }),
+      body: JSON.stringify({ refresh_token: ref }),
     })
     if (!res.ok) { showExpired(); return }
-
     const data = await res.json()
-    accessToken = data.access_token ?? token
+    accessToken = data.access_token || token
     window.history.replaceState(null, '', window.location.pathname)
     showForm()
   } catch {
