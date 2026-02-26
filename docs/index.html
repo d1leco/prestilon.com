@@ -1,837 +1,1199 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="PRESTILON — AI-Powered 3D Printer Fleet Management. Monitor, predict, optimize." />
-  <title>PRESTILON — AI Printer Intelligence</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="PRESTILON — Military-grade AI intelligence for 3D printer fleets. Kalman filtering, CUSUM anomaly detection, failure prediction. Runs locally on Windows."/>
+<title>PRESTILON — AI Fleet Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#04040c;--ink2:#080816;--ink3:#0d0d20;
+  --c:#00e5ff;--c2:#0099cc;--c3:rgba(0,229,255,.12);
+  --g:#7c3aed;--a:#f59e0b;--r:#ef4444;--gr:#10b981;
+  --t:#dde4f0;--t2:#7a87a0;--t3:#363d52;
+  --border:rgba(0,229,255,.07);--border2:rgba(0,229,255,.2);
+  --glow:0 0 60px rgba(0,229,255,.12);
+}
+html{background:var(--ink);scroll-behavior:smooth;font-size:16px}
+body{font-family:'Space Grotesk',sans-serif;color:var(--t);overflow-x:hidden;min-height:100vh}
 
-    :root {
-      --bg:        #070710;
-      --bg2:       #0d0d1a;
-      --bg3:       #111122;
-      --border:    rgba(0,220,255,0.08);
-      --border2:   rgba(0,220,255,0.18);
-      --cyan:      #00dcff;
-      --cyan2:     #00aacc;
-      --blue:      #2563eb;
-      --purple:    #7c3aed;
-      --green:     #10b981;
-      --red:       #ef4444;
-      --amber:     #f59e0b;
-      --text:      #e8eaf0;
-      --text2:     #8892a4;
-      --text3:     #4a5568;
-      --glow:      rgba(0,220,255,0.15);
-    }
+/* ─── CANVAS BG ─── */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
 
-    html { background: var(--bg); scroll-behavior: smooth; }
-    body { font-family: 'Syne', sans-serif; color: var(--text); min-height: 100vh; overflow-x: hidden; }
-    body::before {
-      content: '';
-      position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(0,100,180,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(0,220,255,0.06) 0%, transparent 55%),
-        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(124,58,237,0.04) 0%, transparent 60%);
-    }
+/* ─── NOISE ─── */
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat:repeat;background-size:128px;opacity:.4;
+}
 
-    /* ── GRID OVERLAY ── */
-    body::after {
-      content: '';
-      position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background-image:
-        linear-gradient(rgba(0,220,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,220,255,0.025) 1px, transparent 1px);
-      background-size: 60px 60px;
-    }
+/* ─── LAYOUT ─── */
+.z1{position:relative;z-index:1}
 
-    /* ── PAGES ── */
-    .page { display: none; position: relative; z-index: 1; min-height: 100vh; }
-    .page.active { display: block; }
+/* ─── NAV ─── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;height:68px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 max(2rem, calc(50vw - 580px));
+  background:rgba(4,4,12,.8);backdrop-filter:blur(24px) saturate(180%);
+  border-bottom:1px solid var(--border);
+  transition:background .3s;
+}
+.logo{display:flex;align-items:center;gap:.75rem;cursor:pointer;text-decoration:none}
+.logo-mark{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--c),var(--c2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron',monospace;font-size:.75rem;font-weight:900;color:#000;
+  box-shadow:0 0 20px rgba(0,229,255,.3);
+  position:relative;overflow:hidden;
+}
+.logo-mark::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2),transparent)}
+.logo-text{font-family:'Orbitron',monospace;font-weight:800;font-size:1rem;letter-spacing:.12em;color:var(--c);text-shadow:0 0 20px rgba(0,229,255,.35)}
+.logo-sub{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--t3);letter-spacing:.08em}
+.nav-right{display:flex;align-items:center;gap:.5rem}
+.nbtn{
+  padding:.45rem 1.1rem;border-radius:8px;border:none;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.82rem;
+  transition:all .2s;text-decoration:none;display:inline-block;
+}
+.nbtn-ghost{background:transparent;color:var(--t2)}
+.nbtn-ghost:hover{color:var(--t);background:rgba(255,255,255,.04)}
+.nbtn-outline{background:transparent;color:var(--c);border:1px solid var(--border2)}
+.nbtn-outline:hover{background:rgba(0,229,255,.06);box-shadow:0 0 20px rgba(0,229,255,.15)}
+.nbtn-cta{
+  background:var(--c);color:#000;font-weight:800;
+  box-shadow:0 0 20px rgba(0,229,255,.3);
+  padding:.5rem 1.3rem;
+}
+.nbtn-cta:hover{box-shadow:0 0 35px rgba(0,229,255,.5);transform:translateY(-1px)}
 
-    /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2rem; height: 64px;
-      background: rgba(7,7,16,0.85);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo {
-      font-family: 'Orbitron', monospace; font-weight: 800; font-size: 1.2rem;
-      color: var(--cyan); letter-spacing: 0.15em; cursor: pointer;
-      text-shadow: 0 0 20px rgba(0,220,255,0.4);
-    }
-    .nav-logo span { color: var(--text2); font-weight: 400; font-size: 0.75rem; letter-spacing: 0.1em; display: block; }
-    .nav-links { display: flex; align-items: center; gap: 0.5rem; }
-    .nav-btn {
-      padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.85rem;
-      font-family: 'Syne', sans-serif; font-weight: 600; cursor: pointer;
-      transition: all 0.2s; border: none; text-decoration: none;
-    }
-    .nav-btn-ghost { background: transparent; color: var(--text2); }
-    .nav-btn-ghost:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-    .nav-btn-primary {
-      background: linear-gradient(135deg, var(--cyan), var(--blue));
-      color: #000; font-weight: 700;
-      box-shadow: 0 0 20px rgba(0,220,255,0.25);
-    }
-    .nav-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 25px rgba(0,220,255,0.4); }
+/* ─── PAGES ─── */
+.page{display:none}.page.active{display:block}
 
-    /* ── HERO ── */
-    .hero {
-      padding: 140px 2rem 80px;
-      max-width: 1100px; margin: 0 auto;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
-    }
-    @media(max-width:768px) { .hero { grid-template-columns: 1fr; padding: 120px 1.5rem 60px; } }
+/* ═══════════════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════════════ */
+.hero-section{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:100px max(1.5rem, calc(50vw - 600px)) 80px;
+  text-align:center;position:relative;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:.6rem;
+  padding:.35rem 1rem .35rem .6rem;border-radius:99px;
+  background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.18);
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.06em;
+  color:var(--c);margin-bottom:2rem;
+  animation:fadeSlide .8s ease both;
+}
+.hero-eyebrow-dot{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c);animation:pulseGlow 2s infinite}
+@keyframes pulseGlow{0%,100%{opacity:1;box-shadow:0 0 8px var(--c)}50%{opacity:.5;box-shadow:0 0 4px var(--c)}}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.35rem 0.9rem; border-radius: 999px;
-      border: 1px solid rgba(0,220,255,0.3);
-      background: rgba(0,220,255,0.05);
-      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
-      color: var(--cyan); letter-spacing: 0.05em; margin-bottom: 1.5rem;
-    }
-    .hero-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.hero-h1{
+  font-family:'Orbitron',monospace;font-weight:900;
+  font-size:clamp(2.4rem,7vw,5.5rem);line-height:1.0;letter-spacing:-.02em;
+  margin-bottom:1.5rem;animation:fadeSlide .8s ease .1s both;
+}
+.hero-h1 em{
+  font-style:normal;
+  background:linear-gradient(90deg,var(--c),#a78bfa,var(--c));
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 4s linear infinite;
+}
+@keyframes shimmer{to{background-position:200% center}}
 
-    .hero h1 {
-      font-family: 'Orbitron', monospace; font-weight: 900;
-      font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.05;
-      margin-bottom: 1.2rem;
-    }
-    .hero h1 .accent { color: var(--cyan); text-shadow: 0 0 30px rgba(0,220,255,0.5); }
-    .hero p { color: var(--text2); font-size: 1.05rem; line-height: 1.7; margin-bottom: 2rem; }
+.hero-sub{
+  max-width:620px;margin:0 auto 2.5rem;
+  color:var(--t2);font-size:1.1rem;line-height:1.75;
+  animation:fadeSlide .8s ease .2s both;
+}
+.hero-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:4rem;animation:fadeSlide .8s ease .3s both}
 
-    .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
-    .btn-xl {
-      padding: 0.85rem 2rem; border-radius: 12px; font-size: 0.95rem;
-      font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer;
-      transition: all 0.25s; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--cyan), #0088cc);
-      color: #000; box-shadow: 0 0 30px rgba(0,220,255,0.3);
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 35px rgba(0,220,255,0.45); }
-    .btn-outline {
-      background: transparent; color: var(--text);
-      border: 1px solid var(--border2);
-    }
-    .btn-outline:hover { background: rgba(255,255,255,0.04); border-color: rgba(0,220,255,0.4); }
+.btn{
+  padding:.8rem 2rem;border-radius:12px;border:none;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;
+  transition:all .25s;display:inline-flex;align-items:center;gap:.5rem;text-decoration:none;
+}
+.btn-primary{background:var(--c);color:#000;box-shadow:0 0 30px rgba(0,229,255,.35)}
+.btn-primary:hover{box-shadow:0 0 50px rgba(0,229,255,.55);transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--t);border:1px solid rgba(255,255,255,.1)}
+.btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(0,229,255,.3)}
 
-    /* ── STATS ── */
-    .hero-stats {
-      display: grid; grid-template-columns: repeat(3,1fr); gap: 1px;
-      background: var(--border); border-radius: 16px; overflow: hidden;
-      border: 1px solid var(--border); margin-top: 2.5rem;
-    }
-    .stat { background: var(--bg2); padding: 1.2rem; text-align: center; }
-    .stat-val { font-family: 'Orbitron', monospace; font-size: 1.6rem; font-weight: 800; color: var(--cyan); }
-    .stat-lbl { font-size: 0.7rem; color: var(--text3); letter-spacing: 0.05em; margin-top: 0.2rem; }
+/* ─── TRUST METRICS ─── */
+.trust-row{
+  display:flex;align-items:center;justify-content:center;gap:0;
+  background:rgba(255,255,255,.02);border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;margin-bottom:4rem;
+  animation:fadeSlide .8s ease .4s both;width:100%;max-width:700px;
+}
+.trust-item{flex:1;padding:1.25rem .75rem;text-align:center;position:relative}
+.trust-item+.trust-item::before{content:'';position:absolute;left:0;top:15%;bottom:15%;width:1px;background:var(--border)}
+.trust-val{font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:800;color:var(--c);line-height:1}
+.trust-lbl{font-size:.65rem;color:var(--t3);letter-spacing:.08em;margin-top:.3rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase}
 
-    /* ── DASHBOARD PREVIEW ── */
-    .hero-visual {
-      position: relative;
-    }
-    .dashboard-mock {
-      background: var(--bg2); border: 1px solid var(--border2);
-      border-radius: 16px; overflow: hidden;
-      box-shadow: 0 0 60px rgba(0,220,255,0.08), 0 40px 80px rgba(0,0,0,0.5);
-    }
-    .mock-bar {
-      background: var(--bg3); padding: 0.7rem 1rem;
-      display: flex; align-items: center; gap: 0.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .mock-title { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--text3); margin-left: auto; }
-    .mock-body { padding: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-    .mock-card {
-      background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem;
-    }
-    .mock-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--text3); margin-bottom: 0.4rem; }
-    .mock-val { font-family: 'Orbitron', monospace; font-size: 1.1rem; font-weight: 700; }
-    .mock-val.cyan { color: var(--cyan); }
-    .mock-val.green { color: var(--green); }
-    .mock-val.amber { color: var(--amber); }
-    .mock-bar-chart { display: flex; align-items: flex-end; gap: 3px; height: 36px; margin-top: 0.5rem; }
-    .mock-bar-item { flex: 1; background: rgba(0,220,255,0.2); border-radius: 2px; transition: height 1s ease; }
-    .mock-bar-item:nth-child(odd) { background: rgba(0,220,255,0.35); }
-    .health-ring {
-      width: 60px; height: 60px; margin: 0 auto;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      background: conic-gradient(var(--cyan) 310deg, rgba(0,220,255,0.1) 0deg);
-      font-family: 'Orbitron', monospace; font-size: 0.75rem; font-weight: 800; color: var(--cyan);
-      position: relative;
-    }
-    .health-ring::before {
-      content: ''; position: absolute; inset: 6px; border-radius: 50%; background: var(--bg3);
-    }
-    .health-ring span { position: relative; z-index: 1; }
+/* ─── DASHBOARD PREVIEW ─── */
+.preview-wrap{
+  width:100%;max-width:960px;margin:0 auto;
+  border-radius:20px;overflow:hidden;
+  border:1px solid var(--border2);
+  box-shadow:0 0 80px rgba(0,229,255,.08),0 60px 120px rgba(0,0,0,.6);
+  animation:fadeSlide .8s ease .5s both;
+}
+.preview-chrome{
+  background:var(--ink2);padding:.6rem 1rem;
+  display:flex;align-items:center;gap:.6rem;
+  border-bottom:1px solid var(--border);
+}
+.chrome-dot{width:11px;height:11px;border-radius:50%}
+.chrome-bar{
+  flex:1;background:rgba(255,255,255,.04);border-radius:6px;
+  padding:.3rem .8rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--t3);
+  display:flex;align-items:center;gap:.5rem;max-width:320px;margin:0 auto;
+}
+.chrome-lock{color:var(--gr);font-size:.7rem}
+.preview-body{background:var(--ink2);display:grid;grid-template-columns:180px 1fr;min-height:340px}
+.preview-sidebar{border-right:1px solid var(--border);padding:1rem .75rem;display:flex;flex-direction:column;gap:.5rem}
+.preview-sidebar-item{
+  padding:.5rem .75rem;border-radius:8px;font-size:.72rem;
+  display:flex;align-items:center;gap:.5rem;color:var(--t2);cursor:default;
+}
+.preview-sidebar-item.active{background:rgba(0,229,255,.1);color:var(--c)}
+.preview-sidebar-item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.preview-main{padding:1rem;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto;gap:.75rem}
+.pcard{
+  background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:1rem;
+}
+.pcard-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem}
+.pcard-val{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:800}
+.pcard.span2{grid-column:span 2}
+.mini-bars{display:flex;align-items:flex-end;gap:3px;height:32px;margin-top:.5rem}
+.mini-bar{flex:1;border-radius:2px;background:rgba(0,229,255,.15);transition:height 1s}
+.mini-bar.hi{background:rgba(0,229,255,.45)}
+.health-gauge{
+  width:56px;height:56px;border-radius:50%;margin:.25rem auto 0;
+  background:conic-gradient(var(--c) calc(var(--pct,87) * 3.6deg),rgba(0,229,255,.08) 0);
+  display:flex;align-items:center;justify-content:center;position:relative;
+}
+.health-gauge::before{content:'';position:absolute;inset:7px;border-radius:50%;background:var(--ink3)}
+.health-gauge span{position:relative;font-family:'Orbitron',monospace;font-size:.72rem;font-weight:800;color:var(--c)}
+.anomaly-list{display:flex;flex-direction:column;gap:.35rem;margin-top:.4rem}
+.anomaly-item{
+  display:flex;align-items:center;gap:.4rem;
+  font-size:.62rem;color:var(--t2);font-family:'JetBrains Mono',monospace;
+}
+.anomaly-item .sev{padding:.1rem .4rem;border-radius:4px;font-weight:700;font-size:.55rem;text-transform:uppercase}
+.sev-med{background:rgba(245,158,11,.15);color:var(--a)}
+.sev-low{background:rgba(59,130,246,.12);color:#60a5fa}
+.risk-bar-wrap{margin-top:.4rem}
+.risk-bar-track{height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-top:.3rem}
+.risk-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gr),var(--a))}
 
-    /* ── FEATURES ── */
-    .section { padding: 80px 2rem; max-width: 1100px; margin: 0 auto; }
-    .section-label {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em;
-      color: var(--cyan); margin-bottom: 0.75rem; text-transform: uppercase;
-    }
-    .section-title {
-      font-family: 'Orbitron', monospace; font-size: clamp(1.5rem, 3vw, 2.2rem);
-      font-weight: 800; margin-bottom: 1rem; line-height: 1.2;
-    }
-    .section-sub { color: var(--text2); font-size: 1rem; line-height: 1.7; max-width: 540px; }
+/* ═══════════════════════════════════════════════════════
+   SECTIONS
+═══════════════════════════════════════════════════════ */
+.section{padding:100px max(1.5rem, calc(50vw - 600px));position:relative;z-index:1}
+.section+.section::before{
+  content:'';display:block;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border2),transparent);
+  position:absolute;top:0;left:0;right:0;
+}
+.s-eyebrow{
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;
+  letter-spacing:.15em;color:var(--c);text-transform:uppercase;margin-bottom:.75rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.s-eyebrow::before{content:'//';opacity:.5}
+.s-h2{font-family:'Orbitron',monospace;font-weight:800;font-size:clamp(1.6rem,3.5vw,2.6rem);line-height:1.15;margin-bottom:1rem}
+.s-sub{color:var(--t2);font-size:1rem;line-height:1.75;max-width:560px}
 
-    .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
-    @media(max-width:900px) { .features-grid { grid-template-columns: 1fr 1fr; } }
-    @media(max-width:580px) { .features-grid { grid-template-columns: 1fr; } }
+/* ─── FEATURE GRID ─── */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3.5rem}
+@media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:580px){.feat-grid{grid-template-columns:1fr}}
+.feat{
+  background:var(--ink2);border:1px solid var(--border);border-radius:18px;
+  padding:1.75rem;position:relative;overflow:hidden;
+  transition:border-color .3s,transform .3s;
+}
+.feat::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--c),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.feat:hover{border-color:rgba(0,229,255,.25);transform:translateY(-4px)}
+.feat:hover::before{opacity:1}
+.feat-num{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--t3);
+  margin-bottom:1rem;letter-spacing:.1em;
+}
+.feat-icon{
+  width:48px;height:48px;border-radius:14px;margin-bottom:1.1rem;
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+}
+.feat h3{font-size:1rem;font-weight:700;margin-bottom:.5rem}
+.feat p{font-size:.83rem;color:var(--t2);line-height:1.7}
+.feat-tag{
+  display:inline-block;margin-top:.75rem;padding:.2rem .6rem;border-radius:6px;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:600;letter-spacing:.04em;
+}
 
-    .feature-card {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 16px; padding: 1.75rem;
-      transition: all 0.3s; position: relative; overflow: hidden;
-    }
-    .feature-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-      opacity: 0; transition: opacity 0.3s;
-    }
-    .feature-card:hover { border-color: var(--border2); transform: translateY(-3px); background: var(--bg3); }
-    .feature-card:hover::before { opacity: 1; }
-    .feature-icon {
-      width: 44px; height: 44px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; margin-bottom: 1rem;
-    }
-    .feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .feature-card p { font-size: 0.85rem; color: var(--text2); line-height: 1.65; }
+/* ─── TECH DEEP DIVE ─── */
+.tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem;align-items:start}
+@media(max-width:780px){.tech-grid{grid-template-columns:1fr}}
+.tech-panel{background:var(--ink2);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.tech-panel-header{
+  padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:.75rem;
+}
+.tech-panel-header h3{font-size:.95rem;font-weight:700}
+.tech-panel-body{padding:1.5rem}
+.code-block{
+  background:var(--ink);border:1px solid var(--border);border-radius:12px;
+  padding:1rem 1.25rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;
+  line-height:1.8;color:var(--t2);overflow-x:auto;margin-bottom:1rem;
+}
+.code-block .kw{color:var(--c)}.code-block .cm{color:var(--t3);font-style:italic}
+.code-block .nm{color:#a78bfa}.code-block .vl{color:var(--a)}
+.tech-list{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+.tech-list li{
+  display:flex;align-items:flex-start;gap:.6rem;font-size:.83rem;color:var(--t2);line-height:1.6;
+}
+.tech-list li::before{content:'→';color:var(--c);font-family:'JetBrains Mono',monospace;font-size:.75rem;flex-shrink:0;margin-top:.15rem}
 
-    /* ── PRICING ── */
-    .pricing-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.25rem; margin-top: 3rem; }
-    @media(max-width:1000px) { .pricing-grid { grid-template-columns: 1fr 1fr; } }
-    @media(max-width:580px) { .pricing-grid { grid-template-columns: 1fr; } }
+/* ─── DIAGNOSTICS SHOWCASE ─── */
+.diag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2.5rem}
+@media(max-width:780px){.diag-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.diag-grid{grid-template-columns:1fr}}
+.diag-card{
+  background:var(--ink2);border:1px solid var(--border);border-radius:14px;
+  padding:1.25rem;transition:all .3s;
+}
+.diag-card:hover{border-color:var(--border2);background:var(--ink3)}
+.diag-icon-wrap{
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;font-size:1.1rem;
+}
+.diag-card h4{font-size:.85rem;font-weight:700;margin-bottom:.3rem}
+.diag-card p{font-size:.75rem;color:var(--t2);line-height:1.6}
+.diag-duration{
+  margin-top:.65rem;padding:.25rem .6rem;background:rgba(0,229,255,.06);
+  border:1px solid rgba(0,229,255,.15);border-radius:6px;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--c);
+  display:inline-block;
+}
 
-    .plan-card {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 18px; padding: 1.75rem; display: flex; flex-direction: column;
-      position: relative; transition: all 0.3s; overflow: hidden;
-    }
-    .plan-card.featured {
-      border-color: rgba(0,220,255,0.4);
-      box-shadow: 0 0 40px rgba(0,220,255,0.08);
-    }
-    .plan-card:hover { transform: translateY(-4px); border-color: var(--border2); }
-    .plan-badge {
-      position: absolute; top: -1px; right: 1.25rem;
-      padding: 0.3rem 0.8rem; border-radius: 0 0 10px 10px;
-      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em;
-    }
-    .plan-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
-    .plan-name { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
-    .plan-price { font-family: 'Orbitron', monospace; font-size: 1.9rem; font-weight: 900; margin: 0.75rem 0 0.25rem; }
-    .plan-price span { font-size: 0.9rem; font-weight: 400; color: var(--text2); }
-    .plan-vat { font-size: 0.7rem; color: var(--text3); margin-bottom: 1rem; }
-    .plan-features { list-style: none; flex: 1; margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
-    .plan-features li {
-      font-size: 0.8rem; color: var(--text2); display: flex; align-items: flex-start; gap: 0.5rem;
-    }
-    .plan-features li::before { content: '✓'; color: var(--cyan); font-weight: 700; flex-shrink: 0; font-size: 0.75rem; margin-top: 0.05rem; }
-    .plan-btn {
-      width: 100%; padding: 0.75rem; border-radius: 10px; border: none;
-      font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .plan-btn-primary {
-      background: linear-gradient(135deg, var(--cyan), #0088cc);
-      color: #000; box-shadow: 0 0 20px rgba(0,220,255,0.25);
-    }
-    .plan-btn-primary:hover { box-shadow: 0 0 30px rgba(0,220,255,0.4); transform: translateY(-1px); }
-    .plan-btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border2); }
-    .plan-btn-outline:hover { background: rgba(255,255,255,0.04); }
+/* ─── PRICING ─── */
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-top:3rem}
+@media(max-width:1000px){.pricing-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.pricing-grid{grid-template-columns:1fr}}
+.plan{
+  background:var(--ink2);border:1px solid var(--border);border-radius:20px;
+  padding:1.75rem;display:flex;flex-direction:column;position:relative;overflow:hidden;
+  transition:transform .3s,box-shadow .3s;
+}
+.plan:hover{transform:translateY(-5px)}
+.plan.hot{border-color:rgba(0,229,255,.4);box-shadow:0 0 50px rgba(0,229,255,.08)}
+.plan.hot::after{
+  content:'';position:absolute;inset:0;border-radius:20px;
+  background:linear-gradient(135deg,rgba(0,229,255,.03),transparent 60%);pointer-events:none;
+}
+.plan-ribbon{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  padding:.3rem 1.2rem;border-radius:0 0 10px 10px;
+  font-size:.62rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+}
+.plan-emoji{font-size:1.6rem;margin-bottom:.5rem}
+.plan-name{font-family:'Orbitron',monospace;font-weight:800;font-size:.95rem;margin-bottom:.25rem}
+.plan-tagline{font-size:.75rem;color:var(--t2);margin-bottom:1.25rem}
+.plan-price{font-family:'Orbitron',monospace;font-weight:900;font-size:2rem;line-height:1}
+.plan-price sub{font-size:.85rem;font-weight:400;color:var(--t2);vertical-align:baseline}
+.plan-vat{font-size:.68rem;color:var(--t3);margin-bottom:1.25rem;font-family:'JetBrains Mono',monospace}
+.plan-sep{height:1px;background:var(--border);margin:1rem 0}
+.plan-feats{list-style:none;flex:1;display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem}
+.plan-feats li{font-size:.78rem;color:var(--t2);display:flex;align-items:flex-start;gap:.5rem;line-height:1.5}
+.plan-feats li::before{content:'✓';color:var(--gr);font-weight:800;flex-shrink:0;font-size:.72rem;margin-top:.1rem}
+.plan-feats li.dim{color:var(--t3)}.plan-feats li.dim::before{content:'—';color:var(--t3);font-weight:400}
+.plan-btn{
+  width:100%;padding:.8rem;border-radius:12px;border:none;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.88rem;
+  transition:all .25s;
+}
+.plan-btn-primary{background:var(--c);color:#000;box-shadow:0 0 20px rgba(0,229,255,.25)}
+.plan-btn-primary:hover{box-shadow:0 0 35px rgba(0,229,255,.45);transform:translateY(-1px)}
+.plan-btn-outline{background:transparent;color:var(--t);border:1px solid var(--border2)}
+.plan-btn-outline:hover{background:rgba(255,255,255,.04)}
 
-    /* ── AUTH PAGES ── */
-    .auth-wrapper {
-      min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      padding: 80px 1.5rem 2rem;
-    }
-    .auth-card {
-      width: 100%; max-width: 420px;
-      background: var(--bg2); border: 1px solid var(--border2);
-      border-radius: 24px; padding: 2.5rem;
-      box-shadow: 0 0 60px rgba(0,220,255,0.06), 0 40px 80px rgba(0,0,0,0.5);
-    }
-    .auth-logo {
-      font-family: 'Orbitron', monospace; font-weight: 800; font-size: 1.4rem;
-      color: var(--cyan); text-align: center; margin-bottom: 0.3rem;
-      text-shadow: 0 0 20px rgba(0,220,255,0.4);
-    }
-    .auth-subtitle { text-align: center; color: var(--text2); font-size: 0.85rem; margin-bottom: 2rem; }
-    .auth-tabs { display: flex; background: var(--bg3); border-radius: 10px; padding: 4px; margin-bottom: 1.75rem; }
-    .auth-tab {
-      flex: 1; padding: 0.55rem; border-radius: 8px; border: none;
-      font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 600;
-      cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text3);
-    }
-    .auth-tab.active { background: var(--bg2); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+/* ─── CALCULATOR ─── */
+.calc-box{
+  background:var(--ink2);border:1px solid var(--border);border-radius:20px;
+  padding:2rem;margin-top:2rem;
+}
+.calc-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.calc-label{font-size:.88rem;color:var(--t2);font-weight:500}
+.calc-counter{display:flex;align-items:center;gap:.75rem}
+.calc-btn{
+  width:34px;height:34px;border-radius:8px;border:1px solid var(--border2);
+  background:transparent;color:var(--t);font-size:1.2rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.calc-btn:hover{background:rgba(0,229,255,.08);border-color:var(--c)}
+.calc-num{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:800;color:var(--c);min-width:40px;text-align:center}
+input[type=range]{
+  -webkit-appearance:none;width:100%;height:4px;border-radius:2px;
+  background:rgba(255,255,255,.08);outline:none;cursor:pointer;margin-bottom:1.5rem;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--c);box-shadow:0 0 12px rgba(0,229,255,.4);cursor:pointer;
+}
+.calc-result{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;
+}
+@media(max-width:640px){.calc-result{grid-template-columns:1fr 1fr}}
+.calc-plan{
+  background:var(--ink3);border:1px solid var(--border);border-radius:12px;
+  padding:1rem;text-align:center;transition:all .3s;
+}
+.calc-plan.best{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.04)}
+.calc-plan-name{font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;margin-bottom:.35rem}
+.calc-plan-price{font-family:'Orbitron',monospace;font-size:1rem;font-weight:800}
+.calc-plan-sub{font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:.15rem}
+.best-badge{
+  display:block;margin-top:.4rem;font-size:.58rem;font-weight:700;
+  color:var(--a);text-transform:uppercase;letter-spacing:.06em;
+}
 
-    .form-group { margin-bottom: 1rem; }
-    .form-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text2); margin-bottom: 0.45rem; letter-spacing: 0.02em; }
-    .form-input {
-      width: 100%; padding: 0.75rem 1rem; border-radius: 10px;
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--text); font-family: 'Syne', sans-serif; font-size: 0.9rem;
-      transition: all 0.2s; outline: none;
-    }
-    .form-input:focus { border-color: rgba(0,220,255,0.4); box-shadow: 0 0 0 3px rgba(0,220,255,0.08); }
-    .form-input::placeholder { color: var(--text3); }
+/* ─── ARCH / HOW ─── */
+.arch-flow{
+  display:flex;align-items:center;justify-content:center;gap:0;
+  flex-wrap:wrap;margin-top:3rem;
+}
+.arch-node{
+  background:var(--ink2);border:1px solid var(--border);border-radius:16px;
+  padding:1.5rem 1.25rem;text-align:center;min-width:150px;
+}
+.arch-node-icon{font-size:1.8rem;margin-bottom:.5rem}
+.arch-node-title{font-size:.82rem;font-weight:700;margin-bottom:.25rem}
+.arch-node-sub{font-size:.68rem;color:var(--t2)}
+.arch-arrow{
+  font-family:'JetBrains Mono',monospace;font-size:1rem;color:var(--t3);
+  padding:0 .75rem;flex-shrink:0;
+}
+@media(max-width:700px){.arch-flow{flex-direction:column}.arch-arrow{transform:rotate(90deg)}}
 
-    .form-submit {
-      width: 100%; padding: 0.85rem; border-radius: 12px; border: none;
-      background: linear-gradient(135deg, var(--cyan), #0088cc);
-      color: #000; font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 800;
-      cursor: pointer; transition: all 0.25s; margin-top: 0.5rem;
-      box-shadow: 0 0 25px rgba(0,220,255,0.25);
-    }
-    .form-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 30px rgba(0,220,255,0.4); }
-    .form-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+/* ─── CTA BANNER ─── */
+.cta-banner{
+  background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(124,58,237,.06));
+  border:1px solid var(--border2);border-radius:24px;
+  padding:4rem 2rem;text-align:center;position:relative;overflow:hidden;
+}
+.cta-banner::before{
+  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:500px;height:200px;
+  background:radial-gradient(ellipse,rgba(0,229,255,.08),transparent 70%);
+}
+.cta-banner h2{font-family:'Orbitron',monospace;font-size:clamp(1.5rem,3.5vw,2.4rem);font-weight:800;margin-bottom:.75rem}
+.cta-banner p{color:var(--t2);margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto}
 
-    .auth-divider { text-align: center; position: relative; margin: 1.25rem 0; }
-    .auth-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border); }
-    .auth-divider span { position: relative; background: var(--bg2); padding: 0 0.75rem; font-size: 0.75rem; color: var(--text3); }
+/* ─── FOOTER ─── */
+footer{
+  border-top:1px solid var(--border);
+  padding:3rem max(1.5rem, calc(50vw - 600px));
+  display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;
+}
+@media(max-width:640px){footer{grid-template-columns:1fr}}
+.footer-copy{font-size:.75rem;color:var(--t3);margin-top:.5rem}
+.footer-links{display:flex;gap:1.5rem;flex-wrap:wrap}
+.footer-links a{color:var(--t3);text-decoration:none;font-size:.78rem;transition:color .2s}
+.footer-links a:hover{color:var(--t2)}
 
-    .auth-link { color: var(--cyan); text-decoration: none; font-weight: 600; font-size: 0.85rem; }
-    .auth-link:hover { text-decoration: underline; }
+/* ═══════════════════════════════════════════════════════
+   AUTH PAGE
+═══════════════════════════════════════════════════════ */
+.auth-bg{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:90px 1.5rem 3rem;
+}
+.auth-card{
+  width:100%;max-width:440px;
+  background:var(--ink2);border:1px solid var(--border2);
+  border-radius:24px;padding:2.75rem;
+  box-shadow:0 0 80px rgba(0,229,255,.06),0 50px 100px rgba(0,0,0,.5);
+}
+.auth-logo-wrap{text-align:center;margin-bottom:.25rem}
+.auth-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1.3rem;color:var(--c);letter-spacing:.12em;text-shadow:0 0 20px rgba(0,229,255,.4)}
+.auth-meta{text-align:center;color:var(--t2);font-size:.82rem;margin-bottom:2rem}
+.auth-tabs{
+  display:flex;background:var(--ink);border-radius:12px;padding:4px;
+  margin-bottom:1.75rem;border:1px solid var(--border);
+}
+.at{
+  flex:1;padding:.55rem;border-radius:9px;border:none;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-size:.84rem;font-weight:600;
+  transition:all .2s;background:transparent;color:var(--t3);
+}
+.at.on{background:var(--ink2);color:var(--t);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.fg{margin-bottom:1rem}
+.fl{display:block;font-size:.75rem;font-weight:600;color:var(--t2);margin-bottom:.4rem;letter-spacing:.02em}
+.fi{
+  width:100%;padding:.75rem 1rem;border-radius:10px;
+  background:var(--ink);border:1px solid var(--border);
+  color:var(--t);font-family:'Space Grotesk',sans-serif;font-size:.9rem;
+  transition:all .2s;outline:none;
+}
+.fi:focus{border-color:rgba(0,229,255,.4);box-shadow:0 0 0 3px rgba(0,229,255,.07)}
+.fi::placeholder{color:var(--t3)}
+.fs{
+  width:100%;padding:.85rem;border-radius:12px;border:none;
+  background:var(--c);color:#000;
+  font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:800;
+  cursor:pointer;transition:all .25s;margin-top:.5rem;
+  box-shadow:0 0 25px rgba(0,229,255,.25);
+}
+.fs:hover{box-shadow:0 0 40px rgba(0,229,255,.45);transform:translateY(-1px)}
+.fs:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.adiv{text-align:center;position:relative;margin:1.25rem 0}
+.adiv::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)}
+.adiv span{position:relative;background:var(--ink2);padding:0 .75rem;font-size:.72rem;color:var(--t3)}
+.alink{color:var(--c);text-decoration:none;font-weight:600;font-size:.84rem}
+.alink:hover{text-decoration:underline}
+.alert-box{padding:.75rem 1rem;border-radius:10px;font-size:.8rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:.5rem;line-height:1.5}
+.ae{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.as{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7}
+.ai{background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.22);color:var(--c)}
+.tab-pnl{display:none}.tab-pnl.on{display:block}
+.spin{width:16px;height:16px;border:2px solid rgba(0,0,0,.2);border-top-color:#000;border-radius:50%;animation:_s .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:.35rem}
+@keyframes _s{to{transform:rotate(360deg)}}
 
-    .alert {
-      padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.82rem;
-      margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.5rem;
-    }
-    .alert-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
-    .alert-success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
-    .alert-info { background: rgba(0,220,255,0.08); border: 1px solid rgba(0,220,255,0.25); color: var(--cyan); }
+/* ═══════════════════════════════════════════════════════
+   ACCOUNT PAGE
+═══════════════════════════════════════════════════════ */
+.acct-wrap{max-width:960px;margin:0 auto;padding:88px max(1.5rem,calc(50vw - 480px)) 4rem}
+.acct-h1{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:800;margin-bottom:.3rem}
+.acct-sub{color:var(--t2);font-size:.88rem;margin-bottom:2.5rem}
+.acct-grid{display:grid;grid-template-columns:240px 1fr;gap:1.5rem;align-items:start}
+@media(max-width:720px){.acct-grid{grid-template-columns:1fr}}
+.acct-sidebar{
+  background:var(--ink2);border:1px solid var(--border);border-radius:18px;
+  padding:1.5rem 1.1rem;position:sticky;top:80px;
+}
+.av{
+  width:60px;height:60px;border-radius:50%;margin:0 auto .75rem;
+  background:linear-gradient(135deg,var(--c),var(--c2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:#000;
+}
+.an{text-align:center;font-weight:700;font-size:.92rem;margin-bottom:.15rem}
+.ae2{text-align:center;font-size:.72rem;color:var(--t2);margin-bottom:1.5rem}
+.snav{display:flex;flex-direction:column;gap:.2rem}
+.snav-btn{
+  padding:.55rem .85rem;border-radius:9px;border:none;background:transparent;
+  color:var(--t2);font-family:'Space Grotesk',sans-serif;font-size:.83rem;font-weight:600;
+  cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.5rem;
+}
+.snav-btn:hover{background:rgba(255,255,255,.04);color:var(--t)}
+.snav-btn.on{background:rgba(0,229,255,.08);color:var(--c)}
+.logout{
+  width:100%;margin-top:1.25rem;padding:.65rem;border-radius:10px;
+  background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);
+  color:#fca5a5;font-family:'Space Grotesk',sans-serif;font-size:.82rem;font-weight:600;
+  cursor:pointer;transition:all .2s;
+}
+.logout:hover{background:rgba(239,68,68,.12)}
+.acct-content{display:flex;flex-direction:column;gap:1.25rem}
+.acct-sec{background:var(--ink2);border:1px solid var(--border);border-radius:18px;padding:1.75rem}
+.acct-sec-title{font-size:.92rem;font-weight:700;margin-bottom:1.25rem;display:flex;align-items:center;gap:.4rem}
+.sub-hero{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+  padding:1.25rem;background:var(--ink);border:1px solid var(--border);border-radius:12px;
+}
+.sbadge{padding:.3rem .75rem;border-radius:99px;font-size:.7rem;font-weight:700;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
+.sba{background:rgba(16,185,129,.12);color:var(--gr);border:1px solid rgba(16,185,129,.3)}
+.sbi{background:rgba(239,68,68,.12);color:var(--r);border:1px solid rgba(239,68,68,.3)}
+.sbt{background:rgba(0,229,255,.1);color:var(--c);border:1px solid rgba(0,229,255,.3)}
+.sub-stats{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem}
+.sub-stat{background:var(--ink);border:1px solid var(--border);border-radius:10px;padding:.85rem;text-align:center}
+.sub-stat-val{font-family:'Orbitron',monospace;font-size:1.15rem;font-weight:800;color:var(--c)}
+.sub-stat-lbl{font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-top:.15rem}
 
-    /* ── ACCOUNT PAGE ── */
-    .account-wrapper { max-width: 900px; margin: 0 auto; padding: 100px 2rem 4rem; }
-    .account-header { margin-bottom: 2.5rem; }
-    .account-header h1 { font-family: 'Orbitron', monospace; font-size: 1.5rem; font-weight: 800; color: var(--text); }
-    .account-header p { color: var(--text2); font-size: 0.9rem; margin-top: 0.35rem; }
-
-    .account-grid { display: grid; grid-template-columns: 260px 1fr; gap: 1.5rem; align-items: start; }
-    @media(max-width:700px) { .account-grid { grid-template-columns: 1fr; } }
-
-    .account-sidebar {
-      background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; position: sticky; top: 80px;
-    }
-    .account-avatar {
-      width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 0.75rem;
-      background: linear-gradient(135deg, var(--cyan), var(--blue));
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Orbitron', monospace; font-size: 1.4rem; font-weight: 800; color: #000;
-    }
-    .account-name { text-align: center; font-weight: 700; font-size: 0.95rem; }
-    .account-email { text-align: center; font-size: 0.75rem; color: var(--text2); margin-bottom: 1.25rem; }
-    .sidebar-nav { display: flex; flex-direction: column; gap: 0.25rem; }
-    .sidebar-nav-btn {
-      padding: 0.6rem 0.9rem; border-radius: 8px; border: none;
-      background: transparent; color: var(--text2); font-family: 'Syne', sans-serif;
-      font-size: 0.85rem; font-weight: 600; cursor: pointer; text-align: left;
-      transition: all 0.15s; display: flex; align-items: center; gap: 0.6rem;
-    }
-    .sidebar-nav-btn:hover { background: rgba(255,255,255,0.04); color: var(--text); }
-    .sidebar-nav-btn.active { background: rgba(0,220,255,0.08); color: var(--cyan); }
-    .sidebar-nav-btn .icon { font-size: 0.95rem; width: 18px; text-align: center; }
-
-    .account-content { display: flex; flex-direction: column; gap: 1.25rem; }
-    .account-section {
-      background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem;
-    }
-    .account-section-title {
-      font-size: 0.95rem; font-weight: 700; margin-bottom: 1.25rem;
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .sub-status-card {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.25rem; background: var(--bg3); border-radius: 12px;
-      border: 1px solid var(--border); flex-wrap: wrap; gap: 1rem;
-    }
-    .status-badge {
-      padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700;
-    }
-    .status-active { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
-    .status-inactive { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
-    .status-trial { background: rgba(0,220,255,0.1); color: var(--cyan); border: 1px solid rgba(0,220,255,0.3); }
-    .logout-btn {
-      width: 100%; margin-top: 1rem; padding: 0.65rem; border-radius: 10px;
-      background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
-      color: #fca5a5; font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 600;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .logout-btn:hover { background: rgba(239,68,68,0.15); }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border); padding: 2.5rem 2rem;
-      max-width: 1100px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
-    }
-    .footer-logo { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 800; color: var(--cyan); }
-    .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
-    .footer-links a { color: var(--text3); text-decoration: none; font-size: 0.8rem; transition: color 0.2s; }
-    .footer-links a:hover { color: var(--text2); }
-    .footer-copy { font-size: 0.75rem; color: var(--text3); }
-
-    /* ── SPINNER ── */
-    .spinner { width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── SCROLL REVEAL ── */
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
-    .reveal.visible { opacity: 1; transform: none; }
-
-    /* ── DOWNLOAD SECTION ── */
-    .download-section {
-      background: linear-gradient(135deg, rgba(0,220,255,0.05), rgba(37,99,235,0.05));
-      border: 1px solid var(--border2); border-radius: 24px;
-      padding: 3rem 2rem; text-align: center; margin: 0 2rem 4rem;
-      max-width: 1100px; margin: 0 auto 4rem; position: relative; overflow: hidden;
-    }
-    .download-section::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(0,220,255,0.06), transparent);
-    }
-    .download-section h2 { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.75rem; }
-    .download-section p { color: var(--text2); margin-bottom: 2rem; }
-
-    /* ── HIDDEN ── */
-    .hidden { display: none !important; }
-
-    /* ── TAB PANELS ── */
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-  </style>
+/* ─── UTILITY ─── */
+.mt1{margin-top:.5rem}.mt2{margin-top:1rem}.mt3{margin-top:1.5rem}.mt4{margin-top:2rem}
+.hidden{display:none!important}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.vis{opacity:1;transform:none}
+.chip{display:inline-block;padding:.2rem .6rem;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:600}
+</style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════ NAV ══════════════════════════════════ -->
-<nav>
-  <div class="nav-logo" onclick="showPage('home')">
-    PRESTILON
-    <span>AI PRINTER INTELLIGENCE</span>
-  </div>
-  <div class="nav-links" id="navLinks">
-    <button class="nav-btn nav-btn-ghost" onclick="showPage('home')">Home</button>
-    <button class="nav-btn nav-btn-ghost" onclick="scrollToPricing()">Pricing</button>
-    <button class="nav-btn nav-btn-ghost" id="navAccountBtn" onclick="showPage('account')" style="display:none">Account</button>
-    <button class="nav-btn nav-btn-ghost" id="navLoginBtn" onclick="showPage('auth')">Sign In</button>
-    <button class="nav-btn nav-btn-primary" id="navSignupBtn" onclick="showPage('auth'); switchTab('register')">Get Started</button>
+<canvas id="bg-canvas"></canvas>
+
+<!-- ═══ NAV ═══ -->
+<nav class="z1">
+  <a class="logo" onclick="showPage('home')">
+    <div class="logo-mark">P</div>
+    <div>
+      <div class="logo-text">PRESTILON</div>
+      <div class="logo-sub">AI FLEET INTELLIGENCE</div>
+    </div>
+  </a>
+  <div class="nav-right">
+    <button class="nbtn nbtn-ghost" onclick="scrollTo('features')">Features</button>
+    <button class="nbtn nbtn-ghost" onclick="scrollTo('pricing')">Pricing</button>
+    <button class="nbtn nbtn-outline" id="navAcct" onclick="showPage('account')" style="display:none">Account</button>
+    <button class="nbtn nbtn-ghost" id="navLogin" onclick="showPage('auth')">Sign In</button>
+    <button class="nbtn nbtn-cta" id="navStart" onclick="showPage('auth');switchTab('register')">Get Started</button>
   </div>
 </nav>
 
-<!-- ══════════════════════════════ HOME PAGE ══════════════════════════════ -->
-<div id="page-home" class="page active">
+<!-- ═══════════════ HOME ═══════════════ -->
+<div id="page-home" class="page active z1">
 
-  <!-- HERO -->
-  <section style="padding-top:0">
-    <div class="hero">
-      <div>
-        <div class="hero-badge">AI-POWERED · REAL-TIME · PREDICTIVE</div>
-        <h1>Your 3D Printers.<br>Under <span class="accent">AI Control.</span></h1>
-        <p>PRESTILON runs locally on your Windows PC and gives your entire printer fleet intelligent monitoring, anomaly detection, and predictive maintenance — powered by Kalman filters and CUSUM analytics.</p>
-        <div class="hero-cta">
-          <button class="btn-xl btn-primary" onclick="showPage('auth'); switchTab('register')">
-            ⚡ Start Free Trial
-          </button>
-          <button class="btn-xl btn-outline" onclick="scrollToPricing()">
-            View Plans →
-          </button>
+<!-- HERO -->
+<section class="hero-section z1">
+  <div class="hero-eyebrow">
+    <span class="hero-eyebrow-dot"></span>
+    RUNS LOCALLY · ZERO CLOUD LATENCY · FULL AI STACK
+  </div>
+  <h1 class="hero-h1">Your 3D Printer Fleet.<br>Under <em>Military-Grade AI.</em></h1>
+  <p class="hero-sub">PRESTILON deploys a full signal-processing AI stack directly on your Windows machine — Kalman filters, CUSUM anomaly detection, wear models, failure prediction — all running at localhost with millisecond response times.</p>
+  <div class="hero-actions">
+    <button class="btn btn-primary" onclick="showPage('auth');switchTab('register')">⚡ Start Free Trial</button>
+    <button class="btn btn-ghost" onclick="scrollTo('features')">See How It Works</button>
+  </div>
+
+  <div class="trust-row">
+    <div class="trust-item">
+      <div class="trust-val" id="tv1">0</div>
+      <div class="trust-lbl">Max Printers</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-val">&lt;1ms</div>
+      <div class="trust-lbl">Local Latency</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-val" id="tv2">0</div>
+      <div class="trust-lbl">Diagnostic Tests</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-val" id="tv3">0</div>
+      <div class="trust-lbl">AI Autonomy Levels</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-val">24h</div>
+      <div class="trust-lbl">Offline Grace</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD PREVIEW -->
+  <div class="preview-wrap">
+    <div class="preview-chrome">
+      <div class="chrome-dot" style="background:#ef4444"></div>
+      <div class="chrome-dot" style="background:#f59e0b"></div>
+      <div class="chrome-dot" style="background:#10b981"></div>
+      <div class="chrome-bar">
+        <span class="chrome-lock">🔒</span>
+        localhost:3002 — PRESTILON Dashboard
+      </div>
+    </div>
+    <div class="preview-body">
+      <div class="preview-sidebar">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--t3);letter-spacing:.1em;padding:.3rem .5rem;margin-bottom:.25rem">FLEET · 4 PRINTERS</div>
+        <div class="preview-sidebar-item active"><span class="dot" style="background:var(--gr)"></span>Ender-5 Pro</div>
+        <div class="preview-sidebar-item"><span class="dot" style="background:#3b82f6"></span>Bambu X1-C</div>
+        <div class="preview-sidebar-item"><span class="dot" style="background:var(--a)"></span>CR-10 Max</div>
+        <div class="preview-sidebar-item"><span class="dot" style="background:var(--t3)"></span>Prusa MK4</div>
+        <div style="height:1px;background:var(--border);margin:.5rem 0"></div>
+        <div class="preview-sidebar-item" style="color:var(--c);font-size:.65rem">⚡ AI Engine ON</div>
+        <div class="preview-sidebar-item" style="font-size:.65rem">🧠 L2 Automatic</div>
+      </div>
+      <div class="preview-main">
+        <div class="pcard">
+          <div class="pcard-label">Hotend Temp</div>
+          <div class="pcard-val" style="color:var(--c)" id="pvTemp">215.3°C</div>
+          <div class="mini-bars" id="pvBars"></div>
         </div>
-        <div class="hero-stats">
-          <div class="stat">
-            <div class="stat-val">50</div>
-            <div class="stat-lbl">Max Printers</div>
-          </div>
-          <div class="stat">
-            <div class="stat-val">&lt;1ms</div>
-            <div class="stat-lbl">Local Latency</div>
-          </div>
-          <div class="stat">
-            <div class="stat-val">AI</div>
-            <div class="stat-lbl">Health Score</div>
+        <div class="pcard">
+          <div class="pcard-label">Health Score</div>
+          <div class="health-gauge" style="--pct:87"><span id="pvHealth">87</span></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-label">Print Status</div>
+          <div class="pcard-val" style="color:var(--gr)">ACTIVE</div>
+          <div style="font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:.25rem">72% · <span id="pvEta">1h 23m</span> left</div>
+        </div>
+        <div class="pcard span2">
+          <div class="pcard-label">AI Anomaly Detection — Live</div>
+          <div class="anomaly-list">
+            <div class="anomaly-item"><span class="sev sev-med">MEDIUM</span>Belt wear signature on X-axis — CUSUM Δ 3.2σ</div>
+            <div class="anomaly-item"><span class="sev sev-low">LOW</span>Hotend temperature variance +0.8°C — Kalman residual</div>
           </div>
         </div>
-      </div>
-
-      <div class="hero-visual">
-        <div class="dashboard-mock">
-          <div class="mock-bar">
-            <div class="mock-dot" style="background:#ef4444"></div>
-            <div class="mock-dot" style="background:#f59e0b"></div>
-            <div class="mock-dot" style="background:#10b981"></div>
-            <div class="mock-title">PRESTILON Dashboard — localhost:3002</div>
-          </div>
-          <div class="mock-body">
-            <div class="mock-card">
-              <div class="mock-label">HOTEND TEMP</div>
-              <div class="mock-val cyan">215.3°C</div>
-              <div class="mock-bar-chart" id="barChart1"></div>
+        <div class="pcard">
+          <div class="pcard-label">Failure Risk</div>
+          <div class="risk-bar-wrap">
+            <div style="display:flex;justify-content:space-between;font-size:.65rem">
+              <span style="color:var(--t2)">Overall</span>
+              <span style="color:var(--gr);font-family:'Orbitron',monospace;font-weight:700">12%</span>
             </div>
-            <div class="mock-card">
-              <div class="mock-label">HEALTH SCORE</div>
-              <div class="health-ring"><span id="healthVal">87</span></div>
-            </div>
-            <div class="mock-card">
-              <div class="mock-label">PRINT STATUS</div>
-              <div class="mock-val green">ACTIVE</div>
-              <div style="font-size:0.65rem;color:var(--text3);margin-top:0.25rem;font-family:'JetBrains Mono',monospace">72% complete</div>
-            </div>
-            <div class="mock-card">
-              <div class="mock-label">AI ANOMALIES</div>
-              <div class="mock-val amber">2</div>
-              <div style="font-size:0.65rem;color:var(--text3);margin-top:0.25rem;font-family:'JetBrains Mono',monospace">belt wear · clog risk</div>
-            </div>
+            <div class="risk-bar-track"><div class="risk-bar-fill" style="width:12%"></div></div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FEATURES -->
-  <section class="section reveal" id="features">
-    <div class="section-label">// CAPABILITIES</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start">
-      <div>
-        <div class="section-title">Everything your fleet needs. Running locally.</div>
+<!-- FEATURES -->
+<section class="section reveal" id="features">
+  <div class="s-eyebrow">CAPABILITIES</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:end;margin-bottom:.5rem">
+    <div>
+      <h2 class="s-h2">Not a wrapper.<br>A full AI engine.</h2>
+    </div>
+    <div>
+      <p class="s-sub">Every subsystem — from signal filtering to wear prediction — is custom-built and runs entirely on your hardware. No third-party AI APIs. No data leaving your network.</p>
+    </div>
+  </div>
+  <div class="feat-grid">
+    <div class="feat">
+      <div class="feat-num">01 — SIGNAL PROCESSING</div>
+      <div class="feat-icon" style="background:rgba(0,229,255,.1)">📡</div>
+      <h3>Kalman Filter Engine</h3>
+      <p>Per-sensor Kalman filters continuously estimate true state from noisy measurements. Hotend temp, bed temp, strain gauges, motor loads — all filtered in real-time with tunable Q/R noise coefficients per subscription tier.</p>
+      <span class="feat-tag chip" style="background:rgba(0,229,255,.1);color:var(--c)">kalman · Q/R tuning · per-sensor</span>
+    </div>
+    <div class="feat">
+      <div class="feat-num">02 — CHANGE DETECTION</div>
+      <div class="feat-icon" style="background:rgba(124,58,237,.1)">🔬</div>
+      <h3>CUSUM Anomaly Detection</h3>
+      <p>CUSUM (Cumulative Sum) control charts detect statistically significant shifts in process mean — catching belt wear, clog onset, and thermal runaway risk at the earliest possible moment, before symptoms are visible.</p>
+      <span class="feat-tag chip" style="background:rgba(124,58,237,.1);color:#a78bfa">cusum · 5 sensor streams · σ thresholds</span>
+    </div>
+    <div class="feat">
+      <div class="feat-num">03 — HEALTH SCORING</div>
+      <div class="feat-icon" style="background:rgba(16,185,129,.1)">💚</div>
+      <h3>AI Health Score Orchestrator</h3>
+      <p>A multi-factor health score (0–100) synthesizes anomaly severity, diagnostic test results, wear model coefficients, and maintenance history through a weighted orchestration pipeline with plan-specific AI constants.</p>
+      <span class="feat-tag chip" style="background:rgba(16,185,129,.1);color:var(--gr)">0–100 · orchestrated · tier-specific</span>
+    </div>
+    <div class="feat">
+      <div class="feat-num">04 — FAILURE PREDICTION</div>
+      <div class="feat-icon" style="background:rgba(245,158,11,.1)">⚠️</div>
+      <h3>Multi-Modal Failure Prediction</h3>
+      <p>Separate prediction models for thermal runaway, belt degradation, clog probability, bed adhesion failure, and extruder wear. Each model outputs risk level (minimal → critical), probability %, and estimated time to failure.</p>
+      <span class="feat-tag chip" style="background:rgba(245,158,11,.1);color:var(--a)">shouldPause · shouldAbort · ETA</span>
+    </div>
+    <div class="feat">
+      <div class="feat-num">05 — AI AUTONOMY</div>
+      <div class="feat-icon" style="background:rgba(239,68,68,.1)">🤖</div>
+      <h3>3-Level AI Autonomy</h3>
+      <p><strong>L0 Passive</strong> — observe only. <strong>L1 Recommend</strong> — surfaces prioritized actions. <strong>L2 Automatic</strong> — executes safe corrective GCode without human approval. Configurable per printer.</p>
+      <span class="feat-tag chip" style="background:rgba(239,68,68,.1);color:var(--r)">L0 · L1 · L2 · per-printer override</span>
+    </div>
+    <div class="feat">
+      <div class="feat-num">06 — REAL-TIME DATA</div>
+      <div class="feat-icon" style="background:rgba(37,99,235,.1)">⚡</div>
+      <h3>WebSocket Telemetry Pipeline</h3>
+      <p>Persistent WebSocket connections to Moonraker/Klipper deliver live telemetry: temperatures, progress, position, fan speeds, filament sensor state — all streamed to a React dashboard with &lt;50ms round-trip.</p>
+      <span class="feat-tag chip" style="background:rgba(37,99,235,.1);color:#60a5fa">websocket · moonraker · &lt;50ms</span>
+    </div>
+    <div class="feat">
+      <div class="feat-num">07 — DIAGNOSTIC SUITE</div>
+      <div class="feat-icon" style="background:rgba(245,158,11,.08)">🧪</div>
+      <h3>6-Test Hardware Diagnostics</h3>
+      <p>Full hardware diagnostic suite executes real GCode on the printer: printer status check, extrusion flow, movement & axes, temperature stability, retraction pressure, and full system diagnostic with automated scoring against industry baselines.</p>
+      <span class="feat-tag chip" style="background:rgba(245,158,11,.08);color:var(--a)">6 tests · GCode execution · baseline</span>
+    </div>
+    <div class="feat">
+      <div class="feat-num">08 — FLEET MANAGEMENT</div>
+      <div class="feat-icon" style="background:rgba(0,229,255,.08)">🖨️</div>
+      <h3>50-Printer Fleet Control</h3>
+      <p>Manage up to 50 printers from a single dashboard. Individual AI pipelines, independent telemetry histories, per-printer maintenance logs, HWID hardware binding — with Supabase-backed subscription enforcement.</p>
+      <span class="feat-tag chip" style="background:rgba(0,229,255,.08);color:var(--c)">50 printers · HWID binding · RLS</span>
+    </div>
+    <div class="feat">
+      <div class="feat-num">09 — MAINTENANCE AI</div>
+      <div class="feat-icon" style="background:rgba(16,185,129,.08)">🔧</div>
+      <h3>Predictive Maintenance Scheduling</h3>
+      <p>Tracks print hours, maintenance events, and component wear vectors. Predicts next maintenance window for nozzle replacement, belt re-tension, lubrication, and bed leveling with urgency scoring and ETA estimates.</p>
+      <span class="feat-tag chip" style="background:rgba(16,185,129,.08);color:var(--gr)">wear models · ETA · urgency levels</span>
+    </div>
+  </div>
+</section>
+
+<!-- TECH DEEP DIVE -->
+<section class="section reveal">
+  <div class="s-eyebrow">TECHNICAL DEPTH</div>
+  <h2 class="s-h2">Built for engineers.<br>Not just makers.</h2>
+  <p class="s-sub">Every algorithm is transparent, configurable, and documented. You're not using a black box — you're running a real signal-processing stack.</p>
+
+  <div class="tech-grid">
+    <div class="tech-panel">
+      <div class="tech-panel-header">
+        <span style="font-size:1.1rem">📡</span>
+        <h3>Kalman Filter — Per Sensor</h3>
       </div>
-      <div>
-        <p class="section-sub">PRESTILON installs on your Windows machine and connects directly to your printers via Moonraker/Klipper. No cloud latency. No data leaving your network. Full AI analytics, locally.</p>
+      <div class="tech-panel-body">
+        <div class="code-block"><span class="cm">// Real implementation — kalman.ts</span>
+<span class="kw">interface</span> <span class="nm">KalmanState</span> {
+  x: <span class="kw">number</span>  <span class="cm">// estimated state</span>
+  P: <span class="kw">number</span>  <span class="cm">// error covariance</span>
+}
+
+<span class="cm">// Pro plan overrides (tuned per sensor)</span>
+hotend_temp: { q: <span class="vl">0.008</span>, r: <span class="vl">0.4</span> }
+bed_temp:    { q: <span class="vl">0.004</span>, r: <span class="vl">0.25</span> }
+sg_result_x: { q: <span class="vl">0.02</span>,  r: <span class="vl">1.0</span> }</div>
+        <ul class="tech-list">
+          <li>Separate K,P state per sensor stream per printer</li>
+          <li>Q/R noise ratios configurable via plan-tier AI constants</li>
+          <li>Residual (innovation) fed directly into CUSUM detectors</li>
+          <li>Enterprise tier ships tighter thresholds for higher sensitivity</li>
+        </ul>
       </div>
     </div>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon" style="background:rgba(0,220,255,0.1)">🧠</div>
-        <h3>Kalman + CUSUM AI</h3>
-        <p>Advanced signal filtering and change detection algorithms watch every temperature curve and motion pattern for early anomaly signals.</p>
+
+    <div class="tech-panel">
+      <div class="tech-panel-header">
+        <span style="font-size:1.1rem">📊</span>
+        <h3>CUSUM — 5 Detection Streams</h3>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:rgba(16,185,129,0.1)">📊</div>
-        <h3>Health Scoring</h3>
-        <p>Each printer gets a continuous 0–100 health score based on diagnostics, wear models, and historical patterns. Know before it fails.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:rgba(245,158,11,0.1)">⚡</div>
-        <h3>Real-time WebSocket</h3>
-        <p>Live telemetry at millisecond precision. Temperature, progress, states — all streamed directly from Klipper to your dashboard.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:rgba(124,58,237,0.1)">🔮</div>
-        <h3>Failure Prediction</h3>
-        <p>Wear models and trend analysis predict nozzle clogs, belt degradation, and thermal issues before they cause a failed print.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:rgba(37,99,235,0.1)">🖨️</div>
-        <h3>Multi-Printer Fleet</h3>
-        <p>Manage up to 50 printers from one dashboard. Each with its own AI pipeline, telemetry history, and maintenance log.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:rgba(0,220,255,0.08)">🔒</div>
-        <h3>Local First</h3>
-        <p>Your printer data never leaves your machine. Only subscription validation uses the internet. Full privacy, full control.</p>
+      <div class="tech-panel-body">
+        <div class="code-block"><span class="cm">// CUSUM control chart — cusum.ts</span>
+<span class="kw">const</span> streams = {
+  thermalRunaway: { H: <span class="vl">3.5</span>, k: <span class="vl">0.25</span> },
+  beltWear:       { H: <span class="vl">4.0</span>, k: <span class="vl">0.4</span>  },
+  clogRisk:       { H: <span class="vl">3.0</span>, k: <span class="vl">0.25</span> },
+  bedStability:   { H: <span class="vl">4.0</span>, k: <span class="vl">0.4</span>  },
+}
+<span class="cm">// H = decision threshold, k = reference value</span></div>
+        <ul class="tech-list">
+          <li>One-sided CUSUM for upward and downward shifts</li>
+          <li>Severity classification: low → medium → high → critical</li>
+          <li>Auto-resolves when stream returns to baseline</li>
+          <li>Triggers AI recommendation with confidence score</li>
+        </ul>
       </div>
     </div>
-  </section>
 
-  <!-- PRICING -->
-  <section class="section reveal" id="pricing">
-    <div class="section-label">// PRICING</div>
-    <div class="section-title">Simple, honest pricing.</div>
-    <p class="section-sub">Choose the plan that fits your fleet. All plans include AI analytics, local installation, and Supabase-backed subscription management.</p>
-    <div class="pricing-grid">
-      <div class="plan-card">
-        <div class="plan-icon">⚡</div>
-        <div class="plan-name" style="color:var(--text2)">BASIC</div>
-        <div class="plan-price" style="color:var(--text)">€20 <span>/mo</span></div>
-        <div class="plan-vat">+ 21% VAT · €3/printer/mo</div>
-        <ul class="plan-features">
-          <li>Real-time printer status</li>
-          <li>Basic monitoring</li>
-          <li>Email notifications</li>
-          <li>30-day history</li>
-          <li>€3 per printer / month</li>
-        </ul>
-        <button class="plan-btn plan-btn-outline" onclick="showPage('auth');switchTab('register')">Get Started</button>
+    <div class="tech-panel">
+      <div class="tech-panel-header">
+        <span style="font-size:1.1rem">🎯</span>
+        <h3>Health Score Orchestrator</h3>
       </div>
-
-      <div class="plan-card featured">
-        <div class="plan-badge" style="background:var(--cyan);color:#000">Most Popular</div>
-        <div class="plan-icon">🚀</div>
-        <div class="plan-name" style="color:var(--cyan)">PRO</div>
-        <div class="plan-price" style="color:var(--cyan)">€50 <span>/mo</span></div>
-        <div class="plan-vat">+ 21% VAT · 15 printers included</div>
-        <ul class="plan-features">
-          <li>15 printers included</li>
-          <li>AI anomaly detection</li>
-          <li>Kalman / CUSUM analytics</li>
-          <li>Failure prediction</li>
-          <li>90-day history</li>
-          <li>Priority support</li>
+      <div class="tech-panel-body">
+        <div class="code-block"><span class="cm">// HealthScoreOrchestrator.ts</span>
+calculate({
+  anomalyResult,      <span class="cm">// CUSUM output</span>
+  maintenanceResult,  <span class="cm">// wear model output</span>
+  wearResult,         <span class="cm">// belt/nozzle/motor</span>
+  diagnosticBaseline, <span class="cm">// GCode test scores</span>
+  isConnected,
+}): { score: <span class="vl">0</span>-<span class="vl">100</span>, breakdown, appliedCap }</div>
+        <ul class="tech-list">
+          <li>DiagnosticBaselineBridge caps score until first test run</li>
+          <li>Weighted multi-factor synthesis, not a simple average</li>
+          <li>Scored against real-world industry fleet benchmark data</li>
         </ul>
-        <button class="plan-btn plan-btn-primary" onclick="showPage('auth');switchTab('register')">Choose Pro</button>
-      </div>
-
-      <div class="plan-card">
-        <div class="plan-badge" style="background:var(--purple);color:#fff">Save 29%</div>
-        <div class="plan-icon">👑</div>
-        <div class="plan-name" style="color:#c084fc">ULTRA</div>
-        <div class="plan-price" style="color:#c084fc">€280 <span>/ 6 mo</span></div>
-        <div class="plan-vat">VAT included · up to 50 printers</div>
-        <ul class="plan-features">
-          <li>Up to 50 printers</li>
-          <li>All Pro features</li>
-          <li>AI cloud constants</li>
-          <li>1-year history</li>
-          <li>Priority support</li>
-        </ul>
-        <button class="plan-btn plan-btn-outline" onclick="showPage('auth');switchTab('register')">Choose Ultra</button>
-      </div>
-
-      <div class="plan-card">
-        <div class="plan-badge" style="background:var(--amber);color:#000">Save 55%</div>
-        <div class="plan-icon">📅</div>
-        <div class="plan-name" style="color:var(--amber)">ANNUAL</div>
-        <div class="plan-price" style="color:var(--amber)">€540 <span>/ year</span></div>
-        <div class="plan-vat">VAT included · up to 50 printers</div>
-        <ul class="plan-features">
-          <li>Up to 50 printers</li>
-          <li>All Ultra features</li>
-          <li>Enterprise AI constants</li>
-          <li>Unlimited history</li>
-          <li>24/7 VIP support + SLA</li>
-        </ul>
-        <button class="plan-btn plan-btn-outline" onclick="showPage('auth');switchTab('register')">Choose Annual</button>
       </div>
     </div>
-  </section>
 
-  <!-- DOWNLOAD -->
-  <section style="padding: 0 2rem 80px; max-width:1100px; margin:0 auto;" class="reveal">
-    <div class="download-section">
-      <h2>Ready to get started?</h2>
-      <p>Download PRESTILON, create your account, and have your first printer connected in under 5 minutes.</p>
+    <div class="tech-panel">
+      <div class="tech-panel-header">
+        <span style="font-size:1.1rem">🔒</span>
+        <h3>Security Architecture</h3>
+      </div>
+      <div class="tech-panel-body">
+        <div class="code-block"><span class="cm">// Subscription enforcement chain</span>
+validateLicense()          <span class="cm">// Supabase auth + HWID</span>
+  → hardware_bindings      <span class="cm">// SHA-256(BIOS + MAC)</span>
+  → subscriptions.status   <span class="cm">// RLS enforced</span>
+  → AICore.start()         <span class="cm">// blocked if invalid</span>
+  → AuthGuard.preHandler() <span class="cm">// all /api/* routes</span></div>
+        <ul class="tech-list">
+          <li>HWID = SHA-256(BIOS UUID + MAC address)</li>
+          <li>24-hour offline grace period for network failures</li>
+          <li>Row Level Security — client can only read own subscription</li>
+          <li>Stripe webhook writes subscription server-side only</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIAGNOSTICS -->
+<section class="section reveal">
+  <div class="s-eyebrow">HARDWARE DIAGNOSTICS</div>
+  <h2 class="s-h2">6 tests. Real GCode.<br>Scored against a baseline.</h2>
+  <p class="s-sub">PRESTILON sends actual GCode to your printer and measures the response. Every test is compared to an industry baseline of healthy printers and assigned a 0–100 score.</p>
+
+  <div class="diag-grid">
+    <div class="diag-card">
+      <div class="diag-icon-wrap" style="background:rgba(0,229,255,.1)">🛡️</div>
+      <h4>Printer Status Check</h4>
+      <p>M115 firmware query + M105 sensor read. Non-invasive — no movement. Validates Klipper connection and sensor responsiveness.</p>
+      <span class="diag-duration">~5s · no movement</span>
+    </div>
+    <div class="diag-card">
+      <div class="diag-icon-wrap" style="background:rgba(59,130,246,.1)">⚡</div>
+      <h4>Extrusion Flow Test</h4>
+      <p>Homes all axes, raises Z to purge position, preheats to 200°C, extrudes 5mm + retracts. Measures flow consistency and pressure response.</p>
+      <span class="diag-duration">~60–90s · physical movement</span>
+    </div>
+    <div class="diag-card">
+      <div class="diag-icon-wrap" style="background:rgba(124,58,237,.1)">↔️</div>
+      <h4>Movement & Axes Test</h4>
+      <p>3× G28 X Y homing with belt tension analysis. Backlash measurement. Motor load scoring. Z axis deliberately untouched for safety.</p>
+      <span class="diag-duration">~40–60s · XY homing ×3</span>
+    </div>
+    <div class="diag-card">
+      <div class="diag-icon-wrap" style="background:rgba(245,158,11,.1)">🌡️</div>
+      <h4>Temperature Stability Test</h4>
+      <p>5-second continuous sampling of hotend and bed temperature variance. No GCode required — pure sensor analysis against stability thresholds.</p>
+      <span class="diag-duration">~7s · sensor only</span>
+    </div>
+    <div class="diag-card">
+      <div class="diag-icon-wrap" style="background:rgba(16,185,129,.1)">🎯</div>
+      <h4>Retraction & Pressure Test</h4>
+      <p>Auto-preheats if needed, primes 3mm filament, retracts, and measures pressure drop curve. Clog risk and pressure coefficient scoring.</p>
+      <span class="diag-duration">~7s (+preheat if cold)</span>
+    </div>
+    <div class="diag-card" style="border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.03)">
+      <div class="diag-icon-wrap" style="background:rgba(245,158,11,.12)">🏆</div>
+      <h4>Full System Diagnostic</h4>
+      <p>Runs all 5 tests sequentially. Produces a composite health score, percentile rank against the industry fleet, and a full diagnostic report.</p>
+      <span class="diag-duration">~50s idle · ~10s if busy</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section reveal">
+  <div class="s-eyebrow">ARCHITECTURE</div>
+  <h2 class="s-h2">Local backend.<br>Cloud auth. Zero compromise.</h2>
+  <p class="s-sub">The AI engine runs entirely on your Windows machine. Only subscription validation and account management use the internet. Your printer data never leaves your network.</p>
+
+  <div class="arch-flow">
+    <div class="arch-node">
+      <div class="arch-node-icon">🖨️</div>
+      <div class="arch-node-title">Klipper / Moonraker</div>
+      <div class="arch-node-sub">On your printer</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node" style="border-color:var(--border2)">
+      <div class="arch-node-icon">⚡</div>
+      <div class="arch-node-title">PRESTILON Backend</div>
+      <div class="arch-node-sub">localhost:3002 · Fastify</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node" style="border-color:var(--border2)">
+      <div class="arch-node-icon">🧠</div>
+      <div class="arch-node-title">AI Engine</div>
+      <div class="arch-node-sub">Kalman + CUSUM + Models</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node">
+      <div class="arch-node-icon">📊</div>
+      <div class="arch-node-title">React Dashboard</div>
+      <div class="arch-node-sub">localhost:3002 · WebSocket</div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:center;margin-top:2rem">
+    <div class="arch-node" style="min-width:auto;padding:.75rem 1.5rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;justify-content:center">
+      <div style="text-align:center">
+        <div style="font-size:1.2rem;margin-bottom:.2rem">☁️</div>
+        <div style="font-size:.72rem;font-weight:700">Supabase</div>
+        <div style="font-size:.62rem;color:var(--t3)">Auth + Subscription only</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:1.2rem;margin-bottom:.2rem">💳</div>
+        <div style="font-size:.72rem;font-weight:700">Stripe</div>
+        <div style="font-size:.62rem;color:var(--t3)">Payments + Webhooks</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:1.2rem;margin-bottom:.2rem">📧</div>
+        <div style="font-size:.72rem;font-weight:700">Resend</div>
+        <div style="font-size:.62rem;color:var(--t3)">Email notifications</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section reveal" id="pricing">
+  <div class="s-eyebrow">PRICING</div>
+  <h2 class="s-h2">Choose your fleet tier.</h2>
+  <p class="s-sub">All plans include the full local AI engine. Higher tiers unlock tighter AI constants, more printers, and extended analytics history.</p>
+
+  <div class="pricing-grid">
+    <div class="plan">
+      <div class="plan-emoji">⚡</div>
+      <div class="plan-name" style="color:var(--t2)">BASIC</div>
+      <div class="plan-tagline">Start monitoring today</div>
+      <div class="plan-price" style="color:var(--t)">€20<sub>/mo</sub></div>
+      <div class="plan-vat">+ 21% VAT · €3 per printer/mo</div>
+      <div class="plan-sep"></div>
+      <ul class="plan-feats">
+        <li>Real-time WebSocket dashboard</li>
+        <li>Basic AI anomaly detection</li>
+        <li>Email notifications</li>
+        <li>30-day telemetry history</li>
+        <li>€3 per printer / month</li>
+        <li class="dim">Advanced Kalman tuning</li>
+        <li class="dim">Failure prediction models</li>
+      </ul>
+      <button class="plan-btn plan-btn-outline" onclick="showPage('auth');switchTab('register')">Get Started</button>
+    </div>
+
+    <div class="plan hot">
+      <div class="plan-ribbon" style="background:var(--c);color:#000">Most Popular</div>
+      <div class="plan-emoji">🚀</div>
+      <div class="plan-name" style="color:var(--c)">PRO</div>
+      <div class="plan-tagline">Full AI stack, 15 printers</div>
+      <div class="plan-price" style="color:var(--c)">€50<sub>/mo</sub></div>
+      <div class="plan-vat">+ 21% VAT · 15 printers included</div>
+      <div class="plan-sep"></div>
+      <ul class="plan-feats">
+        <li>15 printers included</li>
+        <li>Tuned Kalman Q/R constants</li>
+        <li>CUSUM with tighter thresholds</li>
+        <li>Failure prediction models</li>
+        <li>Hardware diagnostic suite</li>
+        <li>90-day history</li>
+        <li>Priority support</li>
+      </ul>
+      <button class="plan-btn plan-btn-primary" onclick="showPage('auth');switchTab('register')">Choose Pro</button>
+    </div>
+
+    <div class="plan">
+      <div class="plan-ribbon" style="background:var(--g);color:#fff">Save 29%</div>
+      <div class="plan-emoji">👑</div>
+      <div class="plan-name" style="color:#a78bfa">ULTRA</div>
+      <div class="plan-tagline">50 printers, 6 months fixed</div>
+      <div class="plan-price" style="color:#a78bfa">€280<sub>/ 6 mo</sub></div>
+      <div class="plan-vat">VAT included · up to 50 printers</div>
+      <div class="plan-sep"></div>
+      <ul class="plan-feats">
+        <li>Up to 50 printers included</li>
+        <li>All Pro features</li>
+        <li>Enterprise AI cloud constants</li>
+        <li>Global fleet percentile ranking</li>
+        <li>1-year telemetry history</li>
+        <li>Priority support</li>
+      </ul>
+      <button class="plan-btn plan-btn-outline" onclick="showPage('auth');switchTab('register')">Choose Ultra</button>
+    </div>
+
+    <div class="plan">
+      <div class="plan-ribbon" style="background:var(--a);color:#000">Save 55%</div>
+      <div class="plan-emoji">📅</div>
+      <div class="plan-name" style="color:var(--a)">ANNUAL</div>
+      <div class="plan-tagline">Best value, enterprise tier</div>
+      <div class="plan-price" style="color:var(--a)">€540<sub>/ year</sub></div>
+      <div class="plan-vat">VAT included · up to 50 printers</div>
+      <div class="plan-sep"></div>
+      <ul class="plan-feats">
+        <li>Up to 50 printers included</li>
+        <li>Enterprise AI wear coefficients</li>
+        <li>Tightest CUSUM thresholds</li>
+        <li>Unlimited telemetry history</li>
+        <li>24/7 VIP support + SLA</li>
+        <li>Early access to new features</li>
+      </ul>
+      <button class="plan-btn plan-btn-outline" onclick="showPage('auth');switchTab('register')">Choose Annual</button>
+    </div>
+  </div>
+
+  <!-- CALCULATOR -->
+  <div class="calc-box mt4">
+    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1.5rem">
+      <span style="font-size:1.1rem">🧮</span>
+      <span style="font-weight:700;font-size:.95rem">Price Calculator</span>
+      <span style="font-size:.75rem;color:var(--t2);margin-left:.5rem">— find your optimal plan</span>
+    </div>
+    <div class="calc-row">
+      <span class="calc-label">How many printers do you have?</span>
+      <div class="calc-counter">
+        <button class="calc-btn" onclick="adjustCalc(-1)">−</button>
+        <span class="calc-num" id="calcNum">5</span>
+        <button class="calc-btn" onclick="adjustCalc(1)">+</button>
+      </div>
+    </div>
+    <input type="range" min="1" max="50" value="5" id="calcSlider" oninput="updateCalc(this.value)">
+    <div class="calc-result" id="calcResult"></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section reveal">
+  <div class="cta-banner">
+    <div class="z1" style="position:relative">
+      <div class="s-eyebrow" style="justify-content:center">READY TO START</div>
+      <h2>Run enterprise-grade AI on your printers.<br>Today. Locally. Free trial.</h2>
+      <p>Create your account, download PRESTILON, and have your first printer monitored in under 5 minutes.</p>
       <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-        <button class="btn-xl btn-primary" onclick="showPage('auth');switchTab('register')">⚡ Create Account</button>
-        <button class="btn-xl btn-outline" disabled style="opacity:0.4;cursor:not-allowed">
-          ⬇ Download (coming soon)
-        </button>
+        <button class="btn btn-primary" onclick="showPage('auth');switchTab('register')">⚡ Create Free Account</button>
+        <button class="btn btn-ghost" disabled style="opacity:.4;cursor:not-allowed">⬇ Download (coming soon)</button>
       </div>
-      <p style="margin-top:1.5rem;font-size:0.75rem;color:var(--text3)">Windows 10/11 · Node.js 18+ required · Runs on localhost:3002</p>
+      <p style="margin-top:1.5rem;font-size:.72rem;color:var(--t3);font-family:'JetBrains Mono',monospace">WINDOWS 10/11 · NODE.JS 18+ · KLIPPER/MOONRAKER REQUIRED</p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-logo">PRESTILON</div>
-    <div class="footer-links">
-      <a href="#" onclick="scrollToPricing()">Pricing</a>
-      <a href="mailto:support@prestilon.com">Support</a>
-      <a href="#" onclick="showPage('auth')">Sign In</a>
+<footer class="z1">
+  <div>
+    <div class="logo">
+      <div class="logo-mark">P</div>
+      <div>
+        <div class="logo-text">PRESTILON</div>
+        <div class="logo-sub">AI FLEET INTELLIGENCE</div>
+      </div>
     </div>
-    <div class="footer-copy">© 2026 PRESTILON. All rights reserved.</div>
-  </footer>
-</div>
+    <div class="footer-copy mt2">© 2026 PRESTILON. All rights reserved. Built for engineers.</div>
+  </div>
+  <div class="footer-links">
+    <a href="#" onclick="scrollTo('features')">Features</a>
+    <a href="#" onclick="scrollTo('pricing')">Pricing</a>
+    <a href="mailto:support@prestilon.com">Support</a>
+    <a href="#" onclick="showPage('auth')">Sign In</a>
+  </div>
+</footer>
+</div><!-- /page-home -->
 
-<!-- ═══════════════════════════════ AUTH PAGE ═══════════════════════════════ -->
-<div id="page-auth" class="page">
-  <div class="auth-wrapper">
+<!-- ═══════════════ AUTH ═══════════════ -->
+<div id="page-auth" class="page z1">
+  <div class="auth-bg">
     <div class="auth-card">
-      <div class="auth-logo">PRESTILON</div>
-      <div class="auth-subtitle" id="authSubtitle">Sign in to your account</div>
-
-      <div class="auth-tabs" id="authTabs">
-        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
-        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+      <div class="auth-logo-wrap">
+        <div class="logo-mark" style="margin:0 auto .75rem;width:44px;height:44px">P</div>
+        <div class="auth-logo">PRESTILON</div>
       </div>
-
+      <div class="auth-meta" id="authMeta">Sign in to your account</div>
+      <div class="auth-tabs" id="authTabs">
+        <button class="at on" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+        <button class="at" id="tabRegister" onclick="switchTab('register')">Register</button>
+      </div>
       <div id="alertBox"></div>
 
-      <!-- LOGIN FORM -->
-      <div id="panel-login" class="tab-panel active">
-        <div class="form-group">
-          <label class="form-label">Email address</label>
-          <input type="email" id="loginEmail" class="form-input" placeholder="you@example.com" />
+      <!-- LOGIN -->
+      <div class="tab-pnl on" id="pnlLogin">
+        <div class="fg"><label class="fl">Email address</label><input type="email" id="lEmail" class="fi" placeholder="you@example.com"/></div>
+        <div class="fg">
+          <label class="fl" style="display:flex;justify-content:space-between">Password<a href="#" class="alink" onclick="switchTab('forgot')">Forgot?</a></label>
+          <input type="password" id="lPass" class="fi" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
         </div>
-        <div class="form-group">
-          <label class="form-label" style="display:flex;justify-content:space-between">
-            Password
-            <a href="#" class="auth-link" onclick="switchTab('forgot')">Forgot?</a>
-          </label>
-          <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" />
-        </div>
-        <button class="form-submit" id="loginBtn" onclick="doLogin()">Sign In</button>
-        <div class="auth-divider"><span>New to PRESTILON?</span></div>
-        <div style="text-align:center">
-          <a href="#" class="auth-link" onclick="switchTab('register')">Create an account →</a>
-        </div>
+        <button class="fs" id="loginBtn" onclick="doLogin()">Sign In</button>
+        <div class="adiv"><span>New to PRESTILON?</span></div>
+        <div style="text-align:center"><a href="#" class="alink" onclick="switchTab('register')">Create an account →</a></div>
       </div>
 
-      <!-- REGISTER FORM -->
-      <div id="panel-register" class="tab-panel">
-        <div class="form-group">
-          <label class="form-label">Full name</label>
-          <input type="text" id="regName" class="form-input" placeholder="John Doe" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email address</label>
-          <input type="email" id="regEmail" class="form-input" placeholder="you@example.com" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input type="password" id="regPassword" class="form-input" placeholder="min. 8 characters" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Confirm password</label>
-          <input type="password" id="regConfirm" class="form-input" placeholder="••••••••" />
-        </div>
-        <button class="form-submit" id="registerBtn" onclick="doRegister()">Create Account</button>
-        <div class="auth-divider"><span>Already have an account?</span></div>
-        <div style="text-align:center">
-          <a href="#" class="auth-link" onclick="switchTab('login')">Sign in →</a>
-        </div>
+      <!-- REGISTER -->
+      <div class="tab-pnl" id="pnlRegister">
+        <div class="fg"><label class="fl">Full name</label><input type="text" id="rName" class="fi" placeholder="Jane Doe"/></div>
+        <div class="fg"><label class="fl">Email address</label><input type="email" id="rEmail" class="fi" placeholder="you@example.com"/></div>
+        <div class="fg"><label class="fl">Password</label><input type="password" id="rPass" class="fi" placeholder="min. 8 characters"/></div>
+        <div class="fg"><label class="fl">Confirm password</label><input type="password" id="rConf" class="fi" placeholder="••••••••" onkeydown="if(event.key==='Enter')doRegister()"/></div>
+        <button class="fs" id="regBtn" onclick="doRegister()">Create Account</button>
+        <div class="adiv"><span>Already have an account?</span></div>
+        <div style="text-align:center"><a href="#" class="alink" onclick="switchTab('login')">Sign in →</a></div>
       </div>
 
-      <!-- FORGOT PASSWORD FORM -->
-      <div id="panel-forgot" class="tab-panel">
-        <div class="alert alert-info">Enter your email and we'll send you a reset link.</div>
-        <div class="form-group">
-          <label class="form-label">Email address</label>
-          <input type="email" id="forgotEmail" class="form-input" placeholder="you@example.com" />
-        </div>
-        <button class="form-submit" id="forgotBtn" onclick="doForgot()">Send Reset Link</button>
-        <div style="text-align:center;margin-top:1rem">
-          <a href="#" class="auth-link" onclick="switchTab('login')">← Back to Sign In</a>
-        </div>
+      <!-- FORGOT -->
+      <div class="tab-pnl" id="pnlForgot">
+        <div class="alert-box ai">Enter your email and we'll send a password reset link.</div>
+        <div class="fg"><label class="fl">Email address</label><input type="email" id="fEmail" class="fi" placeholder="you@example.com"/></div>
+        <button class="fs" id="forgotBtn" onclick="doForgot()">Send Reset Link</button>
+        <div style="text-align:center;margin-top:1rem"><a href="#" class="alink" onclick="switchTab('login')">← Back to Sign In</a></div>
       </div>
 
-      <div style="text-align:center;margin-top:1.5rem">
-        <button class="nav-btn nav-btn-ghost" style="font-size:0.78rem;color:var(--text3)" onclick="showPage('home')">← Back to prestilon.com</button>
+      <div style="text-align:center;margin-top:1.75rem">
+        <button onclick="showPage('home')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:.76rem;font-family:'Space Grotesk',sans-serif">← Back to prestilon.com</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════════════ ACCOUNT PAGE ════════════════════════════ -->
-<div id="page-account" class="page">
-  <div class="account-wrapper">
-    <div class="account-header">
-      <h1>Account</h1>
-      <p>Manage your subscription, profile, and security settings.</p>
-    </div>
-
-    <div class="account-grid">
-      <!-- SIDEBAR -->
-      <div class="account-sidebar">
-        <div class="account-avatar" id="accountAvatar">P</div>
-        <div class="account-name" id="accountName">—</div>
-        <div class="account-email" id="accountEmail">—</div>
-
-        <div class="sidebar-nav">
-          <button class="sidebar-nav-btn active" onclick="showAccountTab('subscription')">
-            <span class="icon">💳</span> Subscription
-          </button>
-          <button class="sidebar-nav-btn" onclick="showAccountTab('profile')">
-            <span class="icon">👤</span> Profile
-          </button>
-          <button class="sidebar-nav-btn" onclick="showAccountTab('security')">
-            <span class="icon">🔒</span> Security
-          </button>
-          <button class="sidebar-nav-btn" onclick="showAccountTab('download')">
-            <span class="icon">⬇</span> Download
-          </button>
+<!-- ═══════════════ ACCOUNT ═══════════════ -->
+<div id="page-account" class="page z1">
+  <div class="acct-wrap">
+    <div class="acct-h1">Account</div>
+    <div class="acct-sub">Manage your subscription, profile, and security settings.</div>
+    <div class="acct-grid">
+      <div class="acct-sidebar">
+        <div class="av" id="acctAvatar">P</div>
+        <div class="an" id="acctName">—</div>
+        <div class="ae2" id="acctEmail">—</div>
+        <div class="snav">
+          <button class="snav-btn on" onclick="showAcctTab('subscription',this)">💳 Subscription</button>
+          <button class="snav-btn" onclick="showAcctTab('profile',this)">👤 Profile</button>
+          <button class="snav-btn" onclick="showAcctTab('security',this)">🔒 Security</button>
+          <button class="snav-btn" onclick="showAcctTab('download',this)">⬇ Download</button>
         </div>
-
-        <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+        <button class="logout" onclick="doLogout()">Sign Out</button>
       </div>
+      <div class="acct-content">
+        <div id="acctAlert"></div>
 
-      <!-- CONTENT -->
-      <div class="account-content">
-        <div id="accountAlert"></div>
-
-        <!-- SUBSCRIPTION TAB -->
-        <div id="acct-subscription" class="tab-panel active account-section">
-          <div class="account-section-title">💳 Subscription</div>
-          <div class="sub-status-card" id="subStatusCard">
+        <!-- SUBSCRIPTION -->
+        <div class="tab-pnl on acct-sec" id="acSub">
+          <div class="acct-sec-title">💳 Subscription</div>
+          <div class="sub-hero">
             <div>
-              <div style="font-weight:700;margin-bottom:0.25rem" id="subPlanName">Loading...</div>
-              <div style="font-size:0.78rem;color:var(--text2)" id="subExpiry">—</div>
+              <div style="font-weight:700;font-size:.95rem;margin-bottom:.2rem" id="subName">Loading…</div>
+              <div style="font-size:.75rem;color:var(--t2)" id="subExp">—</div>
             </div>
             <div id="subBadge"></div>
           </div>
-          <div id="subDetails" style="margin-top:1rem;font-size:0.82rem;color:var(--text2)"></div>
-
+          <div class="sub-stats" id="subStats"></div>
           <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
-            <div style="font-size:0.85rem;font-weight:700;margin-bottom:0.75rem">Manage Plan</div>
-            <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
-              <a href="https://billing.stripe.com" target="_blank" class="btn-xl btn-outline" style="font-size:0.82rem;padding:0.6rem 1.2rem">
-                Manage Billing →
-              </a>
-              <button class="btn-xl btn-primary" style="font-size:0.82rem;padding:0.6rem 1.2rem" onclick="showPage('home');scrollToPricing()">
-                Upgrade Plan
-              </button>
+            <div style="font-size:.82rem;font-weight:700;margin-bottom:.75rem">Manage Plan</div>
+            <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+              <a href="https://billing.stripe.com" target="_blank" class="btn btn-ghost" style="font-size:.82rem;padding:.6rem 1.25rem">Manage Billing →</a>
+              <button class="btn btn-primary" style="font-size:.82rem;padding:.6rem 1.25rem" onclick="showPage('home');scrollTo('pricing')">Upgrade Plan</button>
             </div>
           </div>
         </div>
 
-        <!-- PROFILE TAB -->
-        <div id="acct-profile" class="tab-panel account-section">
-          <div class="account-section-title">👤 Profile</div>
-          <div class="form-group">
-            <label class="form-label">Display name</label>
-            <input type="text" id="profileName" class="form-input" placeholder="Your name" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email address</label>
-            <input type="email" id="profileEmail" class="form-input" placeholder="you@example.com" />
-          </div>
-          <button class="form-submit" style="max-width:200px" onclick="saveProfile()">Save Changes</button>
+        <!-- PROFILE -->
+        <div class="tab-pnl acct-sec" id="acProfile">
+          <div class="acct-sec-title">👤 Profile</div>
+          <div class="fg"><label class="fl">Display name</label><input type="text" id="pName" class="fi" placeholder="Your name"/></div>
+          <div class="fg"><label class="fl">Email address</label><input type="email" id="pEmail" class="fi" readonly style="opacity:.6"/></div>
+          <button class="fs" style="max-width:190px;margin-top:.25rem" onclick="saveProfile()">Save Changes</button>
         </div>
 
-        <!-- SECURITY TAB -->
-        <div id="acct-security" class="tab-panel account-section">
-          <div class="account-section-title">🔒 Change Password</div>
-          <div class="form-group">
-            <label class="form-label">New password</label>
-            <input type="password" id="newPassword" class="form-input" placeholder="min. 8 characters" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Confirm new password</label>
-            <input type="password" id="confirmPassword" class="form-input" placeholder="••••••••" />
-          </div>
-          <button class="form-submit" style="max-width:220px" onclick="changePassword()">Update Password</button>
+        <!-- SECURITY -->
+        <div class="tab-pnl acct-sec" id="acSec">
+          <div class="acct-sec-title">🔒 Change Password</div>
+          <div class="fg"><label class="fl">New password</label><input type="password" id="np" class="fi" placeholder="min. 8 characters"/></div>
+          <div class="fg"><label class="fl">Confirm new password</label><input type="password" id="cp2" class="fi" placeholder="••••••••"/></div>
+          <button class="fs" style="max-width:210px;margin-top:.25rem" onclick="changePwd()">Update Password</button>
         </div>
 
-        <!-- DOWNLOAD TAB -->
-        <div id="acct-download" class="tab-panel account-section">
-          <div class="account-section-title">⬇ Download PRESTILON</div>
-          <div class="alert alert-info" style="margin-bottom:1.25rem">
-            Download coming soon. The backend will be packaged as a Windows installer.
-          </div>
-          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.25rem">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text2);line-height:1.8">
-              <div style="color:var(--text3);margin-bottom:0.5rem"># Requirements</div>
+        <!-- DOWNLOAD -->
+        <div class="tab-pnl acct-sec" id="acDown">
+          <div class="acct-sec-title">⬇ Download PRESTILON</div>
+          <div class="alert-box ai mb" style="margin-bottom:1.25rem">Windows installer coming soon. Follow release notes for the launch date.</div>
+          <div style="background:var(--ink);border:1px solid var(--border);border-radius:12px;padding:1.25rem">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--t2);line-height:1.9">
+              <div style="color:var(--t3);margin-bottom:.35rem"># System Requirements</div>
               <div>Windows 10 / 11 (64-bit)</div>
               <div>Node.js 18 or higher</div>
-              <div>Klipper + Moonraker on your printer</div>
-              <div style="margin-top:0.75rem;color:var(--text3)"># After install, open:</div>
-              <div style="color:var(--cyan)">http://localhost:3002</div>
+              <div>Klipper + Moonraker on each printer</div>
+              <div>Local network access to printer IP</div>
+              <div style="margin-top:.85rem;color:var(--t3)"># After install, navigate to:</div>
+              <div style="color:var(--c)">http://localhost:3002</div>
+              <div style="margin-top:.85rem;color:var(--t3)"># Your data stays on your machine.</div>
+              <div>Only subscription validation uses internet.</div>
             </div>
           </div>
         </div>
@@ -840,296 +1202,273 @@
   </div>
 </div>
 
-<!-- ════════════════════════════════ SCRIPTS ════════════════════════════════ -->
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
 <script type="module">
-  // ── SUPABASE ───────────────────────────────────────────────────────────────
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+const sb = createClient('https://ryftlimrjhhoymyfzusq.supabase.co','sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86')
+window._sb = sb
+let _user = null
 
-  const SUPABASE_URL  = 'https://ryftlimrjhhoymyfzusq.supabase.co'
-  const SUPABASE_KEY  = 'sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86'
+sb.auth.onAuthStateChange(async(e,s)=>{ _user=s?.user??null; updNav(); if(_user) await loadAcct() })
 
-  const sb = createClient(SUPABASE_URL, SUPABASE_KEY)
-  window._sb = sb
+window.showPage = n => {
+  if(n==='account'&&!_user){showPage('auth');return}
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.getElementById('page-'+n).classList.add('active')
+  window.scrollTo(0,0); clrAlert()
+}
+window.scrollTo2 = id => {
+  showPage('home')
+  setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}),80)
+}
+window.scrollTo = id => window.scrollTo2(id)
 
-  // ── STATE ──────────────────────────────────────────────────────────────────
-  let currentUser = null
-  let currentSub  = null
-
-  // ── AUTH STATE LISTENER ────────────────────────────────────────────────────
-  sb.auth.onAuthStateChange(async (event, session) => {
-    currentUser = session?.user ?? null
-    updateNav()
-    if (currentUser) await loadAccountData()
+window.switchTab = t => {
+  ;['login','register','forgot'].forEach(x=>{
+    document.getElementById('pnl'+x.charAt(0).toUpperCase()+x.slice(1)).classList.remove('on')
+    const b=document.getElementById('tab'+x.charAt(0).toUpperCase()+x.slice(1))
+    if(b) b.classList.remove('on')
   })
+  const nm=t.charAt(0).toUpperCase()+t.slice(1)
+  document.getElementById('pnl'+nm).classList.add('on')
+  const tb=document.getElementById('tab'+nm)
+  if(tb) tb.classList.add('on')
+  document.getElementById('authTabs').style.display=t==='forgot'?'none':''
+  const titles={login:'Sign in to your account',register:'Create your account',forgot:'Reset your password'}
+  document.getElementById('authMeta').textContent=titles[t]||''
+  clrAlert()
+}
 
-  // ── NAV ────────────────────────────────────────────────────────────────────
-  function updateNav() {
-    const loggedIn = !!currentUser
-    document.getElementById('navLoginBtn').style.display  = loggedIn ? 'none' : ''
-    document.getElementById('navSignupBtn').style.display = loggedIn ? 'none' : ''
-    document.getElementById('navAccountBtn').style.display = loggedIn ? '' : 'none'
-  }
+function updNav(){
+  const li=!!_user
+  document.getElementById('navLogin').style.display=li?'none':''
+  document.getElementById('navStart').style.display=li?'none':''
+  document.getElementById('navAcct').style.display=li?'':'none'
+}
+function alert2(m,t='error',id='alertBox'){
+  const e=document.getElementById(id);if(!e)return
+  const cls={error:'ae',success:'as',info:'ai'}[t]||'ae'
+  e.innerHTML=`<div class="alert-box ${cls}">${m}</div>`
+}
+function clrAlert(){
+  ;['alertBox','acctAlert'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=''})
+}
+function setLoading(id,on,txt){
+  const b=document.getElementById(id);if(!b)return
+  b.disabled=on
+  b.innerHTML=on?`<span class="spin"></span>${txt}`:txt
+}
 
-  // ── PAGES ──────────────────────────────────────────────────────────────────
-  window.showPage = function(name) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
-    document.getElementById('page-' + name).classList.add('active')
-    window.scrollTo(0, 0)
-    clearAlert()
-    if (name === 'account' && !currentUser) {
-      showPage('auth')
-      return
-    }
-  }
-
-  // ── AUTH TABS ──────────────────────────────────────────────────────────────
-  window.switchTab = function(tab) {
-    ;['login','register','forgot'].forEach(t => {
-      document.getElementById('panel-' + t).classList.remove('active')
-      const btn = document.getElementById('tab-' + t)
-      if (btn) btn.classList.remove('active')
-    })
-    document.getElementById('panel-' + tab).classList.add('active')
-    const btn = document.getElementById('tab-' + tab)
-    if (btn) btn.classList.add('active')
-
-    const titles = { login: 'Sign in to your account', register: 'Create your account', forgot: 'Reset your password' }
-    document.getElementById('authSubtitle').textContent = titles[tab] || ''
-    document.getElementById('authTabs').style.display = tab === 'forgot' ? 'none' : ''
-    clearAlert()
-  }
-
-  // ── ALERTS ─────────────────────────────────────────────────────────────────
-  function showAlert(msg, type = 'error', target = 'alertBox') {
-    const el = document.getElementById(target)
-    if (!el) return
-    el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`
-  }
-  function clearAlert(target = 'alertBox') {
-    const el = document.getElementById(target)
-    if (el) el.innerHTML = ''
-    const acc = document.getElementById('accountAlert')
-    if (acc) acc.innerHTML = ''
-  }
-  function setLoading(btnId, loading, text) {
-    const btn = document.getElementById(btnId)
-    if (!btn) return
-    btn.disabled = loading
-    btn.innerHTML = loading ? `<span class="spinner"></span> ${text}` : text
-  }
-
-  // ── LOGIN ──────────────────────────────────────────────────────────────────
-  window.doLogin = async function() {
-    const email = document.getElementById('loginEmail').value.trim()
-    const pass  = document.getElementById('loginPassword').value
-    if (!email || !pass) { showAlert('Please fill in all fields.'); return }
-
-    setLoading('loginBtn', true, 'Signing in...')
-    clearAlert()
-
-    const { error } = await sb.auth.signInWithPassword({ email, password: pass })
-    setLoading('loginBtn', false, 'Sign In')
-
-    if (error) { showAlert(error.message); return }
-    showPage('account')
-  }
-
-  // ── REGISTER ───────────────────────────────────────────────────────────────
-  window.doRegister = async function() {
-    const name    = document.getElementById('regName').value.trim()
-    const email   = document.getElementById('regEmail').value.trim()
-    const pass    = document.getElementById('regPassword').value
-    const confirm = document.getElementById('regConfirm').value
-
-    if (!name || !email || !pass) { showAlert('Please fill in all fields.'); return }
-    if (pass.length < 8) { showAlert('Password must be at least 8 characters.'); return }
-    if (pass !== confirm) { showAlert('Passwords do not match.'); return }
-
-    setLoading('registerBtn', true, 'Creating account...')
-    clearAlert()
-
-    const { error } = await sb.auth.signUp({
-      email, password: pass,
-      options: { data: { full_name: name } }
-    })
-    setLoading('registerBtn', false, 'Create Account')
-
-    if (error) { showAlert(error.message); return }
-    showAlert('✅ Account created! Check your email to confirm your address, then sign in.', 'success')
-    setTimeout(() => switchTab('login'), 3000)
-  }
-
-  // ── FORGOT PASSWORD ────────────────────────────────────────────────────────
-  window.doForgot = async function() {
-    const email = document.getElementById('forgotEmail').value.trim()
-    if (!email) { showAlert('Please enter your email address.'); return }
-
-    setLoading('forgotBtn', true, 'Sending...')
-    clearAlert()
-
-    const { error } = await sb.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/?page=reset-password'
-    })
-    setLoading('forgotBtn', false, 'Send Reset Link')
-
-    if (error) { showAlert(error.message); return }
-    showAlert('✅ Reset link sent! Check your email inbox.', 'success')
-  }
-
-  // ── LOGOUT ─────────────────────────────────────────────────────────────────
-  window.doLogout = async function() {
-    await sb.auth.signOut()
-    currentUser = null
-    currentSub  = null
-    updateNav()
-    showPage('home')
-  }
-
-  // ── LOAD ACCOUNT DATA ──────────────────────────────────────────────────────
-  async function loadAccountData() {
-    if (!currentUser) return
-
-    // Profile
-    const name = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User'
-    const email = currentUser.email || ''
-
-    document.getElementById('accountAvatar').textContent = name.charAt(0).toUpperCase()
-    document.getElementById('accountName').textContent   = name
-    document.getElementById('accountEmail').textContent  = email
-    document.getElementById('profileName').value  = name
-    document.getElementById('profileEmail').value = email
-
-    // Subscription
-    const { data: sub } = await sb
-      .from('subscriptions')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .single()
-
-    currentSub = sub
-
-    const planNames = { starter: 'Basic', professional: 'Pro', enterprise: 'Enterprise' }
-    const planName  = sub ? (planNames[sub.plan] || sub.plan) : 'No active plan'
-    document.getElementById('subPlanName').textContent = planName
-
-    if (sub) {
-      const expiry = sub.valid_until
-        ? 'Valid until: ' + new Date(sub.valid_until).toLocaleDateString('en-GB')
-        : 'No expiry date set'
-      document.getElementById('subExpiry').textContent = expiry
-      document.getElementById('subBadge').innerHTML = `<span class="status-badge status-${sub.status}">${sub.status}</span>`
-      document.getElementById('subDetails').innerHTML = `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.5rem">
-          <div style="background:var(--bg3);padding:0.85rem;border-radius:10px;border:1px solid var(--border)">
-            <div style="font-size:0.65rem;color:var(--text3);margin-bottom:0.25rem">PRINTER LIMIT</div>
-            <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:800;color:var(--cyan)">${sub.printer_limit}</div>
-          </div>
-          <div style="background:var(--bg3);padding:0.85rem;border-radius:10px;border:1px solid var(--border)">
-            <div style="font-size:0.65rem;color:var(--text3);margin-bottom:0.25rem">PLAN</div>
-            <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:800;color:var(--cyan)">${sub.plan.toUpperCase()}</div>
-          </div>
-        </div>
-      `
-    } else {
-      document.getElementById('subBadge').innerHTML = `<span class="status-badge status-inactive">inactive</span>`
-      document.getElementById('subDetails').innerHTML = `
-        <div class="alert alert-error" style="margin-top:0.75rem">
-          No active subscription found. Choose a plan to unlock the AI dashboard.
-        </div>
-      `
-    }
-  }
-
-  // ── SAVE PROFILE ───────────────────────────────────────────────────────────
-  window.saveProfile = async function() {
-    const name = document.getElementById('profileName').value.trim()
-    if (!name) { showAlert('Name cannot be empty.', 'error', 'accountAlert'); return }
-
-    const { error } = await sb.auth.updateUser({ data: { full_name: name } })
-    if (error) { showAlert(error.message, 'error', 'accountAlert'); return }
-    document.getElementById('accountName').textContent = name
-    document.getElementById('accountAvatar').textContent = name.charAt(0).toUpperCase()
-    showAlert('✅ Profile updated.', 'success', 'accountAlert')
-  }
-
-  // ── CHANGE PASSWORD ────────────────────────────────────────────────────────
-  window.changePassword = async function() {
-    const pass    = document.getElementById('newPassword').value
-    const confirm = document.getElementById('confirmPassword').value
-
-    if (pass.length < 8) { showAlert('Password must be at least 8 characters.', 'error', 'accountAlert'); return }
-    if (pass !== confirm) { showAlert('Passwords do not match.', 'error', 'accountAlert'); return }
-
-    const { error } = await sb.auth.updateUser({ password: pass })
-    if (error) { showAlert(error.message, 'error', 'accountAlert'); return }
-    document.getElementById('newPassword').value    = ''
-    document.getElementById('confirmPassword').value = ''
-    showAlert('✅ Password updated successfully.', 'success', 'accountAlert')
-  }
-
-  // ── ACCOUNT TABS ───────────────────────────────────────────────────────────
-  window.showAccountTab = function(tab) {
-    document.querySelectorAll('.account-content .tab-panel').forEach(p => p.classList.remove('active'))
-    document.querySelectorAll('.sidebar-nav-btn').forEach(b => b.classList.remove('active'))
-    document.getElementById('acct-' + tab).classList.add('active')
-    event.currentTarget.classList.add('active')
-  }
-
-  // ── SCROLL TO PRICING ──────────────────────────────────────────────────────
-  window.scrollToPricing = function() {
-    showPage('home')
-    setTimeout(() => {
-      document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 100)
-  }
-
-  // ── HANDLE RESET PASSWORD REDIRECT ────────────────────────────────────────
-  const hash = window.location.hash
-  if (hash.includes('type=recovery')) {
-    showPage('auth')
-    switchTab('forgot')
-    // Supabase handles the token automatically via onAuthStateChange
-  }
-
-  // ── CHECK INITIAL SESSION ──────────────────────────────────────────────────
-  const { data: { session } } = await sb.auth.getSession()
-  if (session) {
-    currentUser = session.user
-    updateNav()
-    await loadAccountData()
-  }
-
-  updateNav()
+window.doLogin=async()=>{
+  const e=document.getElementById('lEmail').value.trim()
+  const p=document.getElementById('lPass').value
+  if(!e||!p){alert2('Please fill in all fields.');return}
+  setLoading('loginBtn',true,'Signing in…')
+  const{error}=await sb.auth.signInWithPassword({email:e,password:p})
+  setLoading('loginBtn',false,'Sign In')
+  if(error){alert2(error.message);return}
+  showPage('account')
+}
+window.doRegister=async()=>{
+  const n=document.getElementById('rName').value.trim()
+  const e=document.getElementById('rEmail').value.trim()
+  const p=document.getElementById('rPass').value
+  const c=document.getElementById('rConf').value
+  if(!n||!e||!p){alert2('Please fill in all fields.');return}
+  if(p.length<8){alert2('Password must be at least 8 characters.');return}
+  if(p!==c){alert2('Passwords do not match.');return}
+  setLoading('regBtn',true,'Creating account…')
+  const{error}=await sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}})
+  setLoading('regBtn',false,'Create Account')
+  if(error){alert2(error.message);return}
+  alert2('✅ Account created! Check your email to confirm, then sign in.','success')
+  setTimeout(()=>switchTab('login'),3000)
+}
+window.doForgot=async()=>{
+  const e=document.getElementById('fEmail').value.trim()
+  if(!e){alert2('Please enter your email.');return}
+  setLoading('forgotBtn',true,'Sending…')
+  const{error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin})
+  setLoading('forgotBtn',false,'Send Reset Link')
+  if(error){alert2(error.message);return}
+  alert2('✅ Reset link sent! Check your inbox.','success')
+}
+window.doLogout=async()=>{
+  await sb.auth.signOut(); _user=null; updNav(); showPage('home')
+}
+async function loadAcct(){
+  if(!_user)return
+  const n=_user.user_metadata?.full_name||_user.email?.split('@')[0]||'User'
+  const e=_user.email||''
+  document.getElementById('acctAvatar').textContent=n.charAt(0).toUpperCase()
+  document.getElementById('acctName').textContent=n
+  document.getElementById('acctEmail').textContent=e
+  document.getElementById('pName').value=n
+  document.getElementById('pEmail').value=e
+  const{data:sub}=await sb.from('subscriptions').select('*').eq('user_id',_user.id).single()
+  const planMap={starter:'Basic',professional:'Pro',enterprise:'Enterprise'}
+  document.getElementById('subName').textContent=sub?(planMap[sub.plan]||sub.plan)+' Plan':'No active plan'
+  document.getElementById('subExp').textContent=sub?.valid_until?'Valid until: '+new Date(sub.valid_until).toLocaleDateString('en-GB'):'No expiry date'
+  const cls={active:'sba',trial:'sbt',trialing:'sbt',expired:'sbi',cancelled:'sbi',inactive:'sbi'}
+  const st=sub?.status||'inactive'
+  document.getElementById('subBadge').innerHTML=`<span class="sbadge ${cls[st]||'sbi'}">${st}</span>`
+  document.getElementById('subStats').innerHTML=sub?`
+    <div class="sub-stat"><div class="sub-stat-val">${sub.printer_limit}</div><div class="sub-stat-lbl">Printer Limit</div></div>
+    <div class="sub-stat"><div class="sub-stat-val" style="font-size:.85rem;font-family:'Space Grotesk'">${(sub.plan||'—').toUpperCase()}</div><div class="sub-stat-lbl">Current Plan</div></div>
+  `:`<div class="alert-box ae" style="grid-column:span 2;margin:0">No active subscription. Choose a plan to unlock the AI engine.</div>`
+}
+window.saveProfile=async()=>{
+  const n=document.getElementById('pName').value.trim()
+  if(!n){alert2('Name cannot be empty.','error','acctAlert');return}
+  const{error}=await sb.auth.updateUser({data:{full_name:n}})
+  if(error){alert2(error.message,'error','acctAlert');return}
+  document.getElementById('acctName').textContent=n
+  document.getElementById('acctAvatar').textContent=n.charAt(0).toUpperCase()
+  alert2('✅ Profile updated.','success','acctAlert')
+}
+window.changePwd=async()=>{
+  const p=document.getElementById('np').value
+  const c=document.getElementById('cp2').value
+  if(p.length<8){alert2('Password must be at least 8 characters.','error','acctAlert');return}
+  if(p!==c){alert2('Passwords do not match.','error','acctAlert');return}
+  const{error}=await sb.auth.updateUser({password:p})
+  if(error){alert2(error.message,'error','acctAlert');return}
+  document.getElementById('np').value='';document.getElementById('cp2').value=''
+  alert2('✅ Password updated.','success','acctAlert')
+}
+window.showAcctTab=(tab,btn)=>{
+  document.querySelectorAll('.acct-content .tab-pnl').forEach(p=>p.classList.remove('on'))
+  document.querySelectorAll('.snav-btn').forEach(b=>b.classList.remove('on'))
+  const map={subscription:'acSub',profile:'acProfile',security:'acSec',download:'acDown'}
+  document.getElementById(map[tab]).classList.add('on')
+  if(btn)btn.classList.add('on')
+}
+const{data:{session}}=await sb.auth.getSession()
+if(session){_user=session.user;updNav();await loadAcct()}
+updNav()
 </script>
 
 <script>
-  // ── ANIMATIONS ─────────────────────────────────────────────────────────────
-  // Bar chart animation
-  const chart = document.getElementById('barChart1')
-  const heights = [60, 40, 80, 55, 70, 45, 90, 65, 50, 75]
-  heights.forEach(h => {
-    const bar = document.createElement('div')
-    bar.className = 'mock-bar-item'
-    bar.style.height = h + '%'
-    chart.appendChild(bar)
+/* ─── CANVAS PARTICLE GRID ─── */
+(()=>{
+  const c=document.getElementById('bg-canvas')
+  const ctx=c.getContext('2d')
+  let W,H,pts=[],frame=0
+  const N=80
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;pts=[]}
+  function init(){
+    pts=[];for(let i=0;i<N;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25})
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H)
+    // Draw connections
+    for(let i=0;i<N;i++){
+      for(let j=i+1;j<N;j++){
+        const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y
+        const d=Math.sqrt(dx*dx+dy*dy)
+        if(d<140){
+          ctx.beginPath()
+          ctx.strokeStyle=`rgba(0,229,255,${.06*(1-d/140)})`
+          ctx.lineWidth=.5
+          ctx.moveTo(pts[i].x,pts[i].y)
+          ctx.lineTo(pts[j].x,pts[j].y)
+          ctx.stroke()
+        }
+      }
+    }
+    // Draw dots
+    pts.forEach(p=>{
+      ctx.beginPath()
+      ctx.arc(p.x,p.y,1.2,0,Math.PI*2)
+      ctx.fillStyle='rgba(0,229,255,0.25)'
+      ctx.fill()
+      p.x+=p.vx;p.y+=p.vy
+      if(p.x<0||p.x>W)p.vx*=-1
+      if(p.y<0||p.y>H)p.vy*=-1
+    })
+    requestAnimationFrame(draw)
+  }
+  window.addEventListener('resize',()=>{resize();init()})
+  resize();init();draw()
+})()
+
+/* ─── COUNTER ANIMATIONS ─── */
+function countUp(id,target,suffix=''){
+  let v=0;const el=document.getElementById(id)
+  const step=Math.ceil(target/40)
+  const t=setInterval(()=>{
+    v=Math.min(v+step,target)
+    el.textContent=v+suffix
+    if(v>=target)clearInterval(t)
+  },30)
+}
+setTimeout(()=>{countUp('tv1',50);countUp('tv2',6);countUp('tv3',3)},600)
+
+/* ─── PREVIEW BARS ─── */
+;(()=>{
+  const wrap=document.getElementById('pvBars')
+  const vals=[55,70,45,85,60,75,50,90,65,80]
+  vals.forEach((h,i)=>{
+    const b=document.createElement('div')
+    b.className='mini-bar'+(h>70?' hi':'')
+    b.style.height=(h/100*32)+'px'
+    wrap.appendChild(b)
   })
+})()
 
-  // Health score count-up
-  let health = 0
-  const target = 87
-  const healthEl = document.getElementById('healthVal')
-  const countUp = setInterval(() => {
-    health = Math.min(health + 3, target)
-    healthEl.textContent = health
-    if (health >= target) clearInterval(countUp)
-  }, 30)
+/* ─── LIVE PREVIEW SIMULATION ─── */
+;(()=>{
+  let t=215.3,tick=0
+  setInterval(()=>{
+    tick++
+    t+=((Math.random()-.48)*0.4)
+    t=Math.max(213,Math.min(218,t))
+    document.getElementById('pvTemp').textContent=t.toFixed(1)+'°C'
+    // health drift
+    const h=85+Math.round(Math.sin(tick*.1)*3)
+    document.getElementById('pvHealth').textContent=h
+    document.querySelector('.health-gauge').style.setProperty('--pct',h)
+  },2000)
+})()
 
-  // Scroll reveal
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') })
-  }, { threshold: 0.1 })
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el))
+/* ─── CALCULATOR ─── */
+const PLANS=[
+  {id:'BASIC',label:'Basic',price:20,base:0,extra:3,months:1},
+  {id:'PRO',label:'Pro',price:50,base:15,extra:3,months:1},
+  {id:'ULTRA',label:'Ultra',price:280,base:50,extra:0,months:6},
+  {id:'ANNUAL',label:'Annual',price:540,base:50,extra:0,months:12},
+]
+function calcCost(p,n){
+  if(p.id==='ULTRA'||p.id==='ANNUAL')return{monthly:p.price/p.months,extra:0}
+  const ext=Math.max(0,n-p.base)*p.extra
+  return{monthly:p.price+ext,extra:ext}
+}
+window.adjustCalc=d=>{
+  const s=document.getElementById('calcSlider')
+  s.value=Math.max(1,Math.min(50,+s.value+d))
+  updateCalc(s.value)
+}
+window.updateCalc=v=>{
+  document.getElementById('calcSlider').value=v
+  document.getElementById('calcNum').textContent=v
+  const n=+v
+  const costs=PLANS.map(p=>({...p,...calcCost(p,n)}))
+  const best=costs.reduce((a,b)=>a.monthly<b.monthly?a:b)
+  const colors={BASIC:'var(--t2)',PRO:'var(--c)',ULTRA:'#a78bfa',ANNUAL:'var(--a)'}
+  document.getElementById('calcResult').innerHTML=costs.map(p=>`
+    <div class="calc-plan${p.id===best.id?' best':''}">
+      <div class="calc-plan-name" style="color:${colors[p.id]}">${p.label}</div>
+      <div class="calc-plan-price" style="color:${colors[p.id]}">€${p.monthly.toFixed(2)}</div>
+      <div class="calc-plan-sub">/ month${p.months>1?' (avg)':''}</div>
+      ${p.id===best.id?'<span class="best-badge">★ Best Value</span>':''}
+    </div>
+  `).join('')
+}
+updateCalc(5)
+
+/* ─── SCROLL REVEAL ─── */
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.08})
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el))
 </script>
-
 </body>
 </html>
