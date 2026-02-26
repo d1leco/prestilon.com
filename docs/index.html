@@ -32,18 +32,50 @@ nav{
   display:flex;align-items:center;justify-content:space-between;
   padding:0 1.5rem 0 0;
   height:64px;
+  clip-path:none;
   background:rgba(6,15,26,.88);
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   border-bottom:1px solid var(--border);
 }
-.logo{display:flex;align-items:center;text-decoration:none;transition:opacity .2s}
+.logo{display:flex;align-items:center;text-decoration:none;transition:opacity .2s;margin-left:-8px}
 .logo:hover{opacity:.85}
 .logo-img{height:120px;width:auto;mix-blend-mode:screen;display:block}
 @media(max-width:640px){
-  nav{padding:0 .75rem 0 0;height:52px;overflow:visible}
+  nav{padding:0 .75rem 0 0;height:52px}
+  .logo{margin-left:-4px}
   .logo-img{height:36px}
   .nl{font-size:.75rem;padding:.3rem .5rem}
   .nc{padding:.35rem .65rem;font-size:.72rem;margin-left:.2rem;white-space:nowrap}
+}
+/* ── MOBILE LAYOUT FIXES ── */
+@media(max-width:640px){
+  .hero{padding:32px 1rem 28px;gap:1.5rem}
+  .hero-h1{font-size:clamp(1.9rem,9vw,2.8rem)}
+  .hero-sub{font-size:.88rem;margin-bottom:1.4rem}
+  .btn{padding:.65rem 1.2rem;font-size:.82rem}
+  .hero-cta{gap:.6rem;margin-bottom:1.8rem}
+  .trust-i{font-size:.7rem}
+  .section{padding:52px 1rem}
+  .sec-h{font-size:clamp(1.5rem,7vw,2rem)}
+  .sec-sub{font-size:.88rem}
+  .stats-inner{padding:0 1rem}
+  .stat{padding:1.6rem .8rem}
+  .stat-val{font-size:1.9rem}
+  .cta-sec{padding:0 1rem 52px}
+  .cta-box{padding:3rem 1.25rem}
+  .cta-h{font-size:1.5rem}
+  .cta-p{font-size:.88rem}
+  .cta-btns{flex-direction:column;align-items:stretch}
+  .cta-btns .btn{text-align:center;justify-content:center}
+  footer{padding:1.5rem 1rem;flex-direction:column;align-items:flex-start;gap:.5rem}
+  /* Fix 2-col feature header grid */
+  [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important;gap:1rem!important}
+  /* Fix arch nodes overflow */
+  .arch-node{min-width:100px;padding:1rem .8rem}
+  .an-title{font-size:.7rem}
+  .an-sub{font-size:.55rem}
+  .cloud-box{padding:.8rem 1rem;gap:1.5rem}
+  .ticker-item{font-size:.6rem;padding:0 1.2rem}
 }
 .nav-r{display:flex;align-items:center;gap:.15rem}
 .nl{padding:.42rem .85rem;color:var(--text2);font-size:.88rem;font-weight:500;text-decoration:none;border-radius:7px;transition:color .18s,background .18s}
@@ -314,7 +346,6 @@ footer{
     <img class="logo-img" src="/prestilon.logo.png" alt="Prestilon">
   </a>
   <div class="nav-r">
-    <a class="nl" href="/">Home</a>
     <a class="nl" href="/support">Support</a>
     <a class="nc" id="navCta" href="/login">Sign In →</a>
   </div>
