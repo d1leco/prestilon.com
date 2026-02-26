@@ -34,7 +34,7 @@ canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.3}
 nav{
   position:sticky;top:0;z-index:999;
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 1rem 0 max(0.5rem,calc(50vw - 820px));
+  padding:0 1.5rem 0 0;
   height:64px;overflow:hidden;
   background:rgba(6,15,26,.9);
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
@@ -43,7 +43,12 @@ nav{
 .logo{display:flex;align-items:center;text-decoration:none;transition:opacity .2s}
 .logo:hover{opacity:.85}
 .logo-img{height:120px;width:auto;mix-blend-mode:screen;display:block}
-@media(max-width:600px){nav{padding:0 1rem;height:56px}.logo-img{height:44px}}
+@media(max-width:600px){
+  nav{padding:0 .75rem 0 0;height:52px}
+  .logo-img{height:36px}
+  .nl{display:none}
+  .nc{padding:.38rem .7rem;font-size:.75rem;margin-left:.3rem}
+}
 .nav-r{display:flex;align-items:center;gap:.15rem}
 .nl{padding:.42rem .85rem;color:var(--text2);font-size:.88rem;font-weight:500;text-decoration:none;border-radius:7px;transition:color .18s,background .18s}
 .nl:hover{color:var(--text);background:rgba(255,255,255,.05)}
