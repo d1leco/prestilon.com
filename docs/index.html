@@ -14,6 +14,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <!-- GitHub Pages SPA routing fix -->
+    <script>
+      (function() {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+        // Also handle ?p= query param from 404.html
+        var search = window.location.search;
+        if (search.startsWith('?p=')) {
+          var path = decodeURIComponent(search.slice(3));
+          history.replaceState(null, null, path);
+        }
+      })();
+    </script>
+
     <!-- Prevent FOUC -->
     <style>
       html {
@@ -27,8 +44,8 @@
         opacity: 1;
       }
     </style>
-    <script type="module" crossorigin src="/assets/index-ZfUZBJFl.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BCGirpt-.css">
+    <script type="module" crossorigin src="/assets/index-DWG0-ngr.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CqItmb81.css">
   </head>
   <body>
     <div id="root"></div>
