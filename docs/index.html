@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="lv" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/prestige-icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0f" />
+    <meta name="description" content="PRESTIGE - Multi-Printer AI Dashboard" />
+    
+    <title>PRESTIGE Dashboard</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Prevent FOUC -->
+    <style>
+      html {
+        background-color: #0a0a0f;
+      }
+      body {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      body.loaded {
+        opacity: 1;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-pfp0h9hq.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-UkBBbR3h.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // Mark body as loaded after fonts
+      document.fonts.ready.then(() => {
+        document.body.classList.add('loaded');
+      });
+      // Fallback
+      setTimeout(() => document.body.classList.add('loaded'), 500);
+    </script>
+  </body>
+</html>
