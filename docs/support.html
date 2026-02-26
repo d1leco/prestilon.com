@@ -25,6 +25,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   radial-gradient(ellipse 50% 50% at 90% 90%,rgba(108,92,231,.04),transparent 55%)}
 canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.3}
 
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes shimmer{to{background-position:200% center}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+@keyframes _sp{to{transform:rotate(360deg)}}
+
 /* NAV */
 nav{
   position:sticky;top:0;z-index:999;height:64px;
@@ -39,18 +44,14 @@ nav{
 .logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;letter-spacing:.07em;color:var(--c1)}
 .nav-r{display:flex;align-items:center;gap:.15rem}
 .nl{padding:.42rem .85rem;color:var(--text2);font-size:.88rem;font-weight:500;text-decoration:none;border-radius:7px;transition:color .18s,background .18s}
-.nl:hover,.nl.active{color:var(--text);background:rgba(255,255,255,.05)}
+.nl:hover{color:var(--text);background:rgba(255,255,255,.05)}
 .nl.active{color:var(--c1)}
 .nc{margin-left:.5rem;padding:.5rem 1.25rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;background:var(--c1);color:#060f1a;text-decoration:none;box-shadow:0 0 18px rgba(0,212,180,.25);transition:all .2s;display:inline-flex;align-items:center;gap:.3rem}
 .nc:hover{box-shadow:0 0 30px rgba(0,212,180,.45);transform:translateY(-1px)}
 
-@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-@keyframes shimmer{to{background-position:200% center}}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
-
 /* HERO */
 .hero{
-  text-align:center;padding:72px var(--r) 56px;
+  text-align:center;padding:72px var(--r) 60px;
   position:relative;z-index:1;
 }
 .h-badge{
@@ -67,114 +68,73 @@ nav{
   margin-bottom:.9rem;animation:up .55s ease .07s both;
 }
 .hero-h1 .acc{background:linear-gradient(100deg,var(--c1),var(--purple),var(--c1));background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 6s linear infinite}
-.hero-sub{color:var(--text2);font-size:.97rem;line-height:1.75;max-width:500px;margin:0 auto 2.5rem;animation:up .55s ease .14s both}
+.hero-sub{color:var(--text2);font-size:.97rem;line-height:1.75;max-width:480px;margin:0 auto;animation:up .55s ease .14s both}
 
-/* SEARCH */
-.search-wrap{max-width:530px;margin:0 auto;position:relative;animation:up .55s ease .2s both}
-.search-input{
-  width:100%;padding:.88rem 3.2rem .88rem 3rem;
-  background:var(--bg2);border:1px solid var(--border2);border-radius:14px;
-  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.92rem;outline:none;
-  transition:border-color .2s,box-shadow .2s;
+/* CONTENT GRID */
+.content{
+  display:grid;grid-template-columns:1fr 340px;gap:2.5rem;
+  padding:48px var(--r) 88px;
+  position:relative;z-index:1;
+  max-width:980px;margin:0 auto;
 }
-.search-input:focus{border-color:rgba(0,212,180,.4);box-shadow:0 0 0 4px rgba(0,212,180,.06)}
-.search-input::placeholder{color:var(--text3)}
-.si-icon{position:absolute;left:.95rem;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
-.si-clear{position:absolute;right:.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:.8rem;transition:color .2s;display:none}
-.si-clear.show{display:block}
-.si-clear:hover{color:var(--text2)}
+@media(max-width:860px){.content{grid-template-columns:1fr}}
 
-/* QUICK CARDS */
-.q-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;
-  padding:44px var(--r) 0;position:relative;z-index:1;
-}
-@media(max-width:780px){.q-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:460px){.q-grid{grid-template-columns:1fr}}
-.qcard{
-  background:var(--bg2);border:1px solid var(--border);border-radius:14px;
-  padding:1.4rem 1.25rem;text-decoration:none;color:inherit;cursor:pointer;
-  display:flex;flex-direction:column;align-items:flex-start;gap:.55rem;
-  transition:border-color .25s,transform .25s,background .25s;position:relative;overflow:hidden;
-}
-.qcard::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--c1),transparent);opacity:0;transition:opacity .25s}
-.qcard:hover{border-color:var(--border2);transform:translateY(-3px);background:var(--bg3)}
-.qcard:hover::after,.qcard.on::after{opacity:1}
-.qcard.on{border-color:var(--border2)}
-.qc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.05rem}
-.qcard h3{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700}
-.qcard p{font-size:.75rem;color:var(--text2);line-height:1.55}
-.qc-link{margin-top:auto;font-size:.72rem;color:var(--c1);font-family:'JetBrains Mono',monospace}
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.8rem}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:.3rem;display:flex;align-items:center;gap:.5rem;color:var(--text)}
+.card-sub{font-size:.8rem;color:var(--text2);margin-bottom:1.4rem;line-height:1.6}
 
-/* MAIN GRID */
-.main-grid{
-  display:grid;grid-template-columns:1fr 370px;gap:2rem;
-  padding:56px var(--r) 80px;position:relative;z-index:1;align-items:start;
-}
-@media(max-width:1020px){.main-grid{grid-template-columns:1fr}}
-
-/* FAQ */
-.faq-head{margin-bottom:1.6rem}
-.sec-label{font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.16em;color:var(--c1);text-transform:uppercase;margin-bottom:.55rem;display:flex;align-items:center;gap:.4rem}
-.sec-label::before{content:'//';opacity:.4}
-.faq-head h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;margin-bottom:.28rem}
-.faq-head p{color:var(--text2);font-size:.84rem}
-
-.cats{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:1.4rem}
-.cat{padding:.3rem .82rem;border-radius:99px;border:1px solid var(--border);background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;color:var(--text2);transition:all .18s}
-.cat:hover{border-color:var(--border2);color:var(--text)}
-.cat.on{background:rgba(0,212,180,.07);border-color:var(--border2);color:var(--c1)}
-
-.faq-list{display:flex;flex-direction:column;gap:.5rem}
-.fi{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
-.fi.open{border-color:rgba(0,212,180,.18)}
-.fi-q{width:100%;padding:1.05rem 1.15rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;background:none;border:none;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;color:var(--text);transition:color .18s}
-.fi-q:hover,.fi.open .fi-q{color:var(--c1)}
-.fi-chev{width:20px;height:20px;flex-shrink:0;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--text3);transition:transform .25s,background .2s,border-color .2s}
-.fi.open .fi-chev{transform:rotate(180deg);background:rgba(0,212,180,.07);border-color:var(--border2);color:var(--c1)}
-.fi-a{max-height:0;overflow:hidden;transition:max-height .32s ease,padding .22s ease;font-size:.82rem;color:var(--text2);line-height:1.77;padding:0 1.15rem}
-.fi.open .fi-a{max-height:500px;padding:0 1.15rem 1.1rem}
-.fi-a code{background:rgba(0,212,180,.07);border:1px solid rgba(0,212,180,.15);border-radius:5px;padding:.06rem .38rem;font-family:'JetBrains Mono',monospace;font-size:.77rem;color:var(--c1)}
-.faq-none{text-align:center;padding:2.5rem;color:var(--text3);font-size:.84rem}
-
-/* CONTACT COLUMN */
-.contact-col{display:flex;flex-direction:column;gap:1.1rem;position:sticky;top:80px}
-
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.6rem}
-.card h3{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:.3rem;display:flex;align-items:center;gap:.5rem}
-.card .c-sub{font-size:.78rem;color:var(--text2);margin-bottom:1.3rem;line-height:1.55}
-
-.fg{margin-bottom:.85rem}
-.fl{display:block;font-size:.7rem;font-weight:600;color:var(--text2);margin-bottom:.35rem;letter-spacing:.02em}
-.ff{width:100%;padding:.68rem .95rem;border-radius:9px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.87rem;transition:border-color .18s,box-shadow .18s;outline:none}
-.ff:focus{border-color:rgba(0,212,180,.35);box-shadow:0 0 0 3px rgba(0,212,180,.06)}
+/* FORM */
+.fg{margin-bottom:.9rem}
+.fl{display:block;font-size:.7rem;font-weight:600;color:var(--text2);margin-bottom:.36rem;letter-spacing:.02em;text-transform:uppercase}
+.ff{width:100%;padding:.72rem 1rem;border-radius:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;transition:border-color .18s,box-shadow .18s;outline:none}
+.ff:focus{border-color:rgba(0,212,180,.38);box-shadow:0 0 0 3px rgba(0,212,180,.06)}
 .ff::placeholder{color:var(--text3)}
-textarea.ff{resize:vertical;min-height:88px;line-height:1.6}
+textarea.ff{resize:vertical;min-height:100px;line-height:1.65}
 select.ff{cursor:pointer}
-.fsub{width:100%;padding:.78rem;border-radius:10px;border:none;background:var(--c1);color:#060f1a;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer;transition:all .22s;box-shadow:0 0 20px rgba(0,212,180,.18);display:flex;align-items:center;justify-content:center;gap:.4rem}
-.fsub:hover:not(:disabled){box-shadow:0 0 34px rgba(0,212,180,.38);transform:translateY(-1px)}
+.fsub{width:100%;padding:.82rem;border-radius:10px;border:none;background:var(--c1);color:#060f1a;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:800;cursor:pointer;transition:all .22s;box-shadow:0 0 22px rgba(0,212,180,.2);display:flex;align-items:center;justify-content:center;gap:.4rem;margin-top:.2rem}
+.fsub:hover:not(:disabled){box-shadow:0 0 38px rgba(0,212,180,.4);transform:translateY(-1px)}
 .fsub:disabled{opacity:.45;cursor:not-allowed;transform:none}
 
-.res-link{display:flex;align-items:center;gap:.7rem;text-decoration:none;padding:.6rem .75rem;border-radius:9px;border:1px solid var(--border);transition:border-color .2s,background .2s;margin-bottom:.55rem}
+/* ALERTS */
+.albox{padding:.72rem .9rem;border-radius:9px;font-size:.79rem;margin-bottom:.85rem;display:flex;align-items:flex-start;gap:.42rem;line-height:1.5}
+.ae{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);color:#fca5a5}
+.as{background:rgba(16,212,138,.08);border:1px solid rgba(16,212,138,.22);color:#6ee7b7}
+.spin{width:13px;height:13px;border:2px solid rgba(0,0,0,.15);border-top-color:#060f1a;border-radius:50%;animation:_sp .55s linear infinite;display:inline-block;flex-shrink:0}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:1.1rem;position:sticky;top:80px}
+
+/* LINKS CARD */
+.res-link{
+  display:flex;align-items:center;gap:.75rem;text-decoration:none;
+  padding:.65rem .8rem;border-radius:10px;border:1px solid var(--border);
+  transition:border-color .2s,background .2s;margin-bottom:.5rem;
+}
 .res-link:last-child{margin-bottom:0}
 .res-link:hover{border-color:var(--border2);background:rgba(0,212,180,.03)}
-.rl-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0}
-.rl-t{font-size:.8rem;font-weight:600;color:var(--text)}
+.rl-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.rl-t{font-size:.82rem;font-weight:600;color:var(--text)}
 .rl-s{font-size:.67rem;color:var(--text2);font-family:'JetBrains Mono',monospace}
-.rl-arr{margin-left:auto;color:var(--text3);font-size:.75rem}
+.rl-arr{margin-left:auto;color:var(--text3);font-size:.8rem;flex-shrink:0}
 
-.alert{padding:.7rem .9rem;border-radius:9px;font-size:.78rem;margin-bottom:.8rem;display:flex;align-items:flex-start;gap:.42rem;line-height:1.5}
-.ae{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#fca5a5}
-.as{background:rgba(16,212,138,.08);border:1px solid rgba(16,212,138,.25);color:#6ee7b7}
-.spin{width:13px;height:13px;border:2px solid rgba(0,0,0,.15);border-top-color:#060f1a;border-radius:50%;animation:_sp .55s linear infinite;display:inline-block;flex-shrink:0}
-@keyframes _sp{to{transform:rotate(360deg)}}
+/* INFO BOX */
+.info-box{
+  background:rgba(0,212,180,.04);border:1px solid var(--border2);border-radius:14px;
+  padding:1.3rem 1.4rem;
+}
+.info-box p{font-size:.8rem;color:var(--text2);line-height:1.7;margin-bottom:1rem}
+.info-box a{color:var(--c1);text-decoration:none;font-weight:600;font-size:.8rem}
+.info-box a:hover{text-decoration:underline}
 
+/* FOOTER */
 footer{border-top:1px solid var(--border);padding:2rem var(--r);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;position:relative;z-index:1}
 .fc{font-size:.7rem;color:var(--text3);margin-top:.2rem}
 .fl-links{display:flex;gap:1.4rem;flex-wrap:wrap}
 .fl-links a{color:var(--text3);text-decoration:none;font-size:.74rem;transition:color .2s}
 .fl-links a:hover{color:var(--text2)}
 
+/* REVEAL */
 .rev{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
 .rev.vis{opacity:1;transform:none}
 </style>
@@ -191,124 +151,75 @@ footer{border-top:1px solid var(--border);padding:2rem var(--r);display:flex;ali
   </div>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
   <div class="h-badge"><span class="h-dot"></span>HELP CENTER</div>
   <h1 class="hero-h1">How can we <span class="acc">help you?</span></h1>
-  <p class="hero-sub">Search our documentation, browse common questions, or send us a message — we'll get back to you fast.</p>
-  <div class="search-wrap">
-    <span class="si-icon">
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
-    </span>
-    <input type="text" class="search-input" id="si" placeholder="Search setup, diagnostics, billing…" oninput="doSearch(this.value)"/>
-    <button class="si-clear" id="sc" onclick="clearSearch()">✕</button>
-  </div>
+  <p class="hero-sub">Send us a message and we'll get back to you within 24 hours on business days.</p>
 </div>
 
-<!-- QUICK CARDS -->
-<div class="q-grid rev">
-  <div class="qcard" id="qc-all" onclick="setCat('all',this)">
-    <div class="qc-icon" style="background:rgba(0,212,180,.08)">
-      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect stroke="#00d4b4" stroke-width="1.7" stroke-linecap="round" x="3" y="3" width="7" height="7" rx="1"/><rect stroke="#00d4b4" stroke-width="1.7" stroke-linecap="round" x="14" y="3" width="7" height="7" rx="1"/><rect stroke="#00d4b4" stroke-width="1.7" stroke-linecap="round" x="3" y="14" width="7" height="7" rx="1"/><rect stroke="#00d4b4" stroke-width="1.7" stroke-linecap="round" x="14" y="14" width="7" height="7" rx="1"/></svg>
+<div class="content">
+  <!-- CONTACT FORM -->
+  <div class="card rev">
+    <div class="card-title">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Send a Message
     </div>
-    <h3>All Topics</h3>
-    <p>Browse every FAQ across all categories.</p>
-    <div class="qc-link">View all →</div>
-  </div>
-  <div class="qcard" id="qc-setup" onclick="setCat('setup',this)">
-    <div class="qc-icon" style="background:rgba(59,130,246,.08)">
-      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="#3b82f6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    <p class="card-sub">Describe your issue and we'll respond directly to your email.</p>
+    <div id="cAlert"></div>
+    <div class="fg"><label class="fl">Your name</label><input type="text" id="cName" class="ff" placeholder="Jane Doe"/></div>
+    <div class="fg"><label class="fl">Email address</label><input type="email" id="cEmail" class="ff" placeholder="you@example.com"/></div>
+    <div class="fg">
+      <label class="fl">Topic</label>
+      <select id="cTopic" class="ff">
+        <option value="">Select a topic…</option>
+        <option value="setup">Installation & Setup</option>
+        <option value="diagnostics">Diagnostics & AI</option>
+        <option value="billing">Billing & Subscription</option>
+        <option value="license">License / Activation</option>
+        <option value="bug">Bug Report</option>
+        <option value="feature">Feature Request</option>
+        <option value="other">Other</option>
+      </select>
     </div>
-    <h3>Getting Started</h3>
-    <p>Installation, first printer setup, connecting Klipper.</p>
-    <div class="qc-link">Setup guide →</div>
-  </div>
-  <div class="qcard" id="qc-diagnostics" onclick="setCat('diagnostics',this)">
-    <div class="qc-icon" style="background:rgba(108,92,231,.08)">
-      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="#6c5ce7" stroke-width="1.7" stroke-linecap="round" d="M3 12h2l2-7 4 14 3-9 2 2h5"/></svg>
-    </div>
-    <h3>Diagnostics & AI</h3>
-    <p>Health scores, anomaly detection, AI autonomy levels.</p>
-    <div class="qc-link">Learn more →</div>
-  </div>
-  <div class="qcard" id="qc-billing" onclick="setCat('billing',this)">
-    <div class="qc-icon" style="background:rgba(16,212,138,.08)">
-      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect stroke="#10d48a" stroke-width="1.7" stroke-linecap="round" x="2" y="5" width="20" height="14" rx="2"/><path stroke="#10d48a" stroke-width="1.7" stroke-linecap="round" d="M2 10h20"/></svg>
-    </div>
-    <h3>Billing & Plans</h3>
-    <p>Subscriptions, upgrades, payment questions.</p>
-    <div class="qc-link">Billing FAQ →</div>
-  </div>
-</div>
-
-<!-- MAIN CONTENT -->
-<div class="main-grid" id="faqTop">
-  <!-- FAQ -->
-  <div>
-    <div class="faq-head rev">
-      <div class="sec-label">FREQUENTLY ASKED</div>
-      <h2>Common Questions</h2>
-      <p>Quick answers to the most common PRESTILON questions.</p>
-    </div>
-    <div class="cats rev">
-      <button class="cat on" data-c="all" onclick="setCatBtn('all',this)">All</button>
-      <button class="cat" data-c="setup" onclick="setCatBtn('setup',this)">Setup</button>
-      <button class="cat" data-c="diagnostics" onclick="setCatBtn('diagnostics',this)">Diagnostics & AI</button>
-      <button class="cat" data-c="billing" onclick="setCatBtn('billing',this)">Billing</button>
-      <button class="cat" data-c="troubleshooting" onclick="setCatBtn('troubleshooting',this)">Troubleshooting</button>
-    </div>
-    <div class="faq-list rev" id="faqList"></div>
+    <div class="fg"><label class="fl">Message</label><textarea id="cMsg" class="ff" rows="5" placeholder="Describe your issue in detail…"></textarea></div>
+    <button class="fsub" id="sendBtn" onclick="sendMsg()">Send Message</button>
   </div>
 
-  <!-- CONTACT COLUMN -->
-  <div class="contact-col">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
     <div class="card rev">
-      <h3>
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        Send a Message
-      </h3>
-      <p class="c-sub">Can't find an answer? We respond within 24 hours on business days.</p>
-      <div id="cAlert"></div>
-      <div class="fg"><label class="fl">Your name</label><input type="text" id="cName" class="ff" placeholder="Jane Doe"/></div>
-      <div class="fg"><label class="fl">Email address</label><input type="email" id="cEmail" class="ff" placeholder="you@example.com"/></div>
-      <div class="fg"><label class="fl">Topic</label>
-        <select id="cTopic" class="ff">
-          <option value="">Select a topic…</option>
-          <option value="setup">Installation & Setup</option>
-          <option value="diagnostics">Diagnostics & AI</option>
-          <option value="billing">Billing & Subscription</option>
-          <option value="license">License / Activation</option>
-          <option value="bug">Bug Report</option>
-          <option value="feature">Feature Request</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="fg"><label class="fl">Message</label><textarea id="cMsg" class="ff" rows="4" placeholder="Describe your issue in detail…"></textarea></div>
-      <button class="fsub" id="sendBtn" onclick="sendMsg()">Send Message</button>
-    </div>
-
-    <div class="card rev">
-      <h3>
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+      <div class="card-title">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
         Quick Links
-      </h3>
-      <div style="margin-top:.85rem">
+      </div>
+      <div style="margin-top:1rem">
         <a class="res-link" href="mailto:support@prestilon.com">
-          <div class="rl-icon" style="background:rgba(0,212,180,.08)">✉️</div>
+          <div class="rl-icon" style="background:rgba(0,212,180,.08)">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path stroke="#00d4b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline stroke="#00d4b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="22,6 12,13 2,6"/></svg>
+          </div>
           <div><div class="rl-t">Email Support</div><div class="rl-s">support@prestilon.com</div></div>
           <span class="rl-arr">→</span>
         </a>
         <a class="res-link" href="https://billing.stripe.com" target="_blank">
-          <div class="rl-icon" style="background:rgba(16,212,138,.08)">💳</div>
+          <div class="rl-icon" style="background:rgba(16,212,138,.08)">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect stroke="#10d48a" stroke-width="2" stroke-linecap="round" x="2" y="5" width="20" height="14" rx="2"/><path stroke="#10d48a" stroke-width="2" stroke-linecap="round" d="M2 10h20"/></svg>
+          </div>
           <div><div class="rl-t">Billing Portal</div><div class="rl-s">Manage subscription</div></div>
           <span class="rl-arr">→</span>
         </a>
         <a class="res-link" href="/account">
-          <div class="rl-icon" style="background:rgba(108,92,231,.08)">👤</div>
+          <div class="rl-icon" style="background:rgba(108,92,231,.08)">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path stroke="#6c5ce7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle stroke="#6c5ce7" stroke-width="2" cx="12" cy="7" r="4"/></svg>
+          </div>
           <div><div class="rl-t">My Account</div><div class="rl-s">Login · download</div></div>
           <span class="rl-arr">→</span>
         </a>
       </div>
+    </div>
+
+    <div class="info-box rev">
+      <p>Typical response time is under 24 hours on business days. For urgent license or billing issues, include your account email in the message for faster resolution.</p>
+      <a href="mailto:support@prestilon.com">support@prestilon.com →</a>
     </div>
   </div>
 </div>
@@ -326,7 +237,6 @@ footer{border-top:1px solid var(--border);padding:2rem var(--r);display:flex;ali
 </footer>
 
 <script>
-/* CANVAS */
 (()=>{
   const c=document.getElementById('bg'),x=c.getContext('2d');let W,H,P=[]
   function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
@@ -348,96 +258,19 @@ footer{border-top:1px solid var(--border);padding:2rem var(--r);display:flex;ali
   resize();init();draw()
 })()
 
-/* FAQ DATA */
-const FAQS=[
-  {cat:'setup',q:'What are the system requirements?',
-   a:'PRESTILON requires <code>Windows 10 or 11 (64-bit)</code>, <code>Node.js 18+</code>, and a printer running <code>Klipper + Moonraker</code>. Your Windows machine must have local network access to each printer. No cloud connection needed for AI — only license validation requires internet.'},
-  {cat:'setup',q:'How do I connect my printer to PRESTILON?',
-   a:'After installing, open <code>http://localhost:3002</code> and go to Fleet → Add Printer. Enter your printer\'s local IP address and Moonraker port (default <code>7125</code>). PRESTILON verifies the connection and begins streaming telemetry within seconds.'},
-  {cat:'setup',q:'Does PRESTILON work with any Klipper-based printer?',
-   a:'Yes. PRESTILON connects to any printer running Moonraker — Ender, Bambu (with Klipper), Voron, RatRig, Prusa MK4, and custom builds. Only requirement is a working Moonraker API endpoint on your local network.'},
-  {cat:'setup',q:'Can I run PRESTILON on multiple Windows machines?',
-   a:'Each license is bound to one Windows machine. To migrate, contact support and we\'ll release the old binding. Enterprise plans include multi-machine support.'},
-
-  {cat:'diagnostics',q:'What is a Health Score and how is it calculated?',
-   a:'The Health Score (0–100) is an AI composite score that weighs anomaly severity (CUSUM detection), wear model estimates for belts/nozzle/motors, diagnostic test results, and maintenance history. Above 80 = healthy. Below 60 = attention needed. Below 40 = critical. All scores benchmarked against a real-world fleet baseline.'},
-  {cat:'diagnostics',q:'What do the AI Autonomy levels mean?',
-   a:'<strong>L0 Passive:</strong> PRESTILON observes and logs — never acts.<br><br><strong>L1 Recommend:</strong> AI surfaces prioritized action cards for you to approve.<br><br><strong>L2 Automatic:</strong> PRESTILON autonomously executes safe corrective GCode (fan adjustments, pause, abort) without approval. Each printer is set independently.'},
-  {cat:'diagnostics',q:'What is CUSUM detection and when does it trigger?',
-   a:'CUSUM (Cumulative Sum) control charts monitor sensor streams — belt tension, temperature variance, motor load — for statistically significant drift. An alert triggers when cumulative deviation exceeds a configurable threshold (in σ). Unlike simple thresholds, CUSUM catches gradual degradation before it becomes a failure.'},
-  {cat:'diagnostics',q:'How long do diagnostic tests take?',
-   a:'Quick tests (Status Check, Temperature Stability) complete in under 10 seconds. Physical tests (Extrusion Flow, Axes, Retraction) take 40–90 seconds each. The Full System Diagnostic runs all five tests and completes in approximately 4–5 minutes. Tests only run when the printer is idle.'},
-  {cat:'diagnostics',q:'What does "Failure Risk" percentage mean?',
-   a:'It\'s the AI\'s estimated probability that a specific failure (thermal runaway, belt snap, clog, bed adhesion loss, extruder jam) will occur within the next print session, based on current sensor trends and wear models. Risk above 35% triggers a recommendation; above 70% triggers a pause signal in L1/L2 mode.'},
-
-  {cat:'billing',q:'How do I upgrade or change my plan?',
-   a:'Sign in, go to Account → Subscription, and click "Manage Billing". This opens the Stripe billing portal where you can upgrade, downgrade, or cancel. Changes take effect at the next billing cycle.'},
-  {cat:'billing',q:'Can I cancel at any time?',
-   a:'Yes, cancel anytime via the Stripe portal — no penalties. Your plan stays active until the end of the billing period, then reverts to free tier (1 printer, L0 monitoring only).'},
-  {cat:'billing',q:'Is there a free trial?',
-   a:'Yes. New accounts get a 7-day free trial of the Professional plan — no credit card required. At the end of the trial you choose a plan or continue on free tier.'},
-  {cat:'billing',q:'Are payments secure?',
-   a:'All payments are processed by Stripe (PCI DSS Level 1 certified). PRESTILON never stores or sees your card details.'},
-
-  {cat:'troubleshooting',q:'PRESTILON says my license is invalid — what should I do?',
-   a:'Usually one of three causes: (1) subscription expired — check Account → Subscription; (2) running on a different machine than activation; (3) network error during validation. Try restarting PRESTILON. If the issue persists after 24 hours, contact support with your account email.'},
-  {cat:'troubleshooting',q:'I can\'t connect to my printer — "Moonraker unreachable".',
-   a:'Check: (1) printer is on and Moonraker is running; (2) same local network as your Windows machine; (3) IP address matches current printer IP (check router\'s DHCP table); (4) firewall isn\'t blocking port <code>7125</code>. Setting a static IP for your printer is strongly recommended.'},
-  {cat:'troubleshooting',q:'AI engine shows "License grace period" — is something wrong?',
-   a:'No — expected behavior. If PRESTILON can\'t reach the license validation server (internet outage), it enters a 24-hour offline grace period where all features continue normally. If it persists beyond 24 hours the AI engine pauses until connectivity is restored.'},
-  {cat:'troubleshooting',q:'Diagnostic tests fail or freeze — how do I fix this?',
-   a:'Physical tests require the printer to be fully idle (not printing or homing). If a test freezes: (1) click Cancel Test; (2) send <code>M112</code> emergency stop via Mainsail/Fluidd; (3) home all axes; (4) retry. If tests consistently fail, run Status Check first to verify sensor connectivity.'},
-]
-
-let cur='all', sq=''
-
-function renderFaqs(){
-  const list=document.getElementById('faqList')
-  let items=FAQS
-  if(cur!=='all')items=items.filter(f=>f.cat===cur)
-  if(sq)items=items.filter(f=>f.q.toLowerCase().includes(sq)||f.a.toLowerCase().includes(sq))
-  if(!items.length){list.innerHTML=`<div class="faq-none">No results found. Try a different search or <a href="#" onclick="document.getElementById('cMsg').focus();return false" style="color:var(--c1)">send us a message</a>.</div>`;return}
-  list.innerHTML=items.map((f,i)=>`
-    <div class="fi" id="fi${i}">
-      <button class="fi-q" onclick="tog('fi${i}')"><span>${f.q}</span><span class="fi-chev">▼</span></button>
-      <div class="fi-a">${f.a}</div>
-    </div>`).join('')
-}
-
-function tog(id){
-  const el=document.getElementById(id),was=el.classList.contains('open')
-  document.querySelectorAll('.fi').forEach(e=>e.classList.remove('open'))
-  if(!was)el.classList.add('open')
-}
-
-function setCat(c,btn){
-  cur=c;sq='';document.getElementById('si').value='';document.getElementById('sc').classList.remove('show')
-  document.querySelectorAll('.cat').forEach(b=>b.classList.toggle('on',b.dataset.c===c))
-  renderFaqs()
-}
-function setCatBtn(c,btn){
-  cur=c;sq=''
-  document.querySelectorAll('.cat').forEach(b=>b.classList.toggle('on',b.dataset.c===c))
-  renderFaqs()
-}
-function doSearch(v){
-  sq=v.trim().toLowerCase();document.getElementById('sc').classList.toggle('show',!!v)
-  cur='all';document.querySelectorAll('.cat').forEach(b=>b.classList.toggle('on',b.dataset.c==='all'))
-  renderFaqs()
-}
-function clearSearch(){document.getElementById('si').value='';document.getElementById('sc').classList.remove('show');sq='';renderFaqs()}
-
-/* CONTACT */
 function sendMsg(){
-  const n=document.getElementById('cName').value.trim(),e=document.getElementById('cEmail').value.trim()
-  const t=document.getElementById('cTopic').value,m=document.getElementById('cMsg').value.trim()
-  const al=document.getElementById('cAlert'),btn=document.getElementById('sendBtn')
-  if(!n||!e||!t||!m){al.innerHTML='<div class="alert ae">Please fill in all fields.</div>';return}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){al.innerHTML='<div class="alert ae">Please enter a valid email.</div>';return}
+  const n=document.getElementById('cName').value.trim()
+  const e=document.getElementById('cEmail').value.trim()
+  const t=document.getElementById('cTopic').value
+  const m=document.getElementById('cMsg').value.trim()
+  const al=document.getElementById('cAlert')
+  const btn=document.getElementById('sendBtn')
+  if(!n||!e||!t||!m){al.innerHTML='<div class="albox ae">Please fill in all fields.</div>';return}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){al.innerHTML='<div class="albox ae">Please enter a valid email address.</div>';return}
   btn.disabled=true;btn.innerHTML='<span class="spin"></span> Sending…'
   setTimeout(()=>{
     btn.disabled=false;btn.innerHTML='Send Message'
-    al.innerHTML='<div class="alert as">✅ Message sent! We\'ll reply within 24 hours.</div>'
+    al.innerHTML='<div class="albox as">✅ Message sent! We\'ll reply within 24 hours.</div>'
     document.getElementById('cName').value=''
     document.getElementById('cEmail').value=''
     document.getElementById('cTopic').value=''
@@ -445,11 +278,8 @@ function sendMsg(){
   },1200)
 }
 
-/* REVEAL */
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.06})
 document.querySelectorAll('.rev').forEach(el=>obs.observe(el))
-
-renderFaqs()
 </script>
 
 <script type="module">
