@@ -11,18 +11,18 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#020B14;
-  --bg2:#050F1C;
-  --bg3:#081524;
-  --bg4:#0A1A2E;
-  --c1:#00E5C8;
-  --c2:#00B8A0;
-  --purple:#7B5CF0;
-  --text:#E8F0FB;
-  --text2:#8A9BB8;
-  --text3:#3D5070;
-  --border:rgba(0,229,200,.07);
-  --border2:rgba(0,229,200,.2);
+  --bg:#071525;
+  --bg2:#0C1E30;
+  --bg3:#102540;
+  --bg4:#152A44;
+  --c1:#00D4B4;
+  --c2:#00A896;
+  --purple:#7C6FF7;
+  --text:#FFFFFF;
+  --text2:#94A8C0;
+  --text3:#4A6280;
+  --border:rgba(255,255,255,.08);
+  --border2:rgba(0,212,180,.28);
   --red:#F05060;
   --green:#20D490;
   --amber:#F0A830;
@@ -30,18 +30,19 @@
 }
 html{background:var(--bg);scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh}
-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(0,212,180,.07) 0%,transparent 55%),radial-gradient(ellipse 50% 60% at 90% 90%,rgba(124,111,247,.05) 0%,transparent 50%)}
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4}
 
 /* ── NAV ── */
 nav{
   position:sticky;top:0;z-index:100;height:60px;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 max(1.5rem,calc(50vw - 640px));
-  background:rgba(2,11,20,.88);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  background:rgba(7,21,37,.92);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
   border-bottom:1px solid var(--border);
 }
 .logo{display:flex;align-items:center;gap:.65rem;cursor:pointer;text-decoration:none;border:none;background:none;padding:0}
-.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--c1),var(--c2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:800;color:#020B14;box-shadow:0 0 14px rgba(0,229,200,.25);flex-shrink:0}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--c1),var(--c2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:800;color:#071525;box-shadow:0 0 14px rgba(0,212,180,.28);flex-shrink:0}
 .logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;letter-spacing:.08em;color:var(--c1)}
 .nav-right{display:flex;align-items:center;gap:.75rem}
 .back-nav{color:var(--text3);font-size:.78rem;text-decoration:none;display:flex;align-items:center;gap:.35rem;transition:color .2s;font-family:'DM Sans',sans-serif}
