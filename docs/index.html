@@ -12,215 +12,180 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --ink:#04040c;--ink2:#080816;--ink3:#0d0d20;
-  --c:#00e5ff;--c2:#0099cc;--c3:rgba(0,229,255,.12);
+  --c:#00e5ff;--c2:#0099cc;
   --g:#7c3aed;--a:#f59e0b;--r:#ef4444;--gr:#10b981;
   --t:#dde4f0;--t2:#7a87a0;--t3:#363d52;
   --border:rgba(0,229,255,.07);--border2:rgba(0,229,255,.2);
-  --glow:0 0 60px rgba(0,229,255,.12);
 }
-html{background:var(--ink);scroll-behavior:smooth;font-size:16px}
+html{background:var(--ink);scroll-behavior:smooth}
 body{font-family:'Space Grotesk',sans-serif;color:var(--t);overflow-x:hidden;min-height:100vh}
 
-/* ─── CANVAS BG ─── */
-#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
+/* canvas bg — purely visual, never blocks clicks */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+/* noise overlay — never blocks clicks */
+.noise-overlay{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size:128px;opacity:.5}
 
-/* ─── NOISE ─── */
-body::after{
-  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  background-repeat:repeat;background-size:128px;opacity:.4;
-}
-
-/* ─── LAYOUT ─── */
-.z1{position:relative;z-index:1}
-
-/* ─── NAV ─── */
+/* ── NAV ── */
 nav{
-  position:fixed;top:0;left:0;right:0;z-index:200;height:68px;
+  position:fixed;top:0;left:0;right:0;z-index:9999;height:68px;
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 max(2rem, calc(50vw - 580px));
-  background:rgba(4,4,12,.8);backdrop-filter:blur(24px) saturate(180%);
+  padding:0 max(1.5rem,calc(50vw - 580px));
+  background:rgba(4,4,12,.92);backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
-  transition:background .3s;
 }
-.logo{display:flex;align-items:center;gap:.75rem;cursor:pointer;text-decoration:none}
+.logo{display:flex;align-items:center;gap:.75rem;cursor:pointer;text-decoration:none;border:none;background:none;padding:0}
 .logo-mark{
-  width:36px;height:36px;border-radius:10px;
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
   background:linear-gradient(135deg,var(--c),var(--c2));
   display:flex;align-items:center;justify-content:center;
   font-family:'Orbitron',monospace;font-size:.75rem;font-weight:900;color:#000;
   box-shadow:0 0 20px rgba(0,229,255,.3);
-  position:relative;overflow:hidden;
 }
-.logo-mark::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2),transparent)}
-.logo-text{font-family:'Orbitron',monospace;font-weight:800;font-size:1rem;letter-spacing:.12em;color:var(--c);text-shadow:0 0 20px rgba(0,229,255,.35)}
-.logo-sub{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--t3);letter-spacing:.08em}
-.nav-right{display:flex;align-items:center;gap:.5rem}
+.logo-text{font-family:'Orbitron',monospace;font-weight:800;font-size:.95rem;letter-spacing:.12em;color:var(--c)}
+.logo-sub{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--t3);letter-spacing:.08em}
+.nav-right{display:flex;align-items:center;gap:.4rem}
 .nbtn{
-  padding:.45rem 1.1rem;border-radius:8px;border:none;cursor:pointer;
+  padding:.45rem 1rem;border-radius:8px;border:none;cursor:pointer;
   font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.82rem;
-  transition:all .2s;text-decoration:none;display:inline-block;
+  transition:all .2s;background:transparent;
 }
-.nbtn-ghost{background:transparent;color:var(--t2)}
-.nbtn-ghost:hover{color:var(--t);background:rgba(255,255,255,.04)}
-.nbtn-outline{background:transparent;color:var(--c);border:1px solid var(--border2)}
-.nbtn-outline:hover{background:rgba(0,229,255,.06);box-shadow:0 0 20px rgba(0,229,255,.15)}
-.nbtn-cta{
-  background:var(--c);color:#000;font-weight:800;
-  box-shadow:0 0 20px rgba(0,229,255,.3);
-  padding:.5rem 1.3rem;
-}
+.nbtn-ghost{color:var(--t2)}
+.nbtn-ghost:hover{color:var(--t);background:rgba(255,255,255,.05)}
+.nbtn-outline{color:var(--c);border:1px solid var(--border2)}
+.nbtn-outline:hover{background:rgba(0,229,255,.07)}
+.nbtn-cta{background:var(--c);color:#000;font-weight:800;padding:.5rem 1.3rem;box-shadow:0 0 20px rgba(0,229,255,.3)}
 .nbtn-cta:hover{box-shadow:0 0 35px rgba(0,229,255,.5);transform:translateY(-1px)}
 
-/* ─── PAGES ─── */
-.page{display:none}.page.active{display:block}
+/* ── PAGES ── */
+.page{display:none;position:relative;z-index:2}
+.page.active{display:block}
 
-/* ═══════════════════════════════════════════════════════
-   HERO
-═══════════════════════════════════════════════════════ */
-.hero-section{
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;padding:100px max(1.5rem, calc(50vw - 600px)) 80px;
-  text-align:center;position:relative;
-}
-.hero-eyebrow{
-  display:inline-flex;align-items:center;gap:.6rem;
-  padding:.35rem 1rem .35rem .6rem;border-radius:99px;
-  background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.18);
-  font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.06em;
-  color:var(--c);margin-bottom:2rem;
-  animation:fadeSlide .8s ease both;
-}
-.hero-eyebrow-dot{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c);animation:pulseGlow 2s infinite}
-@keyframes pulseGlow{0%,100%{opacity:1;box-shadow:0 0 8px var(--c)}50%{opacity:.5;box-shadow:0 0 4px var(--c)}}
-@keyframes fadeSlide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-
-.hero-h1{
-  font-family:'Orbitron',monospace;font-weight:900;
-  font-size:clamp(2.4rem,7vw,5.5rem);line-height:1.0;letter-spacing:-.02em;
-  margin-bottom:1.5rem;animation:fadeSlide .8s ease .1s both;
-}
-.hero-h1 em{
-  font-style:normal;
-  background:linear-gradient(90deg,var(--c),#a78bfa,var(--c));
-  background-size:200% auto;
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:shimmer 4s linear infinite;
-}
-@keyframes shimmer{to{background-position:200% center}}
-
-.hero-sub{
-  max-width:620px;margin:0 auto 2.5rem;
-  color:var(--t2);font-size:1.1rem;line-height:1.75;
-  animation:fadeSlide .8s ease .2s both;
-}
-.hero-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:4rem;animation:fadeSlide .8s ease .3s both}
-
-.btn{
-  padding:.8rem 2rem;border-radius:12px;border:none;cursor:pointer;
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;
-  transition:all .25s;display:inline-flex;align-items:center;gap:.5rem;text-decoration:none;
-}
-.btn-primary{background:var(--c);color:#000;box-shadow:0 0 30px rgba(0,229,255,.35)}
-.btn-primary:hover{box-shadow:0 0 50px rgba(0,229,255,.55);transform:translateY(-2px)}
-.btn-ghost{background:rgba(255,255,255,.04);color:var(--t);border:1px solid rgba(255,255,255,.1)}
-.btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(0,229,255,.3)}
-
-/* ─── TRUST METRICS ─── */
-.trust-row{
-  display:flex;align-items:center;justify-content:center;gap:0;
-  background:rgba(255,255,255,.02);border:1px solid var(--border);
-  border-radius:16px;overflow:hidden;margin-bottom:4rem;
-  animation:fadeSlide .8s ease .4s both;width:100%;max-width:700px;
-}
-.trust-item{flex:1;padding:1.25rem .75rem;text-align:center;position:relative}
-.trust-item+.trust-item::before{content:'';position:absolute;left:0;top:15%;bottom:15%;width:1px;background:var(--border)}
-.trust-val{font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:800;color:var(--c);line-height:1}
-.trust-lbl{font-size:.65rem;color:var(--t3);letter-spacing:.08em;margin-top:.3rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase}
-
-/* ─── DASHBOARD PREVIEW ─── */
-.preview-wrap{
-  width:100%;max-width:960px;margin:0 auto;
-  border-radius:20px;overflow:hidden;
-  border:1px solid var(--border2);
-  box-shadow:0 0 80px rgba(0,229,255,.08),0 60px 120px rgba(0,0,0,.6);
-  animation:fadeSlide .8s ease .5s both;
-}
-.preview-chrome{
-  background:var(--ink2);padding:.6rem 1rem;
-  display:flex;align-items:center;gap:.6rem;
-  border-bottom:1px solid var(--border);
-}
-.chrome-dot{width:11px;height:11px;border-radius:50%}
-.chrome-bar{
-  flex:1;background:rgba(255,255,255,.04);border-radius:6px;
-  padding:.3rem .8rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--t3);
-  display:flex;align-items:center;gap:.5rem;max-width:320px;margin:0 auto;
-}
-.chrome-lock{color:var(--gr);font-size:.7rem}
-.preview-body{background:var(--ink2);display:grid;grid-template-columns:180px 1fr;min-height:340px}
-.preview-sidebar{border-right:1px solid var(--border);padding:1rem .75rem;display:flex;flex-direction:column;gap:.5rem}
-.preview-sidebar-item{
-  padding:.5rem .75rem;border-radius:8px;font-size:.72rem;
-  display:flex;align-items:center;gap:.5rem;color:var(--t2);cursor:default;
-}
-.preview-sidebar-item.active{background:rgba(0,229,255,.1);color:var(--c)}
-.preview-sidebar-item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.preview-main{padding:1rem;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto;gap:.75rem}
-.pcard{
-  background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:1rem;
-}
-.pcard-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem}
-.pcard-val{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:800}
-.pcard.span2{grid-column:span 2}
-.mini-bars{display:flex;align-items:flex-end;gap:3px;height:32px;margin-top:.5rem}
-.mini-bar{flex:1;border-radius:2px;background:rgba(0,229,255,.15);transition:height 1s}
-.mini-bar.hi{background:rgba(0,229,255,.45)}
-.health-gauge{
-  width:56px;height:56px;border-radius:50%;margin:.25rem auto 0;
-  background:conic-gradient(var(--c) calc(var(--pct,87) * 3.6deg),rgba(0,229,255,.08) 0);
-  display:flex;align-items:center;justify-content:center;position:relative;
-}
-.health-gauge::before{content:'';position:absolute;inset:7px;border-radius:50%;background:var(--ink3)}
-.health-gauge span{position:relative;font-family:'Orbitron',monospace;font-size:.72rem;font-weight:800;color:var(--c)}
-.anomaly-list{display:flex;flex-direction:column;gap:.35rem;margin-top:.4rem}
-.anomaly-item{
-  display:flex;align-items:center;gap:.4rem;
-  font-size:.62rem;color:var(--t2);font-family:'JetBrains Mono',monospace;
-}
-.anomaly-item .sev{padding:.1rem .4rem;border-radius:4px;font-weight:700;font-size:.55rem;text-transform:uppercase}
-.sev-med{background:rgba(245,158,11,.15);color:var(--a)}
-.sev-low{background:rgba(59,130,246,.12);color:#60a5fa}
-.risk-bar-wrap{margin-top:.4rem}
-.risk-bar-track{height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-top:.3rem}
-.risk-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gr),var(--a))}
-
-/* ═══════════════════════════════════════════════════════
-   SECTIONS
-═══════════════════════════════════════════════════════ */
-.section{padding:100px max(1.5rem, calc(50vw - 600px));position:relative;z-index:1}
-.section+.section::before{
-  content:'';display:block;height:1px;
-  background:linear-gradient(90deg,transparent,var(--border2),transparent);
-  position:absolute;top:0;left:0;right:0;
-}
+/* ── SECTIONS ── */
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(1.5rem,calc(50vw - 600px));padding-right:max(1.5rem,calc(50vw - 600px))}
+.section{padding:100px max(1.5rem,calc(50vw - 600px))}
 .s-eyebrow{
-  font-family:'JetBrains Mono',monospace;font-size:.68rem;
-  letter-spacing:.15em;color:var(--c);text-transform:uppercase;margin-bottom:.75rem;
-  display:flex;align-items:center;gap:.5rem;
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.15em;
+  color:var(--c);text-transform:uppercase;margin-bottom:.75rem;
+  display:flex;align-items:center;gap:.4rem;
 }
 .s-eyebrow::before{content:'//';opacity:.5}
 .s-h2{font-family:'Orbitron',monospace;font-weight:800;font-size:clamp(1.6rem,3.5vw,2.6rem);line-height:1.15;margin-bottom:1rem}
 .s-sub{color:var(--t2);font-size:1rem;line-height:1.75;max-width:560px}
 
-/* ─── FEATURE GRID ─── */
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:100px max(1.5rem,calc(50vw - 600px)) 80px;
+  text-align:center;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:.6rem;padding:.35rem 1rem .35rem .6rem;
+  border-radius:99px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.18);
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.06em;color:var(--c);
+  margin-bottom:2rem;animation:fadeUp .8s ease both;
+}
+.eyebrow-dot{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+.hero-h1{
+  font-family:'Orbitron',monospace;font-weight:900;
+  font-size:clamp(2.2rem,6.5vw,5rem);line-height:1.0;letter-spacing:-.02em;
+  margin-bottom:1.5rem;animation:fadeUp .8s ease .1s both;
+}
+.hero-h1 em{
+  font-style:normal;
+  background:linear-gradient(90deg,var(--c),#a78bfa,var(--c));
+  background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 4s linear infinite;
+}
+@keyframes shimmer{to{background-position:200% center}}
+.hero-sub{
+  max-width:620px;margin:0 auto 2.5rem;color:var(--t2);font-size:1.05rem;line-height:1.75;
+  animation:fadeUp .8s ease .2s both;
+}
+.hero-actions{
+  display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:4rem;
+  animation:fadeUp .8s ease .3s both;
+}
+.btn{
+  padding:.8rem 2rem;border-radius:12px;border:none;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;
+  transition:all .25s;display:inline-flex;align-items:center;gap:.5rem;text-decoration:none;
+}
+.btn-p{background:var(--c);color:#000;box-shadow:0 0 30px rgba(0,229,255,.35)}
+.btn-p:hover{box-shadow:0 0 50px rgba(0,229,255,.55);transform:translateY(-2px)}
+.btn-g{background:rgba(255,255,255,.04);color:var(--t);border:1px solid rgba(255,255,255,.1)}
+.btn-g:hover{background:rgba(255,255,255,.08);border-color:rgba(0,229,255,.3)}
+
+/* ── TRUST ROW ── */
+.trust{
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:16px;
+  overflow:hidden;width:100%;max-width:700px;margin-bottom:4rem;
+  animation:fadeUp .8s ease .4s both;
+}
+.ti{flex:1;padding:1.2rem .75rem;text-align:center;position:relative}
+.ti+.ti::before{content:'';position:absolute;left:0;top:15%;bottom:15%;width:1px;background:var(--border)}
+.tv{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:800;color:var(--c);line-height:1}
+.tl{font-size:.62rem;color:var(--t3);letter-spacing:.08em;margin-top:.3rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase}
+
+/* ── PREVIEW ── */
+.preview{
+  width:100%;max-width:960px;
+  border-radius:20px;overflow:hidden;
+  border:1px solid var(--border2);
+  box-shadow:0 0 80px rgba(0,229,255,.08),0 60px 120px rgba(0,0,0,.6);
+  animation:fadeUp .8s ease .5s both;
+}
+.preview-chrome{
+  background:var(--ink2);padding:.6rem 1rem;
+  display:flex;align-items:center;gap:.6rem;border-bottom:1px solid var(--border);
+}
+.cd{width:11px;height:11px;border-radius:50%}
+.cbar{
+  flex:1;background:rgba(255,255,255,.04);border-radius:6px;
+  padding:.28rem .8rem;font-family:'JetBrains Mono',monospace;font-size:.64rem;color:var(--t3);
+  display:flex;align-items:center;gap:.5rem;max-width:320px;margin:0 auto;
+}
+.preview-body{background:var(--ink2);display:grid;grid-template-columns:170px 1fr;min-height:320px}
+.psidebar{border-right:1px solid var(--border);padding:.85rem .7rem;display:flex;flex-direction:column;gap:.4rem}
+.psi{padding:.45rem .65rem;border-radius:8px;font-size:.7rem;display:flex;align-items:center;gap:.45rem;color:var(--t2)}
+.psi.on{background:rgba(0,229,255,.1);color:var(--c)}
+.pdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.pmain{padding:.9rem;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto;gap:.7rem}
+.pc{background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:.9rem}
+.plbl{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem}
+.pv{font-family:'Orbitron',monospace;font-size:1.35rem;font-weight:800}
+.pc.sp2{grid-column:span 2}
+.mbars{display:flex;align-items:flex-end;gap:3px;height:30px;margin-top:.45rem}
+.mbar{flex:1;border-radius:2px;background:rgba(0,229,255,.15)}
+.mbar.h{background:rgba(0,229,255,.45)}
+.gauge{
+  width:52px;height:52px;border-radius:50%;margin:.2rem auto 0;
+  background:conic-gradient(var(--c) calc(var(--p,87) * 3.6deg),rgba(0,229,255,.08) 0);
+  display:flex;align-items:center;justify-content:center;position:relative;
+}
+.gauge::before{content:'';position:absolute;inset:7px;border-radius:50%;background:var(--ink3)}
+.gauge span{position:relative;font-family:'Orbitron',monospace;font-size:.7rem;font-weight:800;color:var(--c)}
+.anom-list{display:flex;flex-direction:column;gap:.3rem;margin-top:.35rem}
+.anom{display:flex;align-items:center;gap:.35rem;font-size:.6rem;color:var(--t2);font-family:'JetBrains Mono',monospace}
+.sev{padding:.1rem .35rem;border-radius:4px;font-weight:700;font-size:.52rem;text-transform:uppercase}
+.smed{background:rgba(245,158,11,.15);color:var(--a)}
+.slow{background:rgba(59,130,246,.12);color:#60a5fa}
+.risk-bar{margin-top:.35rem}
+.rbt{height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-top:.25rem}
+.rbf{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gr),var(--a))}
+
+/* ── FEATURES ── */
 .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3.5rem}
-@media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.feat-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:580px){.feat-grid{grid-template-columns:1fr}}
 .feat{
   background:var(--ink2);border:1px solid var(--border);border-radius:18px;
-  padding:1.75rem;position:relative;overflow:hidden;
-  transition:border-color .3s,transform .3s;
+  padding:1.75rem;position:relative;overflow:hidden;transition:border-color .3s,transform .3s;
 }
 .feat::before{
   content:'';position:absolute;top:0;left:0;right:0;height:2px;
@@ -229,242 +194,128 @@ nav{
 }
 .feat:hover{border-color:rgba(0,229,255,.25);transform:translateY(-4px)}
 .feat:hover::before{opacity:1}
-.feat-num{
-  font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--t3);
-  margin-bottom:1rem;letter-spacing:.1em;
-}
-.feat-icon{
-  width:48px;height:48px;border-radius:14px;margin-bottom:1.1rem;
-  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
-}
-.feat h3{font-size:1rem;font-weight:700;margin-bottom:.5rem}
-.feat p{font-size:.83rem;color:var(--t2);line-height:1.7}
+.feat-num{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--t3);margin-bottom:.85rem;letter-spacing:.08em}
+.feat-icon{width:46px;height:46px;border-radius:14px;margin-bottom:1rem;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.feat h3{font-size:.97rem;font-weight:700;margin-bottom:.45rem}
+.feat p{font-size:.82rem;color:var(--t2);line-height:1.7}
 .feat-tag{
-  display:inline-block;margin-top:.75rem;padding:.2rem .6rem;border-radius:6px;
-  font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:600;letter-spacing:.04em;
+  display:inline-block;margin-top:.7rem;padding:.2rem .6rem;border-radius:6px;
+  font-family:'JetBrains Mono',monospace;font-size:.58rem;font-weight:600;letter-spacing:.03em;
 }
 
-/* ─── TECH DEEP DIVE ─── */
-.tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem;align-items:start}
+/* ── TECH PANELS ── */
+.tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.75rem;margin-top:3rem}
 @media(max-width:780px){.tech-grid{grid-template-columns:1fr}}
 .tech-panel{background:var(--ink2);border:1px solid var(--border);border-radius:18px;overflow:hidden}
-.tech-panel-header{
-  padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:.75rem;
-}
-.tech-panel-header h3{font-size:.95rem;font-weight:700}
-.tech-panel-body{padding:1.5rem}
-.code-block{
+.tph{padding:1.15rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.7rem}
+.tph h3{font-size:.92rem;font-weight:700}
+.tpb{padding:1.4rem}
+.codeblock{
   background:var(--ink);border:1px solid var(--border);border-radius:12px;
-  padding:1rem 1.25rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;
-  line-height:1.8;color:var(--t2);overflow-x:auto;margin-bottom:1rem;
+  padding:.9rem 1.1rem;font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  line-height:1.8;color:var(--t2);overflow-x:auto;margin-bottom:.9rem;
 }
-.code-block .kw{color:var(--c)}.code-block .cm{color:var(--t3);font-style:italic}
-.code-block .nm{color:#a78bfa}.code-block .vl{color:var(--a)}
-.tech-list{list-style:none;display:flex;flex-direction:column;gap:.6rem}
-.tech-list li{
-  display:flex;align-items:flex-start;gap:.6rem;font-size:.83rem;color:var(--t2);line-height:1.6;
-}
-.tech-list li::before{content:'→';color:var(--c);font-family:'JetBrains Mono',monospace;font-size:.75rem;flex-shrink:0;margin-top:.15rem}
+.codeblock .kw{color:var(--c)}.codeblock .cm{color:var(--t3);font-style:italic}
+.codeblock .nm{color:#a78bfa}.codeblock .vl{color:var(--a)}
+.techlist{list-style:none;display:flex;flex-direction:column;gap:.55rem}
+.techlist li{display:flex;align-items:flex-start;gap:.55rem;font-size:.82rem;color:var(--t2);line-height:1.6}
+.techlist li::before{content:'→';color:var(--c);font-family:'JetBrains Mono',monospace;font-size:.72rem;flex-shrink:0;margin-top:.15rem}
 
-/* ─── DIAGNOSTICS SHOWCASE ─── */
+/* ── DIAGNOSTICS ── */
 .diag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2.5rem}
 @media(max-width:780px){.diag-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.diag-grid{grid-template-columns:1fr}}
-.diag-card{
-  background:var(--ink2);border:1px solid var(--border);border-radius:14px;
-  padding:1.25rem;transition:all .3s;
-}
-.diag-card:hover{border-color:var(--border2);background:var(--ink3)}
-.diag-icon-wrap{
-  width:40px;height:40px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;font-size:1.1rem;
-}
-.diag-card h4{font-size:.85rem;font-weight:700;margin-bottom:.3rem}
-.diag-card p{font-size:.75rem;color:var(--t2);line-height:1.6}
-.diag-duration{
-  margin-top:.65rem;padding:.25rem .6rem;background:rgba(0,229,255,.06);
+.dcard{background:var(--ink2);border:1px solid var(--border);border-radius:14px;padding:1.2rem;transition:all .3s}
+.dcard:hover{border-color:var(--border2);background:var(--ink3)}
+.dicon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:.7rem;font-size:1.05rem}
+.dcard h4{font-size:.83rem;font-weight:700;margin-bottom:.3rem}
+.dcard p{font-size:.74rem;color:var(--t2);line-height:1.6}
+.dtag{
+  margin-top:.6rem;padding:.22rem .55rem;background:rgba(0,229,255,.06);
   border:1px solid rgba(0,229,255,.15);border-radius:6px;
-  font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--c);
-  display:inline-block;
+  font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--c);display:inline-block;
 }
 
-/* ─── PRICING ─── */
-.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-top:3rem}
-@media(max-width:1000px){.pricing-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){.pricing-grid{grid-template-columns:1fr}}
-.plan{
-  background:var(--ink2);border:1px solid var(--border);border-radius:20px;
-  padding:1.75rem;display:flex;flex-direction:column;position:relative;overflow:hidden;
-  transition:transform .3s,box-shadow .3s;
-}
-.plan:hover{transform:translateY(-5px)}
-.plan.hot{border-color:rgba(0,229,255,.4);box-shadow:0 0 50px rgba(0,229,255,.08)}
-.plan.hot::after{
-  content:'';position:absolute;inset:0;border-radius:20px;
-  background:linear-gradient(135deg,rgba(0,229,255,.03),transparent 60%);pointer-events:none;
-}
-.plan-ribbon{
-  position:absolute;top:0;left:50%;transform:translateX(-50%);
-  padding:.3rem 1.2rem;border-radius:0 0 10px 10px;
-  font-size:.62rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
-}
-.plan-emoji{font-size:1.6rem;margin-bottom:.5rem}
-.plan-name{font-family:'Orbitron',monospace;font-weight:800;font-size:.95rem;margin-bottom:.25rem}
-.plan-tagline{font-size:.75rem;color:var(--t2);margin-bottom:1.25rem}
-.plan-price{font-family:'Orbitron',monospace;font-weight:900;font-size:2rem;line-height:1}
-.plan-price sub{font-size:.85rem;font-weight:400;color:var(--t2);vertical-align:baseline}
-.plan-vat{font-size:.68rem;color:var(--t3);margin-bottom:1.25rem;font-family:'JetBrains Mono',monospace}
-.plan-sep{height:1px;background:var(--border);margin:1rem 0}
-.plan-feats{list-style:none;flex:1;display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem}
-.plan-feats li{font-size:.78rem;color:var(--t2);display:flex;align-items:flex-start;gap:.5rem;line-height:1.5}
-.plan-feats li::before{content:'✓';color:var(--gr);font-weight:800;flex-shrink:0;font-size:.72rem;margin-top:.1rem}
-.plan-feats li.dim{color:var(--t3)}.plan-feats li.dim::before{content:'—';color:var(--t3);font-weight:400}
-.plan-btn{
-  width:100%;padding:.8rem;border-radius:12px;border:none;cursor:pointer;
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.88rem;
-  transition:all .25s;
-}
-.plan-btn-primary{background:var(--c);color:#000;box-shadow:0 0 20px rgba(0,229,255,.25)}
-.plan-btn-primary:hover{box-shadow:0 0 35px rgba(0,229,255,.45);transform:translateY(-1px)}
-.plan-btn-outline{background:transparent;color:var(--t);border:1px solid var(--border2)}
-.plan-btn-outline:hover{background:rgba(255,255,255,.04)}
-
-/* ─── CALCULATOR ─── */
-.calc-box{
-  background:var(--ink2);border:1px solid var(--border);border-radius:20px;
-  padding:2rem;margin-top:2rem;
-}
-.calc-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem}
-.calc-label{font-size:.88rem;color:var(--t2);font-weight:500}
-.calc-counter{display:flex;align-items:center;gap:.75rem}
-.calc-btn{
-  width:34px;height:34px;border-radius:8px;border:1px solid var(--border2);
-  background:transparent;color:var(--t);font-size:1.2rem;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:all .15s;
-}
-.calc-btn:hover{background:rgba(0,229,255,.08);border-color:var(--c)}
-.calc-num{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:800;color:var(--c);min-width:40px;text-align:center}
-input[type=range]{
-  -webkit-appearance:none;width:100%;height:4px;border-radius:2px;
-  background:rgba(255,255,255,.08);outline:none;cursor:pointer;margin-bottom:1.5rem;
-}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
-  background:var(--c);box-shadow:0 0 12px rgba(0,229,255,.4);cursor:pointer;
-}
-.calc-result{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;
-}
-@media(max-width:640px){.calc-result{grid-template-columns:1fr 1fr}}
-.calc-plan{
-  background:var(--ink3);border:1px solid var(--border);border-radius:12px;
-  padding:1rem;text-align:center;transition:all .3s;
-}
-.calc-plan.best{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.04)}
-.calc-plan-name{font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;margin-bottom:.35rem}
-.calc-plan-price{font-family:'Orbitron',monospace;font-size:1rem;font-weight:800}
-.calc-plan-sub{font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:.15rem}
-.best-badge{
-  display:block;margin-top:.4rem;font-size:.58rem;font-weight:700;
-  color:var(--a);text-transform:uppercase;letter-spacing:.06em;
-}
-
-/* ─── ARCH / HOW ─── */
-.arch-flow{
-  display:flex;align-items:center;justify-content:center;gap:0;
-  flex-wrap:wrap;margin-top:3rem;
-}
+/* ── ARCH ── */
+.arch-flow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0;margin-top:3rem}
 .arch-node{
   background:var(--ink2);border:1px solid var(--border);border-radius:16px;
-  padding:1.5rem 1.25rem;text-align:center;min-width:150px;
+  padding:1.4rem 1.2rem;text-align:center;min-width:145px;
 }
-.arch-node-icon{font-size:1.8rem;margin-bottom:.5rem}
-.arch-node-title{font-size:.82rem;font-weight:700;margin-bottom:.25rem}
-.arch-node-sub{font-size:.68rem;color:var(--t2)}
-.arch-arrow{
-  font-family:'JetBrains Mono',monospace;font-size:1rem;color:var(--t3);
-  padding:0 .75rem;flex-shrink:0;
-}
+.arch-node .icon{font-size:1.7rem;margin-bottom:.4rem}
+.arch-node .title{font-size:.8rem;font-weight:700;margin-bottom:.2rem}
+.arch-node .sub{font-size:.65rem;color:var(--t2)}
+.arch-arrow{font-family:'JetBrains Mono',monospace;font-size:1.1rem;color:var(--t3);padding:0 .65rem;flex-shrink:0}
 @media(max-width:700px){.arch-flow{flex-direction:column}.arch-arrow{transform:rotate(90deg)}}
+.cloud-row{
+  display:flex;justify-content:center;margin-top:1.5rem;
+}
+.cloud-box{
+  background:var(--ink2);border:1px solid var(--border);border-radius:14px;
+  padding:.85rem 2rem;display:flex;align-items:center;gap:2.5rem;flex-wrap:wrap;justify-content:center;
+}
+.cloud-item{text-align:center}
+.cloud-item .icon{font-size:1.15rem;margin-bottom:.2rem}
+.cloud-item .title{font-size:.7rem;font-weight:700}
+.cloud-item .sub{font-size:.6rem;color:var(--t3)}
 
-/* ─── CTA BANNER ─── */
-.cta-banner{
-  background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(124,58,237,.06));
+/* ── CTA ── */
+.cta-box{
+  background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(124,58,237,.05));
   border:1px solid var(--border2);border-radius:24px;
   padding:4rem 2rem;text-align:center;position:relative;overflow:hidden;
 }
-.cta-banner::before{
+.cta-box::after{
   content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  width:500px;height:200px;
-  background:radial-gradient(ellipse,rgba(0,229,255,.08),transparent 70%);
+  width:500px;height:180px;pointer-events:none;
+  background:radial-gradient(ellipse,rgba(0,229,255,.07),transparent 70%);
 }
-.cta-banner h2{font-family:'Orbitron',monospace;font-size:clamp(1.5rem,3.5vw,2.4rem);font-weight:800;margin-bottom:.75rem}
-.cta-banner p{color:var(--t2);margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto}
+.cta-box h2{font-family:'Orbitron',monospace;font-size:clamp(1.4rem,3vw,2.2rem);font-weight:800;margin-bottom:.75rem;position:relative;z-index:1}
+.cta-box p{color:var(--t2);margin-bottom:2rem;max-width:460px;margin-left:auto;margin-right:auto;position:relative;z-index:1}
+.cta-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
 
-/* ─── FOOTER ─── */
+/* ── FOOTER ── */
 footer{
   border-top:1px solid var(--border);
-  padding:3rem max(1.5rem, calc(50vw - 600px));
-  display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;
+  padding:2.5rem max(1.5rem,calc(50vw - 600px));
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
 }
-@media(max-width:640px){footer{grid-template-columns:1fr}}
-.footer-copy{font-size:.75rem;color:var(--t3);margin-top:.5rem}
+.footer-copy{font-size:.73rem;color:var(--t3);margin-top:.3rem}
 .footer-links{display:flex;gap:1.5rem;flex-wrap:wrap}
-.footer-links a{color:var(--t3);text-decoration:none;font-size:.78rem;transition:color .2s}
+.footer-links a{color:var(--t3);text-decoration:none;font-size:.76rem;transition:color .2s}
 .footer-links a:hover{color:var(--t2)}
 
-/* ═══════════════════════════════════════════════════════
-   AUTH PAGE
-═══════════════════════════════════════════════════════ */
-.auth-bg{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  padding:90px 1.5rem 3rem;
-}
+/* ── AUTH ── */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:90px 1.5rem 3rem}
 .auth-card{
   width:100%;max-width:440px;
   background:var(--ink2);border:1px solid var(--border2);
   border-radius:24px;padding:2.75rem;
   box-shadow:0 0 80px rgba(0,229,255,.06),0 50px 100px rgba(0,0,0,.5);
 }
-.auth-logo-wrap{text-align:center;margin-bottom:.25rem}
-.auth-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1.3rem;color:var(--c);letter-spacing:.12em;text-shadow:0 0 20px rgba(0,229,255,.4)}
+.auth-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1.3rem;color:var(--c);letter-spacing:.12em;text-align:center;margin-bottom:.25rem}
 .auth-meta{text-align:center;color:var(--t2);font-size:.82rem;margin-bottom:2rem}
-.auth-tabs{
-  display:flex;background:var(--ink);border-radius:12px;padding:4px;
-  margin-bottom:1.75rem;border:1px solid var(--border);
-}
-.at{
-  flex:1;padding:.55rem;border-radius:9px;border:none;cursor:pointer;
-  font-family:'Space Grotesk',sans-serif;font-size:.84rem;font-weight:600;
-  transition:all .2s;background:transparent;color:var(--t3);
-}
+.auth-tabs{display:flex;background:var(--ink);border-radius:12px;padding:4px;margin-bottom:1.75rem;border:1px solid var(--border)}
+.at{flex:1;padding:.55rem;border-radius:9px;border:none;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:.84rem;font-weight:600;transition:all .2s;background:transparent;color:var(--t3)}
 .at.on{background:var(--ink2);color:var(--t);box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .fg{margin-bottom:1rem}
 .fl{display:block;font-size:.75rem;font-weight:600;color:var(--t2);margin-bottom:.4rem;letter-spacing:.02em}
-.fi{
-  width:100%;padding:.75rem 1rem;border-radius:10px;
-  background:var(--ink);border:1px solid var(--border);
-  color:var(--t);font-family:'Space Grotesk',sans-serif;font-size:.9rem;
-  transition:all .2s;outline:none;
-}
+.fi{width:100%;padding:.75rem 1rem;border-radius:10px;background:var(--ink);border:1px solid var(--border);color:var(--t);font-family:'Space Grotesk',sans-serif;font-size:.9rem;transition:all .2s;outline:none}
 .fi:focus{border-color:rgba(0,229,255,.4);box-shadow:0 0 0 3px rgba(0,229,255,.07)}
 .fi::placeholder{color:var(--t3)}
-.fs{
+.fsub{
   width:100%;padding:.85rem;border-radius:12px;border:none;
-  background:var(--c);color:#000;
-  font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:800;
-  cursor:pointer;transition:all .25s;margin-top:.5rem;
-  box-shadow:0 0 25px rgba(0,229,255,.25);
+  background:var(--c);color:#000;font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:800;
+  cursor:pointer;transition:all .25s;margin-top:.5rem;box-shadow:0 0 25px rgba(0,229,255,.25);
 }
-.fs:hover{box-shadow:0 0 40px rgba(0,229,255,.45);transform:translateY(-1px)}
-.fs:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.fsub:hover{box-shadow:0 0 40px rgba(0,229,255,.45);transform:translateY(-1px)}
+.fsub:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .adiv{text-align:center;position:relative;margin:1.25rem 0}
 .adiv::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)}
 .adiv span{position:relative;background:var(--ink2);padding:0 .75rem;font-size:.72rem;color:var(--t3)}
 .alink{color:var(--c);text-decoration:none;font-weight:600;font-size:.84rem}
 .alink:hover{text-decoration:underline}
-.alert-box{padding:.75rem 1rem;border-radius:10px;font-size:.8rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:.5rem;line-height:1.5}
+.alertbox{padding:.75rem 1rem;border-radius:10px;font-size:.8rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:.5rem;line-height:1.5}
 .ae{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
 .as{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7}
 .ai{background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.22);color:var(--c)}
@@ -472,178 +323,139 @@ footer{
 .spin{width:16px;height:16px;border:2px solid rgba(0,0,0,.2);border-top-color:#000;border-radius:50%;animation:_s .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:.35rem}
 @keyframes _s{to{transform:rotate(360deg)}}
 
-/* ═══════════════════════════════════════════════════════
-   ACCOUNT PAGE
-═══════════════════════════════════════════════════════ */
+/* ── ACCOUNT ── */
 .acct-wrap{max-width:960px;margin:0 auto;padding:88px max(1.5rem,calc(50vw - 480px)) 4rem}
-.acct-h1{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:800;margin-bottom:.3rem}
-.acct-sub{color:var(--t2);font-size:.88rem;margin-bottom:2.5rem}
+.acct-h1{font-family:'Orbitron',monospace;font-size:1.35rem;font-weight:800;margin-bottom:.3rem}
+.acct-sub{color:var(--t2);font-size:.87rem;margin-bottom:2.5rem}
 .acct-grid{display:grid;grid-template-columns:240px 1fr;gap:1.5rem;align-items:start}
 @media(max-width:720px){.acct-grid{grid-template-columns:1fr}}
-.acct-sidebar{
-  background:var(--ink2);border:1px solid var(--border);border-radius:18px;
-  padding:1.5rem 1.1rem;position:sticky;top:80px;
-}
-.av{
-  width:60px;height:60px;border-radius:50%;margin:0 auto .75rem;
-  background:linear-gradient(135deg,var(--c),var(--c2));
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:#000;
-}
-.an{text-align:center;font-weight:700;font-size:.92rem;margin-bottom:.15rem}
-.ae2{text-align:center;font-size:.72rem;color:var(--t2);margin-bottom:1.5rem}
+.acct-side{background:var(--ink2);border:1px solid var(--border);border-radius:18px;padding:1.4rem 1.1rem;position:sticky;top:80px}
+.av{width:58px;height:58px;border-radius:50%;margin:0 auto .7rem;background:linear-gradient(135deg,var(--c),var(--c2));display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:1.25rem;font-weight:900;color:#000}
+.an{text-align:center;font-weight:700;font-size:.9rem;margin-bottom:.15rem}
+.ae2{text-align:center;font-size:.7rem;color:var(--t2);margin-bottom:1.4rem}
 .snav{display:flex;flex-direction:column;gap:.2rem}
-.snav-btn{
-  padding:.55rem .85rem;border-radius:9px;border:none;background:transparent;
-  color:var(--t2);font-family:'Space Grotesk',sans-serif;font-size:.83rem;font-weight:600;
-  cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.5rem;
-}
+.snav-btn{padding:.55rem .8rem;border-radius:9px;border:none;background:transparent;color:var(--t2);font-family:'Space Grotesk',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.5rem}
 .snav-btn:hover{background:rgba(255,255,255,.04);color:var(--t)}
 .snav-btn.on{background:rgba(0,229,255,.08);color:var(--c)}
-.logout{
-  width:100%;margin-top:1.25rem;padding:.65rem;border-radius:10px;
-  background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);
-  color:#fca5a5;font-family:'Space Grotesk',sans-serif;font-size:.82rem;font-weight:600;
-  cursor:pointer;transition:all .2s;
-}
-.logout:hover{background:rgba(239,68,68,.12)}
+.logout-btn{width:100%;margin-top:1.2rem;padding:.6rem;border-radius:10px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);color:#fca5a5;font-family:'Space Grotesk',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
+.logout-btn:hover{background:rgba(239,68,68,.12)}
 .acct-content{display:flex;flex-direction:column;gap:1.25rem}
 .acct-sec{background:var(--ink2);border:1px solid var(--border);border-radius:18px;padding:1.75rem}
-.acct-sec-title{font-size:.92rem;font-weight:700;margin-bottom:1.25rem;display:flex;align-items:center;gap:.4rem}
-.sub-hero{
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
-  padding:1.25rem;background:var(--ink);border:1px solid var(--border);border-radius:12px;
-}
-.sbadge{padding:.3rem .75rem;border-radius:99px;font-size:.7rem;font-weight:700;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
-.sba{background:rgba(16,185,129,.12);color:var(--gr);border:1px solid rgba(16,185,129,.3)}
-.sbi{background:rgba(239,68,68,.12);color:var(--r);border:1px solid rgba(239,68,68,.3)}
-.sbt{background:rgba(0,229,255,.1);color:var(--c);border:1px solid rgba(0,229,255,.3)}
+.acct-stitle{font-size:.9rem;font-weight:700;margin-bottom:1.25rem;display:flex;align-items:center;gap:.4rem}
+.sub-hero{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding:1.2rem;background:var(--ink);border:1px solid var(--border);border-radius:12px}
+.sbadge{padding:.28rem .7rem;border-radius:99px;font-size:.68rem;font-weight:700;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
+.sb-a{background:rgba(16,185,129,.12);color:var(--gr);border:1px solid rgba(16,185,129,.3)}
+.sb-i{background:rgba(239,68,68,.12);color:var(--r);border:1px solid rgba(239,68,68,.3)}
+.sb-t{background:rgba(0,229,255,.1);color:var(--c);border:1px solid rgba(0,229,255,.3)}
 .sub-stats{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem}
-.sub-stat{background:var(--ink);border:1px solid var(--border);border-radius:10px;padding:.85rem;text-align:center}
-.sub-stat-val{font-family:'Orbitron',monospace;font-size:1.15rem;font-weight:800;color:var(--c)}
-.sub-stat-lbl{font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-top:.15rem}
+.ss{background:var(--ink);border:1px solid var(--border);border-radius:10px;padding:.85rem;text-align:center}
+.ssv{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:800;color:var(--c)}
+.ssl{font-size:.6rem;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-top:.15rem}
 
-/* ─── UTILITY ─── */
-.mt1{margin-top:.5rem}.mt2{margin-top:1rem}.mt3{margin-top:1.5rem}.mt4{margin-top:2rem}
-.hidden{display:none!important}
+/* ── REVEAL ── */
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
 .reveal.vis{opacity:1;transform:none}
-.chip{display:inline-block;padding:.2rem .6rem;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:600}
 </style>
 </head>
 <body>
 
 <canvas id="bg-canvas"></canvas>
+<div class="noise-overlay"></div>
 
 <!-- ═══ NAV ═══ -->
-<nav class="z1">
-  <a class="logo" onclick="showPage('home')">
+<nav>
+  <button class="logo" onclick="goHome()">
     <div class="logo-mark">P</div>
     <div>
       <div class="logo-text">PRESTILON</div>
       <div class="logo-sub">AI FLEET INTELLIGENCE</div>
     </div>
-  </a>
+  </button>
   <div class="nav-right">
-    <button class="nbtn nbtn-ghost" onclick="scrollTo('features')">Features</button>
-    <button class="nbtn nbtn-ghost" onclick="scrollTo('pricing')">Pricing</button>
-    <button class="nbtn nbtn-outline" id="navAcct" onclick="showPage('account')" style="display:none">Account</button>
-    <button class="nbtn nbtn-ghost" id="navLogin" onclick="showPage('auth')">Sign In</button>
-    <button class="nbtn nbtn-cta" id="navStart" onclick="showPage('auth');switchTab('register')">Get Started</button>
+    <button class="nbtn nbtn-ghost" onclick="goSection('features')">Features</button>
+    <button class="nbtn nbtn-ghost" onclick="goSection('howit')">How It Works</button>
+    <button class="nbtn nbtn-outline" id="navAcct" onclick="goAcct()" style="display:none">Account</button>
+    <button class="nbtn nbtn-ghost" id="navLogin" onclick="goAuth('login')">Sign In</button>
+    <button class="nbtn nbtn-cta" id="navStart" onclick="goAuth('register')">Get Started</button>
   </div>
 </nav>
 
-<!-- ═══════════════ HOME ═══════════════ -->
-<div id="page-home" class="page active z1">
+<!-- ═══════════════ HOME PAGE ═══════════════ -->
+<div id="page-home" class="page active">
 
 <!-- HERO -->
-<section class="hero-section z1">
-  <div class="hero-eyebrow">
-    <span class="hero-eyebrow-dot"></span>
+<section class="hero">
+  <div class="eyebrow">
+    <span class="eyebrow-dot"></span>
     RUNS LOCALLY · ZERO CLOUD LATENCY · FULL AI STACK
   </div>
   <h1 class="hero-h1">Your 3D Printer Fleet.<br>Under <em>Military-Grade AI.</em></h1>
   <p class="hero-sub">PRESTILON deploys a full signal-processing AI stack directly on your Windows machine — Kalman filters, CUSUM anomaly detection, wear models, failure prediction — all running at localhost with millisecond response times.</p>
   <div class="hero-actions">
-    <button class="btn btn-primary" onclick="showPage('auth');switchTab('register')">⚡ Start Free Trial</button>
-    <button class="btn btn-ghost" onclick="scrollTo('features')">See How It Works</button>
+    <button class="btn btn-p" onclick="goAuth('register')">⚡ Start Free Trial</button>
+    <button class="btn btn-g" onclick="goSection('features')">See How It Works →</button>
   </div>
 
-  <div class="trust-row">
-    <div class="trust-item">
-      <div class="trust-val" id="tv1">0</div>
-      <div class="trust-lbl">Max Printers</div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-val">&lt;1ms</div>
-      <div class="trust-lbl">Local Latency</div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-val" id="tv2">0</div>
-      <div class="trust-lbl">Diagnostic Tests</div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-val" id="tv3">0</div>
-      <div class="trust-lbl">AI Autonomy Levels</div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-val">24h</div>
-      <div class="trust-lbl">Offline Grace</div>
-    </div>
+  <div class="trust">
+    <div class="ti"><div class="tv" id="tv1">0</div><div class="tl">Max Printers</div></div>
+    <div class="ti"><div class="tv">&lt;1ms</div><div class="tl">Local Latency</div></div>
+    <div class="ti"><div class="tv" id="tv2">0</div><div class="tl">Diagnostic Tests</div></div>
+    <div class="ti"><div class="tv" id="tv3">0</div><div class="tl">AI Autonomy Levels</div></div>
+    <div class="ti"><div class="tv">24h</div><div class="tl">Offline Grace</div></div>
   </div>
 
-  <!-- DASHBOARD PREVIEW -->
-  <div class="preview-wrap">
+  <!-- LIVE PREVIEW -->
+  <div class="preview">
     <div class="preview-chrome">
-      <div class="chrome-dot" style="background:#ef4444"></div>
-      <div class="chrome-dot" style="background:#f59e0b"></div>
-      <div class="chrome-dot" style="background:#10b981"></div>
-      <div class="chrome-bar">
-        <span class="chrome-lock">🔒</span>
+      <div class="cd" style="background:#ef4444"></div>
+      <div class="cd" style="background:#f59e0b"></div>
+      <div class="cd" style="background:#10b981"></div>
+      <div class="cbar">
+        <span style="color:var(--gr);font-size:.7rem">🔒</span>
         localhost:3002 — PRESTILON Dashboard
       </div>
     </div>
     <div class="preview-body">
-      <div class="preview-sidebar">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--t3);letter-spacing:.1em;padding:.3rem .5rem;margin-bottom:.25rem">FLEET · 4 PRINTERS</div>
-        <div class="preview-sidebar-item active"><span class="dot" style="background:var(--gr)"></span>Ender-5 Pro</div>
-        <div class="preview-sidebar-item"><span class="dot" style="background:#3b82f6"></span>Bambu X1-C</div>
-        <div class="preview-sidebar-item"><span class="dot" style="background:var(--a)"></span>CR-10 Max</div>
-        <div class="preview-sidebar-item"><span class="dot" style="background:var(--t3)"></span>Prusa MK4</div>
-        <div style="height:1px;background:var(--border);margin:.5rem 0"></div>
-        <div class="preview-sidebar-item" style="color:var(--c);font-size:.65rem">⚡ AI Engine ON</div>
-        <div class="preview-sidebar-item" style="font-size:.65rem">🧠 L2 Automatic</div>
+      <div class="psidebar">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--t3);letter-spacing:.1em;padding:.25rem .4rem;margin-bottom:.2rem">FLEET · 4 PRINTERS</div>
+        <div class="psi on"><span class="pdot" style="background:var(--gr)"></span>Ender-5 Pro</div>
+        <div class="psi"><span class="pdot" style="background:#3b82f6"></span>Bambu X1-C</div>
+        <div class="psi"><span class="pdot" style="background:var(--a)"></span>CR-10 Max</div>
+        <div class="psi"><span class="pdot" style="background:var(--t3)"></span>Prusa MK4</div>
+        <div style="height:1px;background:var(--border);margin:.4rem 0"></div>
+        <div class="psi" style="color:var(--c);font-size:.63rem">⚡ AI Engine ON</div>
+        <div class="psi" style="font-size:.63rem">🧠 L2 Automatic</div>
       </div>
-      <div class="preview-main">
-        <div class="pcard">
-          <div class="pcard-label">Hotend Temp</div>
-          <div class="pcard-val" style="color:var(--c)" id="pvTemp">215.3°C</div>
-          <div class="mini-bars" id="pvBars"></div>
+      <div class="pmain">
+        <div class="pc">
+          <div class="plbl">Hotend Temp</div>
+          <div class="pv" style="color:var(--c)" id="pvT">215.3°C</div>
+          <div class="mbars" id="pvBars"></div>
         </div>
-        <div class="pcard">
-          <div class="pcard-label">Health Score</div>
-          <div class="health-gauge" style="--pct:87"><span id="pvHealth">87</span></div>
+        <div class="pc">
+          <div class="plbl">Health Score</div>
+          <div class="gauge" style="--p:87"><span id="pvH">87</span></div>
         </div>
-        <div class="pcard">
-          <div class="pcard-label">Print Status</div>
-          <div class="pcard-val" style="color:var(--gr)">ACTIVE</div>
-          <div style="font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:.25rem">72% · <span id="pvEta">1h 23m</span> left</div>
+        <div class="pc">
+          <div class="plbl">Print Status</div>
+          <div class="pv" style="color:var(--gr)">ACTIVE</div>
+          <div style="font-size:.6rem;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:.2rem">72% · 1h 23m left</div>
         </div>
-        <div class="pcard span2">
-          <div class="pcard-label">AI Anomaly Detection — Live</div>
-          <div class="anomaly-list">
-            <div class="anomaly-item"><span class="sev sev-med">MEDIUM</span>Belt wear signature on X-axis — CUSUM Δ 3.2σ</div>
-            <div class="anomaly-item"><span class="sev sev-low">LOW</span>Hotend temperature variance +0.8°C — Kalman residual</div>
+        <div class="pc sp2">
+          <div class="plbl">AI Anomaly Detection — Live</div>
+          <div class="anom-list">
+            <div class="anom"><span class="sev smed">MEDIUM</span>Belt wear on X-axis — CUSUM Δ 3.2σ</div>
+            <div class="anom"><span class="sev slow">LOW</span>Hotend variance +0.8°C — Kalman residual</div>
           </div>
         </div>
-        <div class="pcard">
-          <div class="pcard-label">Failure Risk</div>
-          <div class="risk-bar-wrap">
-            <div style="display:flex;justify-content:space-between;font-size:.65rem">
+        <div class="pc">
+          <div class="plbl">Failure Risk</div>
+          <div class="risk-bar">
+            <div style="display:flex;justify-content:space-between;font-size:.63rem">
               <span style="color:var(--t2)">Overall</span>
               <span style="color:var(--gr);font-family:'Orbitron',monospace;font-weight:700">12%</span>
             </div>
-            <div class="risk-bar-track"><div class="risk-bar-fill" style="width:12%"></div></div>
+            <div class="rbt"><div class="rbf" style="width:12%"></div></div>
           </div>
         </div>
       </div>
@@ -653,79 +465,89 @@ footer{
 
 <!-- FEATURES -->
 <section class="section reveal" id="features">
-  <div class="s-eyebrow">CAPABILITIES</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:end;margin-bottom:.5rem">
     <div>
+      <div class="s-eyebrow">CAPABILITIES</div>
       <h2 class="s-h2">Not a wrapper.<br>A full AI engine.</h2>
     </div>
-    <div>
+    <div style="padding-bottom:.25rem">
       <p class="s-sub">Every subsystem — from signal filtering to wear prediction — is custom-built and runs entirely on your hardware. No third-party AI APIs. No data leaving your network.</p>
     </div>
   </div>
   <div class="feat-grid">
+
     <div class="feat">
       <div class="feat-num">01 — SIGNAL PROCESSING</div>
       <div class="feat-icon" style="background:rgba(0,229,255,.1)">📡</div>
       <h3>Kalman Filter Engine</h3>
       <p>Per-sensor Kalman filters continuously estimate true state from noisy measurements. Hotend temp, bed temp, strain gauges, motor loads — all filtered in real-time with tunable Q/R noise coefficients per subscription tier.</p>
-      <span class="feat-tag chip" style="background:rgba(0,229,255,.1);color:var(--c)">kalman · Q/R tuning · per-sensor</span>
+      <span class="feat-tag" style="background:rgba(0,229,255,.08);color:var(--c)">kalman · Q/R tuning · per-sensor</span>
     </div>
+
     <div class="feat">
       <div class="feat-num">02 — CHANGE DETECTION</div>
       <div class="feat-icon" style="background:rgba(124,58,237,.1)">🔬</div>
       <h3>CUSUM Anomaly Detection</h3>
-      <p>CUSUM (Cumulative Sum) control charts detect statistically significant shifts in process mean — catching belt wear, clog onset, and thermal runaway risk at the earliest possible moment, before symptoms are visible.</p>
-      <span class="feat-tag chip" style="background:rgba(124,58,237,.1);color:#a78bfa">cusum · 5 sensor streams · σ thresholds</span>
+      <p>CUSUM control charts detect statistically significant shifts in process mean — catching belt wear, clog onset, and thermal runaway risk at the earliest possible moment, before symptoms are visible to the naked eye.</p>
+      <span class="feat-tag" style="background:rgba(124,58,237,.1);color:#a78bfa">cusum · 5 streams · σ thresholds</span>
     </div>
+
     <div class="feat">
       <div class="feat-num">03 — HEALTH SCORING</div>
       <div class="feat-icon" style="background:rgba(16,185,129,.1)">💚</div>
       <h3>AI Health Score Orchestrator</h3>
       <p>A multi-factor health score (0–100) synthesizes anomaly severity, diagnostic test results, wear model coefficients, and maintenance history through a weighted orchestration pipeline with plan-specific AI constants.</p>
-      <span class="feat-tag chip" style="background:rgba(16,185,129,.1);color:var(--gr)">0–100 · orchestrated · tier-specific</span>
+      <span class="feat-tag" style="background:rgba(16,185,129,.1);color:var(--gr)">0–100 · orchestrated · tier-specific</span>
     </div>
+
     <div class="feat">
       <div class="feat-num">04 — FAILURE PREDICTION</div>
       <div class="feat-icon" style="background:rgba(245,158,11,.1)">⚠️</div>
       <h3>Multi-Modal Failure Prediction</h3>
-      <p>Separate prediction models for thermal runaway, belt degradation, clog probability, bed adhesion failure, and extruder wear. Each model outputs risk level (minimal → critical), probability %, and estimated time to failure.</p>
-      <span class="feat-tag chip" style="background:rgba(245,158,11,.1);color:var(--a)">shouldPause · shouldAbort · ETA</span>
+      <p>Separate prediction models for thermal runaway, belt degradation, clog probability, bed adhesion failure, and extruder wear — each outputs risk level, probability %, and estimated time to failure. Automated pause/abort signals.</p>
+      <span class="feat-tag" style="background:rgba(245,158,11,.1);color:var(--a)">shouldPause · shouldAbort · ETA</span>
     </div>
+
     <div class="feat">
       <div class="feat-num">05 — AI AUTONOMY</div>
       <div class="feat-icon" style="background:rgba(239,68,68,.1)">🤖</div>
       <h3>3-Level AI Autonomy</h3>
-      <p><strong>L0 Passive</strong> — observe only. <strong>L1 Recommend</strong> — surfaces prioritized actions. <strong>L2 Automatic</strong> — executes safe corrective GCode without human approval. Configurable per printer.</p>
-      <span class="feat-tag chip" style="background:rgba(239,68,68,.1);color:var(--r)">L0 · L1 · L2 · per-printer override</span>
+      <p><strong>L0 Passive</strong> — observe only. <strong>L1 Recommend</strong> — surfaces prioritized actions. <strong>L2 Automatic</strong> — executes safe corrective GCode without human approval. Independently configurable per printer.</p>
+      <span class="feat-tag" style="background:rgba(239,68,68,.1);color:var(--r)">L0 · L1 · L2 · per-printer override</span>
     </div>
+
     <div class="feat">
       <div class="feat-num">06 — REAL-TIME DATA</div>
       <div class="feat-icon" style="background:rgba(37,99,235,.1)">⚡</div>
       <h3>WebSocket Telemetry Pipeline</h3>
-      <p>Persistent WebSocket connections to Moonraker/Klipper deliver live telemetry: temperatures, progress, position, fan speeds, filament sensor state — all streamed to a React dashboard with &lt;50ms round-trip.</p>
-      <span class="feat-tag chip" style="background:rgba(37,99,235,.1);color:#60a5fa">websocket · moonraker · &lt;50ms</span>
+      <p>Persistent WebSocket connections to Moonraker/Klipper deliver live telemetry: temperatures, print progress, position, fan speeds, filament sensor state — all streamed with &lt;50ms round-trip latency.</p>
+      <span class="feat-tag" style="background:rgba(37,99,235,.1);color:#60a5fa">websocket · moonraker · &lt;50ms</span>
     </div>
+
     <div class="feat">
       <div class="feat-num">07 — DIAGNOSTIC SUITE</div>
       <div class="feat-icon" style="background:rgba(245,158,11,.08)">🧪</div>
       <h3>6-Test Hardware Diagnostics</h3>
-      <p>Full hardware diagnostic suite executes real GCode on the printer: printer status check, extrusion flow, movement & axes, temperature stability, retraction pressure, and full system diagnostic with automated scoring against industry baselines.</p>
-      <span class="feat-tag chip" style="background:rgba(245,158,11,.08);color:var(--a)">6 tests · GCode execution · baseline</span>
+      <p>Executes real GCode on the printer: printer status check, extrusion flow, movement & axes, temperature stability, retraction pressure, and full system diagnostic. Each scored against an industry baseline of healthy printers.</p>
+      <span class="feat-tag" style="background:rgba(245,158,11,.08);color:var(--a)">6 tests · real GCode · baseline scored</span>
     </div>
+
     <div class="feat">
       <div class="feat-num">08 — FLEET MANAGEMENT</div>
-      <div class="feat-icon" style="background:rgba(0,229,255,.08)">🖨️</div>
+      <div class="feat-icon" style="background:rgba(0,229,255,.07)">🖨️</div>
       <h3>50-Printer Fleet Control</h3>
-      <p>Manage up to 50 printers from a single dashboard. Individual AI pipelines, independent telemetry histories, per-printer maintenance logs, HWID hardware binding — with Supabase-backed subscription enforcement.</p>
-      <span class="feat-tag chip" style="background:rgba(0,229,255,.08);color:var(--c)">50 printers · HWID binding · RLS</span>
+      <p>Manage up to 50 printers from a single dashboard. Individual AI pipelines, independent telemetry histories, per-printer maintenance logs, and HWID hardware binding for secure per-machine license enforcement.</p>
+      <span class="feat-tag" style="background:rgba(0,229,255,.07);color:var(--c)">50 printers · HWID binding · RLS</span>
     </div>
+
     <div class="feat">
-      <div class="feat-num">09 — MAINTENANCE AI</div>
-      <div class="feat-icon" style="background:rgba(16,185,129,.08)">🔧</div>
+      <div class="feat-num">09 — PREDICTIVE MAINTENANCE</div>
+      <div class="feat-icon" style="background:rgba(16,185,129,.07)">🔧</div>
       <h3>Predictive Maintenance Scheduling</h3>
-      <p>Tracks print hours, maintenance events, and component wear vectors. Predicts next maintenance window for nozzle replacement, belt re-tension, lubrication, and bed leveling with urgency scoring and ETA estimates.</p>
-      <span class="feat-tag chip" style="background:rgba(16,185,129,.08);color:var(--gr)">wear models · ETA · urgency levels</span>
+      <p>Tracks print hours, component events, and wear vectors. Predicts next maintenance window for nozzle replacement, belt re-tension, lubrication, and bed leveling with urgency scoring and time-to-service estimates.</p>
+      <span class="feat-tag" style="background:rgba(16,185,129,.07);color:var(--gr)">wear models · ETA · urgency levels</span>
     </div>
+
   </div>
 </section>
 
@@ -733,95 +555,78 @@ footer{
 <section class="section reveal">
   <div class="s-eyebrow">TECHNICAL DEPTH</div>
   <h2 class="s-h2">Built for engineers.<br>Not just makers.</h2>
-  <p class="s-sub">Every algorithm is transparent, configurable, and documented. You're not using a black box — you're running a real signal-processing stack.</p>
-
+  <p class="s-sub">Every algorithm is transparent and configurable. You're running a real signal-processing stack, not a black box.</p>
   <div class="tech-grid">
     <div class="tech-panel">
-      <div class="tech-panel-header">
-        <span style="font-size:1.1rem">📡</span>
-        <h3>Kalman Filter — Per Sensor</h3>
-      </div>
-      <div class="tech-panel-body">
-        <div class="code-block"><span class="cm">// Real implementation — kalman.ts</span>
+      <div class="tph"><span style="font-size:1.05rem">📡</span><h3>Kalman Filter — Per Sensor</h3></div>
+      <div class="tpb">
+        <div class="codeblock"><span class="cm">// Real implementation — kalman.ts</span>
 <span class="kw">interface</span> <span class="nm">KalmanState</span> {
   x: <span class="kw">number</span>  <span class="cm">// estimated state</span>
   P: <span class="kw">number</span>  <span class="cm">// error covariance</span>
 }
-
 <span class="cm">// Pro plan overrides (tuned per sensor)</span>
 hotend_temp: { q: <span class="vl">0.008</span>, r: <span class="vl">0.4</span> }
 bed_temp:    { q: <span class="vl">0.004</span>, r: <span class="vl">0.25</span> }
 sg_result_x: { q: <span class="vl">0.02</span>,  r: <span class="vl">1.0</span> }</div>
-        <ul class="tech-list">
+        <ul class="techlist">
           <li>Separate K,P state per sensor stream per printer</li>
-          <li>Q/R noise ratios configurable via plan-tier AI constants</li>
-          <li>Residual (innovation) fed directly into CUSUM detectors</li>
-          <li>Enterprise tier ships tighter thresholds for higher sensitivity</li>
+          <li>Q/R noise ratios configurable via plan AI constants</li>
+          <li>Residual fed directly into CUSUM detectors</li>
+          <li>Enterprise tier ships tighter thresholds</li>
         </ul>
       </div>
     </div>
-
     <div class="tech-panel">
-      <div class="tech-panel-header">
-        <span style="font-size:1.1rem">📊</span>
-        <h3>CUSUM — 5 Detection Streams</h3>
-      </div>
-      <div class="tech-panel-body">
-        <div class="code-block"><span class="cm">// CUSUM control chart — cusum.ts</span>
+      <div class="tph"><span style="font-size:1.05rem">📊</span><h3>CUSUM — 5 Detection Streams</h3></div>
+      <div class="tpb">
+        <div class="codeblock"><span class="cm">// CUSUM control chart — cusum.ts</span>
 <span class="kw">const</span> streams = {
   thermalRunaway: { H: <span class="vl">3.5</span>, k: <span class="vl">0.25</span> },
   beltWear:       { H: <span class="vl">4.0</span>, k: <span class="vl">0.4</span>  },
   clogRisk:       { H: <span class="vl">3.0</span>, k: <span class="vl">0.25</span> },
   bedStability:   { H: <span class="vl">4.0</span>, k: <span class="vl">0.4</span>  },
 }
-<span class="cm">// H = decision threshold, k = reference value</span></div>
-        <ul class="tech-list">
+<span class="cm">// H = threshold, k = reference value</span></div>
+        <ul class="techlist">
           <li>One-sided CUSUM for upward and downward shifts</li>
-          <li>Severity classification: low → medium → high → critical</li>
+          <li>Severity: low → medium → high → critical</li>
           <li>Auto-resolves when stream returns to baseline</li>
           <li>Triggers AI recommendation with confidence score</li>
         </ul>
       </div>
     </div>
-
     <div class="tech-panel">
-      <div class="tech-panel-header">
-        <span style="font-size:1.1rem">🎯</span>
-        <h3>Health Score Orchestrator</h3>
-      </div>
-      <div class="tech-panel-body">
-        <div class="code-block"><span class="cm">// HealthScoreOrchestrator.ts</span>
+      <div class="tph"><span style="font-size:1.05rem">🎯</span><h3>Health Score Orchestrator</h3></div>
+      <div class="tpb">
+        <div class="codeblock"><span class="cm">// HealthScoreOrchestrator.ts</span>
 calculate({
   anomalyResult,      <span class="cm">// CUSUM output</span>
-  maintenanceResult,  <span class="cm">// wear model output</span>
+  maintenanceResult,  <span class="cm">// wear model</span>
   wearResult,         <span class="cm">// belt/nozzle/motor</span>
   diagnosticBaseline, <span class="cm">// GCode test scores</span>
   isConnected,
-}): { score: <span class="vl">0</span>-<span class="vl">100</span>, breakdown, appliedCap }</div>
-        <ul class="tech-list">
-          <li>DiagnosticBaselineBridge caps score until first test run</li>
+}): { score: <span class="vl">0</span>-<span class="vl">100</span>, breakdown, cap }</div>
+        <ul class="techlist">
+          <li>DiagnosticBaselineBridge caps score until first test</li>
           <li>Weighted multi-factor synthesis, not a simple average</li>
-          <li>Scored against real-world industry fleet benchmark data</li>
+          <li>Scored against real-world industry fleet benchmark</li>
         </ul>
       </div>
     </div>
-
     <div class="tech-panel">
-      <div class="tech-panel-header">
-        <span style="font-size:1.1rem">🔒</span>
-        <h3>Security Architecture</h3>
-      </div>
-      <div class="tech-panel-body">
-        <div class="code-block"><span class="cm">// Subscription enforcement chain</span>
-validateLicense()          <span class="cm">// Supabase auth + HWID</span>
-  → hardware_bindings      <span class="cm">// SHA-256(BIOS + MAC)</span>
+      <div class="tph"><span style="font-size:1.05rem">🔒</span><h3>Security Architecture</h3></div>
+      <div class="tpb">
+        <div class="codeblock"><span class="cm">// Subscription enforcement chain</span>
+validateLicense()          <span class="cm">// Supabase + HWID</span>
+  → hardware_bindings      <span class="cm">// SHA-256(BIOS+MAC)</span>
   → subscriptions.status   <span class="cm">// RLS enforced</span>
   → AICore.start()         <span class="cm">// blocked if invalid</span>
   → AuthGuard.preHandler() <span class="cm">// all /api/* routes</span></div>
-        <ul class="tech-list">
+        <ul class="techlist">
           <li>HWID = SHA-256(BIOS UUID + MAC address)</li>
           <li>24-hour offline grace period for network failures</li>
-          <li>Row Level Security — client can only read own subscription</li>
+          <li>Row Level Security — client reads own data only</li>
           <li>Stripe webhook writes subscription server-side only</li>
         </ul>
       </div>
@@ -833,250 +638,127 @@ validateLicense()          <span class="cm">// Supabase auth + HWID</span>
 <section class="section reveal">
   <div class="s-eyebrow">HARDWARE DIAGNOSTICS</div>
   <h2 class="s-h2">6 tests. Real GCode.<br>Scored against a baseline.</h2>
-  <p class="s-sub">PRESTILON sends actual GCode to your printer and measures the response. Every test is compared to an industry baseline of healthy printers and assigned a 0–100 score.</p>
-
+  <p class="s-sub">PRESTILON sends actual GCode to your printer and measures the response. Every test is compared to an industry baseline and assigned a 0–100 score.</p>
   <div class="diag-grid">
-    <div class="diag-card">
-      <div class="diag-icon-wrap" style="background:rgba(0,229,255,.1)">🛡️</div>
+    <div class="dcard">
+      <div class="dicon" style="background:rgba(0,229,255,.1)">🛡️</div>
       <h4>Printer Status Check</h4>
-      <p>M115 firmware query + M105 sensor read. Non-invasive — no movement. Validates Klipper connection and sensor responsiveness.</p>
-      <span class="diag-duration">~5s · no movement</span>
+      <p>M115 firmware query + M105 sensor read. Non-invasive — no movement. Validates Klipper connection and all sensor channels.</p>
+      <span class="dtag">~5s · no movement</span>
     </div>
-    <div class="diag-card">
-      <div class="diag-icon-wrap" style="background:rgba(59,130,246,.1)">⚡</div>
+    <div class="dcard">
+      <div class="dicon" style="background:rgba(59,130,246,.1)">⚡</div>
       <h4>Extrusion Flow Test</h4>
-      <p>Homes all axes, raises Z to purge position, preheats to 200°C, extrudes 5mm + retracts. Measures flow consistency and pressure response.</p>
-      <span class="diag-duration">~60–90s · physical movement</span>
+      <p>Homes axes, raises Z to purge position, preheats to 200°C, extrudes 5mm + retracts. Measures flow consistency and pressure response.</p>
+      <span class="dtag">~60–90s · physical movement</span>
     </div>
-    <div class="diag-card">
-      <div class="diag-icon-wrap" style="background:rgba(124,58,237,.1)">↔️</div>
+    <div class="dcard">
+      <div class="dicon" style="background:rgba(124,58,237,.1)">↔️</div>
       <h4>Movement & Axes Test</h4>
-      <p>3× G28 X Y homing with belt tension analysis. Backlash measurement. Motor load scoring. Z axis deliberately untouched for safety.</p>
-      <span class="diag-duration">~40–60s · XY homing ×3</span>
+      <p>3× G28 X Y homing with belt tension analysis. Backlash measurement. Motor load scoring. Z axis untouched for safety.</p>
+      <span class="dtag">~40–60s · XY homing ×3</span>
     </div>
-    <div class="diag-card">
-      <div class="diag-icon-wrap" style="background:rgba(245,158,11,.1)">🌡️</div>
-      <h4>Temperature Stability Test</h4>
-      <p>5-second continuous sampling of hotend and bed temperature variance. No GCode required — pure sensor analysis against stability thresholds.</p>
-      <span class="diag-duration">~7s · sensor only</span>
+    <div class="dcard">
+      <div class="dicon" style="background:rgba(245,158,11,.1)">🌡️</div>
+      <h4>Temperature Stability</h4>
+      <p>5-second continuous sampling of hotend and bed temperature variance. No GCode — pure sensor analysis against stability thresholds.</p>
+      <span class="dtag">~7s · sensor only</span>
     </div>
-    <div class="diag-card">
-      <div class="diag-icon-wrap" style="background:rgba(16,185,129,.1)">🎯</div>
+    <div class="dcard">
+      <div class="dicon" style="background:rgba(16,185,129,.1)">🎯</div>
       <h4>Retraction & Pressure Test</h4>
-      <p>Auto-preheats if needed, primes 3mm filament, retracts, and measures pressure drop curve. Clog risk and pressure coefficient scoring.</p>
-      <span class="diag-duration">~7s (+preheat if cold)</span>
+      <p>Auto-preheats if needed, primes 3mm filament, retracts, measures pressure drop curve. Clog risk and pressure coefficient scoring.</p>
+      <span class="dtag">~7s (+preheat if cold)</span>
     </div>
-    <div class="diag-card" style="border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.03)">
-      <div class="diag-icon-wrap" style="background:rgba(245,158,11,.12)">🏆</div>
+    <div class="dcard" style="border-color:rgba(245,158,11,.2);background:rgba(245,158,11,.02)">
+      <div class="dicon" style="background:rgba(245,158,11,.12)">🏆</div>
       <h4>Full System Diagnostic</h4>
-      <p>Runs all 5 tests sequentially. Produces a composite health score, percentile rank against the industry fleet, and a full diagnostic report.</p>
-      <span class="diag-duration">~50s idle · ~10s if busy</span>
+      <p>Runs all 5 tests sequentially. Produces a composite health score, fleet percentile rank, and a complete diagnostic report.</p>
+      <span class="dtag">~50s idle · ~10s if busy</span>
     </div>
   </div>
 </section>
 
 <!-- HOW IT WORKS -->
-<section class="section reveal">
+<section class="section reveal" id="howit">
   <div class="s-eyebrow">ARCHITECTURE</div>
   <h2 class="s-h2">Local backend.<br>Cloud auth. Zero compromise.</h2>
   <p class="s-sub">The AI engine runs entirely on your Windows machine. Only subscription validation and account management use the internet. Your printer data never leaves your network.</p>
 
   <div class="arch-flow">
     <div class="arch-node">
-      <div class="arch-node-icon">🖨️</div>
-      <div class="arch-node-title">Klipper / Moonraker</div>
-      <div class="arch-node-sub">On your printer</div>
+      <div class="icon">🖨️</div>
+      <div class="title">Klipper / Moonraker</div>
+      <div class="sub">On your printer</div>
     </div>
     <div class="arch-arrow">→</div>
     <div class="arch-node" style="border-color:var(--border2)">
-      <div class="arch-node-icon">⚡</div>
-      <div class="arch-node-title">PRESTILON Backend</div>
-      <div class="arch-node-sub">localhost:3002 · Fastify</div>
+      <div class="icon">⚡</div>
+      <div class="title">PRESTILON Backend</div>
+      <div class="sub">localhost:3002 · Fastify</div>
     </div>
     <div class="arch-arrow">→</div>
     <div class="arch-node" style="border-color:var(--border2)">
-      <div class="arch-node-icon">🧠</div>
-      <div class="arch-node-title">AI Engine</div>
-      <div class="arch-node-sub">Kalman + CUSUM + Models</div>
+      <div class="icon">🧠</div>
+      <div class="title">AI Engine</div>
+      <div class="sub">Kalman + CUSUM + Models</div>
     </div>
     <div class="arch-arrow">→</div>
     <div class="arch-node">
-      <div class="arch-node-icon">📊</div>
-      <div class="arch-node-title">React Dashboard</div>
-      <div class="arch-node-sub">localhost:3002 · WebSocket</div>
+      <div class="icon">📊</div>
+      <div class="title">React Dashboard</div>
+      <div class="sub">localhost:3002 · WebSocket</div>
     </div>
   </div>
 
-  <div style="display:flex;justify-content:center;margin-top:2rem">
-    <div class="arch-node" style="min-width:auto;padding:.75rem 1.5rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;justify-content:center">
-      <div style="text-align:center">
-        <div style="font-size:1.2rem;margin-bottom:.2rem">☁️</div>
-        <div style="font-size:.72rem;font-weight:700">Supabase</div>
-        <div style="font-size:.62rem;color:var(--t3)">Auth + Subscription only</div>
-      </div>
-      <div style="text-align:center">
-        <div style="font-size:1.2rem;margin-bottom:.2rem">💳</div>
-        <div style="font-size:.72rem;font-weight:700">Stripe</div>
-        <div style="font-size:.62rem;color:var(--t3)">Payments + Webhooks</div>
-      </div>
-      <div style="text-align:center">
-        <div style="font-size:1.2rem;margin-bottom:.2rem">📧</div>
-        <div style="font-size:.72rem;font-weight:700">Resend</div>
-        <div style="font-size:.62rem;color:var(--t3)">Email notifications</div>
-      </div>
+  <div class="cloud-row">
+    <div class="cloud-box">
+      <div class="cloud-item"><div class="icon">☁️</div><div class="title">Supabase</div><div class="sub">Auth + Subscription only</div></div>
+      <div class="cloud-item"><div class="icon">💳</div><div class="title">Stripe</div><div class="sub">Payments + Webhooks</div></div>
+      <div class="cloud-item"><div class="icon">📧</div><div class="title">Resend</div><div class="sub">Email notifications</div></div>
     </div>
-  </div>
-</section>
-
-<!-- PRICING -->
-<section class="section reveal" id="pricing">
-  <div class="s-eyebrow">PRICING</div>
-  <h2 class="s-h2">Choose your fleet tier.</h2>
-  <p class="s-sub">All plans include the full local AI engine. Higher tiers unlock tighter AI constants, more printers, and extended analytics history.</p>
-
-  <div class="pricing-grid">
-    <div class="plan">
-      <div class="plan-emoji">⚡</div>
-      <div class="plan-name" style="color:var(--t2)">BASIC</div>
-      <div class="plan-tagline">Start monitoring today</div>
-      <div class="plan-price" style="color:var(--t)">€20<sub>/mo</sub></div>
-      <div class="plan-vat">+ 21% VAT · €3 per printer/mo</div>
-      <div class="plan-sep"></div>
-      <ul class="plan-feats">
-        <li>Real-time WebSocket dashboard</li>
-        <li>Basic AI anomaly detection</li>
-        <li>Email notifications</li>
-        <li>30-day telemetry history</li>
-        <li>€3 per printer / month</li>
-        <li class="dim">Advanced Kalman tuning</li>
-        <li class="dim">Failure prediction models</li>
-      </ul>
-      <button class="plan-btn plan-btn-outline" onclick="showPage('auth');switchTab('register')">Get Started</button>
-    </div>
-
-    <div class="plan hot">
-      <div class="plan-ribbon" style="background:var(--c);color:#000">Most Popular</div>
-      <div class="plan-emoji">🚀</div>
-      <div class="plan-name" style="color:var(--c)">PRO</div>
-      <div class="plan-tagline">Full AI stack, 15 printers</div>
-      <div class="plan-price" style="color:var(--c)">€50<sub>/mo</sub></div>
-      <div class="plan-vat">+ 21% VAT · 15 printers included</div>
-      <div class="plan-sep"></div>
-      <ul class="plan-feats">
-        <li>15 printers included</li>
-        <li>Tuned Kalman Q/R constants</li>
-        <li>CUSUM with tighter thresholds</li>
-        <li>Failure prediction models</li>
-        <li>Hardware diagnostic suite</li>
-        <li>90-day history</li>
-        <li>Priority support</li>
-      </ul>
-      <button class="plan-btn plan-btn-primary" onclick="showPage('auth');switchTab('register')">Choose Pro</button>
-    </div>
-
-    <div class="plan">
-      <div class="plan-ribbon" style="background:var(--g);color:#fff">Save 29%</div>
-      <div class="plan-emoji">👑</div>
-      <div class="plan-name" style="color:#a78bfa">ULTRA</div>
-      <div class="plan-tagline">50 printers, 6 months fixed</div>
-      <div class="plan-price" style="color:#a78bfa">€280<sub>/ 6 mo</sub></div>
-      <div class="plan-vat">VAT included · up to 50 printers</div>
-      <div class="plan-sep"></div>
-      <ul class="plan-feats">
-        <li>Up to 50 printers included</li>
-        <li>All Pro features</li>
-        <li>Enterprise AI cloud constants</li>
-        <li>Global fleet percentile ranking</li>
-        <li>1-year telemetry history</li>
-        <li>Priority support</li>
-      </ul>
-      <button class="plan-btn plan-btn-outline" onclick="showPage('auth');switchTab('register')">Choose Ultra</button>
-    </div>
-
-    <div class="plan">
-      <div class="plan-ribbon" style="background:var(--a);color:#000">Save 55%</div>
-      <div class="plan-emoji">📅</div>
-      <div class="plan-name" style="color:var(--a)">ANNUAL</div>
-      <div class="plan-tagline">Best value, enterprise tier</div>
-      <div class="plan-price" style="color:var(--a)">€540<sub>/ year</sub></div>
-      <div class="plan-vat">VAT included · up to 50 printers</div>
-      <div class="plan-sep"></div>
-      <ul class="plan-feats">
-        <li>Up to 50 printers included</li>
-        <li>Enterprise AI wear coefficients</li>
-        <li>Tightest CUSUM thresholds</li>
-        <li>Unlimited telemetry history</li>
-        <li>24/7 VIP support + SLA</li>
-        <li>Early access to new features</li>
-      </ul>
-      <button class="plan-btn plan-btn-outline" onclick="showPage('auth');switchTab('register')">Choose Annual</button>
-    </div>
-  </div>
-
-  <!-- CALCULATOR -->
-  <div class="calc-box mt4">
-    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1.5rem">
-      <span style="font-size:1.1rem">🧮</span>
-      <span style="font-weight:700;font-size:.95rem">Price Calculator</span>
-      <span style="font-size:.75rem;color:var(--t2);margin-left:.5rem">— find your optimal plan</span>
-    </div>
-    <div class="calc-row">
-      <span class="calc-label">How many printers do you have?</span>
-      <div class="calc-counter">
-        <button class="calc-btn" onclick="adjustCalc(-1)">−</button>
-        <span class="calc-num" id="calcNum">5</span>
-        <button class="calc-btn" onclick="adjustCalc(1)">+</button>
-      </div>
-    </div>
-    <input type="range" min="1" max="50" value="5" id="calcSlider" oninput="updateCalc(this.value)">
-    <div class="calc-result" id="calcResult"></div>
   </div>
 </section>
 
 <!-- CTA -->
 <section class="section reveal">
-  <div class="cta-banner">
-    <div class="z1" style="position:relative">
-      <div class="s-eyebrow" style="justify-content:center">READY TO START</div>
-      <h2>Run enterprise-grade AI on your printers.<br>Today. Locally. Free trial.</h2>
-      <p>Create your account, download PRESTILON, and have your first printer monitored in under 5 minutes.</p>
-      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-        <button class="btn btn-primary" onclick="showPage('auth');switchTab('register')">⚡ Create Free Account</button>
-        <button class="btn btn-ghost" disabled style="opacity:.4;cursor:not-allowed">⬇ Download (coming soon)</button>
-      </div>
-      <p style="margin-top:1.5rem;font-size:.72rem;color:var(--t3);font-family:'JetBrains Mono',monospace">WINDOWS 10/11 · NODE.JS 18+ · KLIPPER/MOONRAKER REQUIRED</p>
+  <div class="cta-box">
+    <div class="s-eyebrow" style="justify-content:center">READY TO START</div>
+    <h2>Run enterprise-grade AI on your printers.<br>Today. Locally.</h2>
+    <p>Create your account, download PRESTILON, and have your first printer monitored in under 5 minutes.</p>
+    <div class="cta-actions">
+      <button class="btn btn-p" onclick="goAuth('register')">⚡ Create Free Account</button>
+      <button class="btn btn-g" disabled style="opacity:.4;cursor:not-allowed">⬇ Download (coming soon)</button>
     </div>
+    <p style="margin-top:1.5rem;font-size:.7rem;color:var(--t3);font-family:'JetBrains Mono',monospace;position:relative;z-index:1">WINDOWS 10/11 · NODE.JS 18+ · KLIPPER/MOONRAKER REQUIRED</p>
   </div>
 </section>
 
-<footer class="z1">
+<footer>
   <div>
-    <div class="logo">
-      <div class="logo-mark">P</div>
-      <div>
-        <div class="logo-text">PRESTILON</div>
-        <div class="logo-sub">AI FLEET INTELLIGENCE</div>
-      </div>
-    </div>
-    <div class="footer-copy mt2">© 2026 PRESTILON. All rights reserved. Built for engineers.</div>
+    <button class="logo" onclick="goHome()" style="display:inline-flex">
+      <div class="logo-mark" style="width:30px;height:30px;font-size:.65rem">P</div>
+      <div><div class="logo-text" style="font-size:.85rem">PRESTILON</div></div>
+    </button>
+    <div class="footer-copy">© 2026 PRESTILON. All rights reserved. Built for engineers.</div>
   </div>
   <div class="footer-links">
-    <a href="#" onclick="scrollTo('features')">Features</a>
-    <a href="#" onclick="scrollTo('pricing')">Pricing</a>
+    <a href="#" onclick="goSection('features');return false">Features</a>
+    <a href="#" onclick="goSection('howit');return false">How It Works</a>
     <a href="mailto:support@prestilon.com">Support</a>
-    <a href="#" onclick="showPage('auth')">Sign In</a>
+    <a href="#" onclick="goAuth('login');return false">Sign In</a>
   </div>
 </footer>
-</div><!-- /page-home -->
+</div><!-- /home -->
 
-<!-- ═══════════════ AUTH ═══════════════ -->
-<div id="page-auth" class="page z1">
-  <div class="auth-bg">
+<!-- ═══════════════ AUTH PAGE ═══════════════ -->
+<div id="page-auth" class="page">
+  <div class="auth-wrap">
     <div class="auth-card">
-      <div class="auth-logo-wrap">
-        <div class="logo-mark" style="margin:0 auto .75rem;width:44px;height:44px">P</div>
-        <div class="auth-logo">PRESTILON</div>
+      <div style="text-align:center;margin-bottom:.75rem">
+        <div class="logo-mark" style="margin:0 auto;width:42px;height:42px">P</div>
       </div>
+      <div class="auth-logo">PRESTILON</div>
       <div class="auth-meta" id="authMeta">Sign in to your account</div>
       <div class="auth-tabs" id="authTabs">
         <button class="at on" id="tabLogin" onclick="switchTab('login')">Sign In</button>
@@ -1088,12 +770,12 @@ validateLicense()          <span class="cm">// Supabase auth + HWID</span>
       <div class="tab-pnl on" id="pnlLogin">
         <div class="fg"><label class="fl">Email address</label><input type="email" id="lEmail" class="fi" placeholder="you@example.com"/></div>
         <div class="fg">
-          <label class="fl" style="display:flex;justify-content:space-between">Password<a href="#" class="alink" onclick="switchTab('forgot')">Forgot?</a></label>
+          <label class="fl" style="display:flex;justify-content:space-between">Password<a href="#" class="alink" onclick="switchTab('forgot');return false">Forgot?</a></label>
           <input type="password" id="lPass" class="fi" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
         </div>
-        <button class="fs" id="loginBtn" onclick="doLogin()">Sign In</button>
+        <button class="fsub" id="loginBtn" onclick="doLogin()">Sign In</button>
         <div class="adiv"><span>New to PRESTILON?</span></div>
-        <div style="text-align:center"><a href="#" class="alink" onclick="switchTab('register')">Create an account →</a></div>
+        <div style="text-align:center"><a href="#" class="alink" onclick="switchTab('register');return false">Create an account →</a></div>
       </div>
 
       <!-- REGISTER -->
@@ -1102,97 +784,97 @@ validateLicense()          <span class="cm">// Supabase auth + HWID</span>
         <div class="fg"><label class="fl">Email address</label><input type="email" id="rEmail" class="fi" placeholder="you@example.com"/></div>
         <div class="fg"><label class="fl">Password</label><input type="password" id="rPass" class="fi" placeholder="min. 8 characters"/></div>
         <div class="fg"><label class="fl">Confirm password</label><input type="password" id="rConf" class="fi" placeholder="••••••••" onkeydown="if(event.key==='Enter')doRegister()"/></div>
-        <button class="fs" id="regBtn" onclick="doRegister()">Create Account</button>
+        <button class="fsub" id="regBtn" onclick="doRegister()">Create Account</button>
         <div class="adiv"><span>Already have an account?</span></div>
-        <div style="text-align:center"><a href="#" class="alink" onclick="switchTab('login')">Sign in →</a></div>
+        <div style="text-align:center"><a href="#" class="alink" onclick="switchTab('login');return false">Sign in →</a></div>
       </div>
 
       <!-- FORGOT -->
       <div class="tab-pnl" id="pnlForgot">
-        <div class="alert-box ai">Enter your email and we'll send a password reset link.</div>
+        <div class="alertbox ai">Enter your email and we'll send a password reset link.</div>
         <div class="fg"><label class="fl">Email address</label><input type="email" id="fEmail" class="fi" placeholder="you@example.com"/></div>
-        <button class="fs" id="forgotBtn" onclick="doForgot()">Send Reset Link</button>
-        <div style="text-align:center;margin-top:1rem"><a href="#" class="alink" onclick="switchTab('login')">← Back to Sign In</a></div>
+        <button class="fsub" id="forgotBtn" onclick="doForgot()">Send Reset Link</button>
+        <div style="text-align:center;margin-top:1rem"><a href="#" class="alink" onclick="switchTab('login');return false">← Back to Sign In</a></div>
       </div>
 
       <div style="text-align:center;margin-top:1.75rem">
-        <button onclick="showPage('home')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:.76rem;font-family:'Space Grotesk',sans-serif">← Back to prestilon.com</button>
+        <button onclick="goHome()" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:.75rem;font-family:'Space Grotesk',sans-serif">← Back to prestilon.com</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ ACCOUNT ═══════════════ -->
-<div id="page-account" class="page z1">
+<!-- ═══════════════ ACCOUNT PAGE ═══════════════ -->
+<div id="page-account" class="page">
   <div class="acct-wrap">
     <div class="acct-h1">Account</div>
     <div class="acct-sub">Manage your subscription, profile, and security settings.</div>
     <div class="acct-grid">
-      <div class="acct-sidebar">
-        <div class="av" id="acctAvatar">P</div>
+      <div class="acct-side">
+        <div class="av" id="acctAv">P</div>
         <div class="an" id="acctName">—</div>
         <div class="ae2" id="acctEmail">—</div>
         <div class="snav">
-          <button class="snav-btn on" onclick="showAcctTab('subscription',this)">💳 Subscription</button>
-          <button class="snav-btn" onclick="showAcctTab('profile',this)">👤 Profile</button>
-          <button class="snav-btn" onclick="showAcctTab('security',this)">🔒 Security</button>
-          <button class="snav-btn" onclick="showAcctTab('download',this)">⬇ Download</button>
+          <button class="snav-btn on" id="sBtn0" onclick="showAcctTab('sub',this)">💳 Subscription</button>
+          <button class="snav-btn" id="sBtn1" onclick="showAcctTab('profile',this)">👤 Profile</button>
+          <button class="snav-btn" id="sBtn2" onclick="showAcctTab('security',this)">🔒 Security</button>
+          <button class="snav-btn" id="sBtn3" onclick="showAcctTab('download',this)">⬇ Download</button>
         </div>
-        <button class="logout" onclick="doLogout()">Sign Out</button>
+        <button class="logout-btn" onclick="doLogout()">Sign Out</button>
       </div>
       <div class="acct-content">
         <div id="acctAlert"></div>
 
         <!-- SUBSCRIPTION -->
         <div class="tab-pnl on acct-sec" id="acSub">
-          <div class="acct-sec-title">💳 Subscription</div>
+          <div class="acct-stitle">💳 Subscription</div>
           <div class="sub-hero">
             <div>
-              <div style="font-weight:700;font-size:.95rem;margin-bottom:.2rem" id="subName">Loading…</div>
-              <div style="font-size:.75rem;color:var(--t2)" id="subExp">—</div>
+              <div style="font-weight:700;font-size:.92rem;margin-bottom:.2rem" id="subName">Loading…</div>
+              <div style="font-size:.73rem;color:var(--t2)" id="subExp">—</div>
             </div>
             <div id="subBadge"></div>
           </div>
           <div class="sub-stats" id="subStats"></div>
           <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
-            <div style="font-size:.82rem;font-weight:700;margin-bottom:.75rem">Manage Plan</div>
+            <div style="font-size:.8rem;font-weight:700;margin-bottom:.75rem">Manage Plan</div>
             <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-              <a href="https://billing.stripe.com" target="_blank" class="btn btn-ghost" style="font-size:.82rem;padding:.6rem 1.25rem">Manage Billing →</a>
-              <button class="btn btn-primary" style="font-size:.82rem;padding:.6rem 1.25rem" onclick="showPage('home');scrollTo('pricing')">Upgrade Plan</button>
+              <a href="https://billing.stripe.com" target="_blank" class="btn btn-g" style="font-size:.8rem;padding:.55rem 1.1rem">Manage Billing →</a>
+              <button class="btn btn-p" style="font-size:.8rem;padding:.55rem 1.1rem" onclick="goHome()">View Plans</button>
             </div>
           </div>
         </div>
 
         <!-- PROFILE -->
         <div class="tab-pnl acct-sec" id="acProfile">
-          <div class="acct-sec-title">👤 Profile</div>
+          <div class="acct-stitle">👤 Profile</div>
           <div class="fg"><label class="fl">Display name</label><input type="text" id="pName" class="fi" placeholder="Your name"/></div>
-          <div class="fg"><label class="fl">Email address</label><input type="email" id="pEmail" class="fi" readonly style="opacity:.6"/></div>
-          <button class="fs" style="max-width:190px;margin-top:.25rem" onclick="saveProfile()">Save Changes</button>
+          <div class="fg"><label class="fl">Email address</label><input type="email" id="pEmail" class="fi" readonly style="opacity:.55;cursor:not-allowed"/></div>
+          <button class="fsub" style="max-width:185px;margin-top:.25rem" onclick="saveProfile()">Save Changes</button>
         </div>
 
         <!-- SECURITY -->
         <div class="tab-pnl acct-sec" id="acSec">
-          <div class="acct-sec-title">🔒 Change Password</div>
+          <div class="acct-stitle">🔒 Change Password</div>
           <div class="fg"><label class="fl">New password</label><input type="password" id="np" class="fi" placeholder="min. 8 characters"/></div>
           <div class="fg"><label class="fl">Confirm new password</label><input type="password" id="cp2" class="fi" placeholder="••••••••"/></div>
-          <button class="fs" style="max-width:210px;margin-top:.25rem" onclick="changePwd()">Update Password</button>
+          <button class="fsub" style="max-width:200px;margin-top:.25rem" onclick="changePwd()">Update Password</button>
         </div>
 
         <!-- DOWNLOAD -->
         <div class="tab-pnl acct-sec" id="acDown">
-          <div class="acct-sec-title">⬇ Download PRESTILON</div>
-          <div class="alert-box ai mb" style="margin-bottom:1.25rem">Windows installer coming soon. Follow release notes for the launch date.</div>
+          <div class="acct-stitle">⬇ Download PRESTILON</div>
+          <div class="alertbox ai" style="margin-bottom:1.25rem">Windows installer coming soon. Follow release notes for the launch date.</div>
           <div style="background:var(--ink);border:1px solid var(--border);border-radius:12px;padding:1.25rem">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--t2);line-height:1.9">
-              <div style="color:var(--t3);margin-bottom:.35rem"># System Requirements</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.73rem;color:var(--t2);line-height:1.9">
+              <div style="color:var(--t3);margin-bottom:.3rem"># System Requirements</div>
               <div>Windows 10 / 11 (64-bit)</div>
               <div>Node.js 18 or higher</div>
               <div>Klipper + Moonraker on each printer</div>
               <div>Local network access to printer IP</div>
-              <div style="margin-top:.85rem;color:var(--t3)"># After install, navigate to:</div>
+              <div style="margin-top:.8rem;color:var(--t3)"># After install, open:</div>
               <div style="color:var(--c)">http://localhost:3002</div>
-              <div style="margin-top:.85rem;color:var(--t3)"># Your data stays on your machine.</div>
+              <div style="margin-top:.8rem;color:var(--t3)"># Your data stays on your machine.</div>
               <div>Only subscription validation uses internet.</div>
             </div>
           </div>
@@ -1203,54 +885,60 @@ validateLicense()          <span class="cm">// Supabase auth + HWID</span>
 </div>
 
 <!-- ═══════════════ SCRIPTS ═══════════════ -->
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
-const sb = createClient('https://ryftlimrjhhoymyfzusq.supabase.co','sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86')
-window._sb = sb
-let _user = null
-
-sb.auth.onAuthStateChange(async(e,s)=>{ _user=s?.user??null; updNav(); if(_user) await loadAcct() })
-
-window.showPage = n => {
-  if(n==='account'&&!_user){showPage('auth');return}
+<script>
+/* ── NAVIGATION — no window.scrollTo override! ── */
+function goHome(){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
-  document.getElementById('page-'+n).classList.add('active')
-  window.scrollTo(0,0); clrAlert()
+  document.getElementById('page-home').classList.add('active')
+  window.scrollTo({top:0})
 }
-window.scrollTo2 = id => {
-  showPage('home')
-  setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}),80)
+function goAuth(tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.getElementById('page-auth').classList.add('active')
+  window.scrollTo({top:0})
+  switchTab(tab||'login')
+  clearAlerts()
 }
-window.scrollTo = id => window.scrollTo2(id)
-
-window.switchTab = t => {
+function goAcct(){
+  if(!window._user){goAuth('login');return}
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.getElementById('page-account').classList.add('active')
+  window.scrollTo({top:0})
+  clearAlerts()
+}
+function goSection(id){
+  goHome()
+  setTimeout(()=>{
+    const el=document.getElementById(id)
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'})
+  },50)
+}
+function switchTab(t){
   ;['login','register','forgot'].forEach(x=>{
-    document.getElementById('pnl'+x.charAt(0).toUpperCase()+x.slice(1)).classList.remove('on')
-    const b=document.getElementById('tab'+x.charAt(0).toUpperCase()+x.slice(1))
+    const p=document.getElementById('pnl'+cap(x))
+    const b=document.getElementById('tab'+cap(x))
+    if(p) p.classList.remove('on')
     if(b) b.classList.remove('on')
   })
-  const nm=t.charAt(0).toUpperCase()+t.slice(1)
-  document.getElementById('pnl'+nm).classList.add('on')
-  const tb=document.getElementById('tab'+nm)
-  if(tb) tb.classList.add('on')
-  document.getElementById('authTabs').style.display=t==='forgot'?'none':''
+  const p=document.getElementById('pnl'+cap(t))
+  const b=document.getElementById('tab'+cap(t))
+  if(p) p.classList.add('on')
+  if(b) b.classList.add('on')
+  const tabs=document.getElementById('authTabs')
+  if(tabs) tabs.style.display=t==='forgot'?'none':''
+  const meta=document.getElementById('authMeta')
   const titles={login:'Sign in to your account',register:'Create your account',forgot:'Reset your password'}
-  document.getElementById('authMeta').textContent=titles[t]||''
-  clrAlert()
+  if(meta) meta.textContent=titles[t]||''
+  clearAlerts()
 }
-
-function updNav(){
-  const li=!!_user
-  document.getElementById('navLogin').style.display=li?'none':''
-  document.getElementById('navStart').style.display=li?'none':''
-  document.getElementById('navAcct').style.display=li?'':'none'
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function showAlert(msg,type,target){
+  target=target||'alertBox'
+  const el=document.getElementById(target);if(!el)return
+  const cls={error:'ae',success:'as',info:'ai'}[type]||'ae'
+  el.innerHTML=`<div class="alertbox ${cls}">${msg}</div>`
 }
-function alert2(m,t='error',id='alertBox'){
-  const e=document.getElementById(id);if(!e)return
-  const cls={error:'ae',success:'as',info:'ai'}[t]||'ae'
-  e.innerHTML=`<div class="alert-box ${cls}">${m}</div>`
-}
-function clrAlert(){
+function clearAlerts(){
   ;['alertBox','acctAlert'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=''})
 }
 function setLoading(id,on,txt){
@@ -1258,217 +946,178 @@ function setLoading(id,on,txt){
   b.disabled=on
   b.innerHTML=on?`<span class="spin"></span>${txt}`:txt
 }
+window._user=null
 
-window.doLogin=async()=>{
-  const e=document.getElementById('lEmail').value.trim()
-  const p=document.getElementById('lPass').value
-  if(!e||!p){alert2('Please fill in all fields.');return}
-  setLoading('loginBtn',true,'Signing in…')
-  const{error}=await sb.auth.signInWithPassword({email:e,password:p})
-  setLoading('loginBtn',false,'Sign In')
-  if(error){alert2(error.message);return}
-  showPage('account')
-}
-window.doRegister=async()=>{
-  const n=document.getElementById('rName').value.trim()
-  const e=document.getElementById('rEmail').value.trim()
-  const p=document.getElementById('rPass').value
-  const c=document.getElementById('rConf').value
-  if(!n||!e||!p){alert2('Please fill in all fields.');return}
-  if(p.length<8){alert2('Password must be at least 8 characters.');return}
-  if(p!==c){alert2('Passwords do not match.');return}
-  setLoading('regBtn',true,'Creating account…')
-  const{error}=await sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}})
-  setLoading('regBtn',false,'Create Account')
-  if(error){alert2(error.message);return}
-  alert2('✅ Account created! Check your email to confirm, then sign in.','success')
-  setTimeout(()=>switchTab('login'),3000)
-}
-window.doForgot=async()=>{
-  const e=document.getElementById('fEmail').value.trim()
-  if(!e){alert2('Please enter your email.');return}
-  setLoading('forgotBtn',true,'Sending…')
-  const{error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin})
-  setLoading('forgotBtn',false,'Send Reset Link')
-  if(error){alert2(error.message);return}
-  alert2('✅ Reset link sent! Check your inbox.','success')
-}
-window.doLogout=async()=>{
-  await sb.auth.signOut(); _user=null; updNav(); showPage('home')
-}
-async function loadAcct(){
-  if(!_user)return
-  const n=_user.user_metadata?.full_name||_user.email?.split('@')[0]||'User'
-  const e=_user.email||''
-  document.getElementById('acctAvatar').textContent=n.charAt(0).toUpperCase()
-  document.getElementById('acctName').textContent=n
-  document.getElementById('acctEmail').textContent=e
-  document.getElementById('pName').value=n
-  document.getElementById('pEmail').value=e
-  const{data:sub}=await sb.from('subscriptions').select('*').eq('user_id',_user.id).single()
-  const planMap={starter:'Basic',professional:'Pro',enterprise:'Enterprise'}
-  document.getElementById('subName').textContent=sub?(planMap[sub.plan]||sub.plan)+' Plan':'No active plan'
-  document.getElementById('subExp').textContent=sub?.valid_until?'Valid until: '+new Date(sub.valid_until).toLocaleDateString('en-GB'):'No expiry date'
-  const cls={active:'sba',trial:'sbt',trialing:'sbt',expired:'sbi',cancelled:'sbi',inactive:'sbi'}
-  const st=sub?.status||'inactive'
-  document.getElementById('subBadge').innerHTML=`<span class="sbadge ${cls[st]||'sbi'}">${st}</span>`
-  document.getElementById('subStats').innerHTML=sub?`
-    <div class="sub-stat"><div class="sub-stat-val">${sub.printer_limit}</div><div class="sub-stat-lbl">Printer Limit</div></div>
-    <div class="sub-stat"><div class="sub-stat-val" style="font-size:.85rem;font-family:'Space Grotesk'">${(sub.plan||'—').toUpperCase()}</div><div class="sub-stat-lbl">Current Plan</div></div>
-  `:`<div class="alert-box ae" style="grid-column:span 2;margin:0">No active subscription. Choose a plan to unlock the AI engine.</div>`
-}
-window.saveProfile=async()=>{
-  const n=document.getElementById('pName').value.trim()
-  if(!n){alert2('Name cannot be empty.','error','acctAlert');return}
-  const{error}=await sb.auth.updateUser({data:{full_name:n}})
-  if(error){alert2(error.message,'error','acctAlert');return}
-  document.getElementById('acctName').textContent=n
-  document.getElementById('acctAvatar').textContent=n.charAt(0).toUpperCase()
-  alert2('✅ Profile updated.','success','acctAlert')
-}
-window.changePwd=async()=>{
-  const p=document.getElementById('np').value
-  const c=document.getElementById('cp2').value
-  if(p.length<8){alert2('Password must be at least 8 characters.','error','acctAlert');return}
-  if(p!==c){alert2('Passwords do not match.','error','acctAlert');return}
-  const{error}=await sb.auth.updateUser({password:p})
-  if(error){alert2(error.message,'error','acctAlert');return}
-  document.getElementById('np').value='';document.getElementById('cp2').value=''
-  alert2('✅ Password updated.','success','acctAlert')
-}
-window.showAcctTab=(tab,btn)=>{
+/* ── ACCOUNT TABS ── */
+function showAcctTab(tab,btn){
+  const map={sub:'acSub',profile:'acProfile',security:'acSec',download:'acDown'}
   document.querySelectorAll('.acct-content .tab-pnl').forEach(p=>p.classList.remove('on'))
   document.querySelectorAll('.snav-btn').forEach(b=>b.classList.remove('on'))
-  const map={subscription:'acSub',profile:'acProfile',security:'acSec',download:'acDown'}
-  document.getElementById(map[tab]).classList.add('on')
-  if(btn)btn.classList.add('on')
+  const panel=document.getElementById(map[tab])
+  if(panel) panel.classList.add('on')
+  if(btn) btn.classList.add('on')
 }
-const{data:{session}}=await sb.auth.getSession()
-if(session){_user=session.user;updNav();await loadAcct()}
-updNav()
-</script>
 
-<script>
-/* ─── CANVAS PARTICLE GRID ─── */
-(()=>{
+/* ── CANVAS PARTICLES ── */
+;(()=>{
   const c=document.getElementById('bg-canvas')
   const ctx=c.getContext('2d')
-  let W,H,pts=[],frame=0
-  const N=80
-  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;pts=[]}
-  function init(){
-    pts=[];for(let i=0;i<N;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25})
-  }
+  let W,H,pts=[]
+  const N=70
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  function init(){pts=[];for(let i=0;i<N;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22})}
   function draw(){
     ctx.clearRect(0,0,W,H)
-    // Draw connections
     for(let i=0;i<N;i++){
       for(let j=i+1;j<N;j++){
-        const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y
-        const d=Math.sqrt(dx*dx+dy*dy)
-        if(d<140){
-          ctx.beginPath()
-          ctx.strokeStyle=`rgba(0,229,255,${.06*(1-d/140)})`
-          ctx.lineWidth=.5
-          ctx.moveTo(pts[i].x,pts[i].y)
-          ctx.lineTo(pts[j].x,pts[j].y)
-          ctx.stroke()
-        }
+        const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy)
+        if(d<130){ctx.beginPath();ctx.strokeStyle=`rgba(0,229,255,${.055*(1-d/130)})`;ctx.lineWidth=.5;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke()}
       }
+      ctx.beginPath();ctx.arc(pts[i].x,pts[i].y,1.1,0,Math.PI*2);ctx.fillStyle='rgba(0,229,255,0.22)';ctx.fill()
+      pts[i].x+=pts[i].vx;pts[i].y+=pts[i].vy
+      if(pts[i].x<0||pts[i].x>W)pts[i].vx*=-1
+      if(pts[i].y<0||pts[i].y>H)pts[i].vy*=-1
     }
-    // Draw dots
-    pts.forEach(p=>{
-      ctx.beginPath()
-      ctx.arc(p.x,p.y,1.2,0,Math.PI*2)
-      ctx.fillStyle='rgba(0,229,255,0.25)'
-      ctx.fill()
-      p.x+=p.vx;p.y+=p.vy
-      if(p.x<0||p.x>W)p.vx*=-1
-      if(p.y<0||p.y>H)p.vy*=-1
-    })
     requestAnimationFrame(draw)
   }
   window.addEventListener('resize',()=>{resize();init()})
   resize();init();draw()
 })()
 
-/* ─── COUNTER ANIMATIONS ─── */
-function countUp(id,target,suffix=''){
-  let v=0;const el=document.getElementById(id)
+/* ── COUNTER ANIMATIONS ── */
+function countUp(id,target){
+  let v=0;const el=document.getElementById(id);if(!el)return
   const step=Math.ceil(target/40)
-  const t=setInterval(()=>{
-    v=Math.min(v+step,target)
-    el.textContent=v+suffix
-    if(v>=target)clearInterval(t)
-  },30)
+  const t=setInterval(()=>{v=Math.min(v+step,target);el.textContent=v;if(v>=target)clearInterval(t)},30)
 }
 setTimeout(()=>{countUp('tv1',50);countUp('tv2',6);countUp('tv3',3)},600)
 
-/* ─── PREVIEW BARS ─── */
+/* ── PREVIEW BARS ── */
 ;(()=>{
-  const wrap=document.getElementById('pvBars')
-  const vals=[55,70,45,85,60,75,50,90,65,80]
-  vals.forEach((h,i)=>{
+  const wrap=document.getElementById('pvBars');if(!wrap)return
+  ;[55,70,45,85,60,75,50,90,65,80].forEach(h=>{
     const b=document.createElement('div')
-    b.className='mini-bar'+(h>70?' hi':'')
-    b.style.height=(h/100*32)+'px'
+    b.className='mbar'+(h>70?' h':'')
+    b.style.height=(h/100*30)+'px'
     wrap.appendChild(b)
   })
 })()
 
-/* ─── LIVE PREVIEW SIMULATION ─── */
+/* ── LIVE PREVIEW ── */
 ;(()=>{
   let t=215.3,tick=0
   setInterval(()=>{
-    tick++
-    t+=((Math.random()-.48)*0.4)
-    t=Math.max(213,Math.min(218,t))
-    document.getElementById('pvTemp').textContent=t.toFixed(1)+'°C'
-    // health drift
-    const h=85+Math.round(Math.sin(tick*.1)*3)
-    document.getElementById('pvHealth').textContent=h
-    document.querySelector('.health-gauge').style.setProperty('--pct',h)
-  },2000)
+    tick++;t+=((Math.random()-.48)*0.35);t=Math.max(213,Math.min(218,t))
+    const el=document.getElementById('pvT');if(el)el.textContent=t.toFixed(1)+'°C'
+    const h=85+Math.round(Math.sin(tick*.12)*3)
+    const hEl=document.getElementById('pvH');if(hEl)hEl.textContent=h
+    const g=document.querySelector('.gauge');if(g)g.style.setProperty('--p',h)
+  },2200)
 })()
 
-/* ─── CALCULATOR ─── */
-const PLANS=[
-  {id:'BASIC',label:'Basic',price:20,base:0,extra:3,months:1},
-  {id:'PRO',label:'Pro',price:50,base:15,extra:3,months:1},
-  {id:'ULTRA',label:'Ultra',price:280,base:50,extra:0,months:6},
-  {id:'ANNUAL',label:'Annual',price:540,base:50,extra:0,months:12},
-]
-function calcCost(p,n){
-  if(p.id==='ULTRA'||p.id==='ANNUAL')return{monthly:p.price/p.months,extra:0}
-  const ext=Math.max(0,n-p.base)*p.extra
-  return{monthly:p.price+ext,extra:ext}
-}
-window.adjustCalc=d=>{
-  const s=document.getElementById('calcSlider')
-  s.value=Math.max(1,Math.min(50,+s.value+d))
-  updateCalc(s.value)
-}
-window.updateCalc=v=>{
-  document.getElementById('calcSlider').value=v
-  document.getElementById('calcNum').textContent=v
-  const n=+v
-  const costs=PLANS.map(p=>({...p,...calcCost(p,n)}))
-  const best=costs.reduce((a,b)=>a.monthly<b.monthly?a:b)
-  const colors={BASIC:'var(--t2)',PRO:'var(--c)',ULTRA:'#a78bfa',ANNUAL:'var(--a)'}
-  document.getElementById('calcResult').innerHTML=costs.map(p=>`
-    <div class="calc-plan${p.id===best.id?' best':''}">
-      <div class="calc-plan-name" style="color:${colors[p.id]}">${p.label}</div>
-      <div class="calc-plan-price" style="color:${colors[p.id]}">€${p.monthly.toFixed(2)}</div>
-      <div class="calc-plan-sub">/ month${p.months>1?' (avg)':''}</div>
-      ${p.id===best.id?'<span class="best-badge">★ Best Value</span>':''}
-    </div>
-  `).join('')
-}
-updateCalc(5)
-
-/* ─── SCROLL REVEAL ─── */
+/* ── SCROLL REVEAL ── */
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.08})
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el))
+</script>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+const sb=createClient('https://ryftlimrjhhoymyfzusq.supabase.co','sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86')
+
+function updNav(){
+  const li=!!window._user
+  document.getElementById('navLogin').style.display=li?'none':''
+  document.getElementById('navStart').style.display=li?'none':''
+  document.getElementById('navAcct').style.display=li?'':'none'
+}
+
+sb.auth.onAuthStateChange(async(e,s)=>{
+  window._user=s?.user??null
+  updNav()
+  if(window._user) await loadAcct()
+})
+
+async function loadAcct(){
+  const u=window._user;if(!u)return
+  const n=u.user_metadata?.full_name||u.email?.split('@')[0]||'User'
+  const e=u.email||''
+  document.getElementById('acctAv').textContent=n.charAt(0).toUpperCase()
+  document.getElementById('acctName').textContent=n
+  document.getElementById('acctEmail').textContent=e
+  document.getElementById('pName').value=n
+  document.getElementById('pEmail').value=e
+  const{data:sub}=await sb.from('subscriptions').select('*').eq('user_id',u.id).single()
+  const pm={starter:'Basic',professional:'Pro',enterprise:'Enterprise'}
+  document.getElementById('subName').textContent=sub?(pm[sub.plan]||sub.plan)+' Plan':'No active plan'
+  document.getElementById('subExp').textContent=sub?.valid_until?'Valid until: '+new Date(sub.valid_until).toLocaleDateString('en-GB'):'No expiry date'
+  const bc={active:'sb-a',trial:'sb-t',trialing:'sb-t',expired:'sb-i',cancelled:'sb-i',inactive:'sb-i'}
+  const st=sub?.status||'inactive'
+  document.getElementById('subBadge').innerHTML=`<span class="sbadge ${bc[st]||'sb-i'}">${st}</span>`
+  document.getElementById('subStats').innerHTML=sub?`
+    <div class="ss"><div class="ssv">${sub.printer_limit}</div><div class="ssl">Printer Limit</div></div>
+    <div class="ss"><div class="ssv" style="font-size:.82rem;font-family:'Space Grotesk'">${(sub.plan||'—').toUpperCase()}</div><div class="ssl">Plan</div></div>
+  `:`<div class="alertbox ae" style="grid-column:span 2;margin:0">No active subscription. Choose a plan to get started.</div>`
+}
+
+window.doLogin=async()=>{
+  const e=document.getElementById('lEmail').value.trim()
+  const p=document.getElementById('lPass').value
+  if(!e||!p){showAlert('Please fill in all fields.');return}
+  setLoading('loginBtn',true,'Signing in…')
+  const{error}=await sb.auth.signInWithPassword({email:e,password:p})
+  setLoading('loginBtn',false,'Sign In')
+  if(error){showAlert(error.message,'error');return}
+  goAcct()
+}
+window.doRegister=async()=>{
+  const n=document.getElementById('rName').value.trim()
+  const e=document.getElementById('rEmail').value.trim()
+  const p=document.getElementById('rPass').value
+  const c=document.getElementById('rConf').value
+  if(!n||!e||!p){showAlert('Please fill in all fields.');return}
+  if(p.length<8){showAlert('Password must be at least 8 characters.');return}
+  if(p!==c){showAlert('Passwords do not match.');return}
+  setLoading('regBtn',true,'Creating account…')
+  const{error}=await sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}})
+  setLoading('regBtn',false,'Create Account')
+  if(error){showAlert(error.message,'error');return}
+  showAlert('✅ Account created! Check your email to confirm, then sign in.','success')
+  setTimeout(()=>switchTab('login'),3000)
+}
+window.doForgot=async()=>{
+  const e=document.getElementById('fEmail').value.trim()
+  if(!e){showAlert('Please enter your email.');return}
+  setLoading('forgotBtn',true,'Sending…')
+  const{error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin})
+  setLoading('forgotBtn',false,'Send Reset Link')
+  if(error){showAlert(error.message,'error');return}
+  showAlert('✅ Reset link sent! Check your inbox.','success')
+}
+window.doLogout=async()=>{
+  await sb.auth.signOut();window._user=null;updNav();goHome()
+}
+window.saveProfile=async()=>{
+  const n=document.getElementById('pName').value.trim()
+  if(!n){showAlert('Name cannot be empty.','error','acctAlert');return}
+  const{error}=await sb.auth.updateUser({data:{full_name:n}})
+  if(error){showAlert(error.message,'error','acctAlert');return}
+  document.getElementById('acctName').textContent=n
+  document.getElementById('acctAv').textContent=n.charAt(0).toUpperCase()
+  showAlert('✅ Profile updated.','success','acctAlert')
+}
+window.changePwd=async()=>{
+  const p=document.getElementById('np').value
+  const c=document.getElementById('cp2').value
+  if(p.length<8){showAlert('Password must be at least 8 characters.','error','acctAlert');return}
+  if(p!==c){showAlert('Passwords do not match.','error','acctAlert');return}
+  const{error}=await sb.auth.updateUser({password:p})
+  if(error){showAlert(error.message,'error','acctAlert');return}
+  document.getElementById('np').value='';document.getElementById('cp2').value=''
+  showAlert('✅ Password updated.','success','acctAlert')
+}
+const{data:{session}}=await sb.auth.getSession()
+if(session){window._user=session.user;updNav();await loadAcct()}
+updNav()
 </script>
 </body>
 </html>
