@@ -72,12 +72,10 @@ nav{
 
 /* CONTENT GRID */
 .content{
-  display:grid;grid-template-columns:1fr 340px;gap:2.5rem;
   padding:48px var(--r) 88px;
   position:relative;z-index:1;
-  max-width:980px;margin:0 auto;
+  max-width:660px;margin:0 auto;
 }
-@media(max-width:860px){.content{grid-template-columns:1fr}}
 
 /* CARDS */
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.8rem}
@@ -185,43 +183,7 @@ footer{border-top:1px solid var(--border);padding:2rem var(--r);display:flex;ali
     <button class="fsub" id="sendBtn" onclick="sendMsg()">Send Message</button>
   </div>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="card rev">
-      <div class="card-title">
-        <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-        Quick Links
-      </div>
-      <div style="margin-top:1rem">
-        <a class="res-link" href="mailto:support@prestilon.com">
-          <div class="rl-icon" style="background:rgba(0,212,180,.08)">
-            <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path stroke="#00d4b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline stroke="#00d4b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="22,6 12,13 2,6"/></svg>
-          </div>
-          <div><div class="rl-t">Email Support</div><div class="rl-s">support@prestilon.com</div></div>
-          <span class="rl-arr">→</span>
-        </a>
-        <a class="res-link" href="https://billing.stripe.com" target="_blank">
-          <div class="rl-icon" style="background:rgba(16,212,138,.08)">
-            <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect stroke="#10d48a" stroke-width="2" stroke-linecap="round" x="2" y="5" width="20" height="14" rx="2"/><path stroke="#10d48a" stroke-width="2" stroke-linecap="round" d="M2 10h20"/></svg>
-          </div>
-          <div><div class="rl-t">Billing Portal</div><div class="rl-s">Manage subscription</div></div>
-          <span class="rl-arr">→</span>
-        </a>
-        <a class="res-link" href="/account">
-          <div class="rl-icon" style="background:rgba(108,92,231,.08)">
-            <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path stroke="#6c5ce7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle stroke="#6c5ce7" stroke-width="2" cx="12" cy="7" r="4"/></svg>
-          </div>
-          <div><div class="rl-t">My Account</div><div class="rl-s">Login · download</div></div>
-          <span class="rl-arr">→</span>
-        </a>
-      </div>
-    </div>
 
-    <div class="info-box rev">
-      <p>Typical response time is under 24 hours on business days. For urgent license or billing issues, include your account email in the message for faster resolution.</p>
-      <a href="mailto:support@prestilon.com">support@prestilon.com →</a>
-    </div>
-  </div>
 </div>
 
 <footer>
