@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="PRESTILON Account — Manage your subscription, profile, and security settings."/>
+<title>Account — PRESTILON</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#020B14;--bg2:#050F1C;--bg3:#081524;
+  --c1:#00E5C8;--c2:#00B8A0;
+  --text:#E8F0FB;--text2:#8A9BB8;--text3:#3D5070;
+  --border:rgba(0,229,200,.07);--border2:rgba(0,229,200,.2);
+  --red:#F05060;--green:#20D490;--amber:#F0A830;
+}
+html{background:var(--bg);min-height:100vh}
+body{font-family:'DM Sans',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh}
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 max(1.5rem,calc(50vw - 640px));background:rgba(2,11,20,.9);backdrop-filter:blur(22px);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:.65rem;text-decoration:none}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--c1),var(--c2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:800;color:#020B14;box-shadow:0 0 14px rgba(0,229,200,.25)}
+.logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;letter-spacing:.08em;color:var(--c1)}
+.nav-links{display:flex;align-items:center;gap:.4rem}
+.nav-link{padding:.4rem .8rem;color:var(--text2);font-size:.84rem;font-weight:500;text-decoration:none;border-radius:7px;transition:color .2s,background .2s}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.nav-link.active{color:var(--c1)}
+.logout-nav{padding:.4rem .8rem;border-radius:7px;border:1px solid rgba(240,80,96,.25);background:transparent;color:#fca5a5;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:500;cursor:pointer;transition:all .2s}
+.logout-nav:hover{background:rgba(240,80,96,.1)}
+
+/* MAIN */
+.main{max-width:960px;margin:0 auto;padding:50px max(1.5rem,calc(50vw - 480px)) 5rem;position:relative;z-index:1}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.page-header{margin-bottom:2.25rem;animation:fadeUp .5s ease both}
+.page-h1{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:.25rem}
+.page-sub{color:var(--text2);font-size:.85rem}
+
+/* LOADING */
+.loading-overlay{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;transition:opacity .4s}
+.loading-overlay.hidden{opacity:0;pointer-events:none}
+.loading-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--c1);letter-spacing:.1em}
+.loading-spin{width:28px;height:28px;border:2px solid rgba(0,229,200,.15);border-top-color:var(--c1);border-radius:50%;animation:_s .7s linear infinite}
+@keyframes _s{to{transform:rotate(360deg)}}
+
+/* LAYOUT */
+.acct-layout{display:grid;grid-template-columns:220px 1fr;gap:1.5rem;align-items:start}
+@media(max-width:700px){.acct-layout{grid-template-columns:1fr}}
+
+/* SIDEBAR */
+.sidebar{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:1.4rem 1.1rem;position:sticky;top:78px;animation:fadeUp .5s ease .05s both}
+.av{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--c1),var(--c2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#020B14;margin:0 auto .65rem}
+.sb-name{text-align:center;font-weight:700;font-size:.9rem;margin-bottom:.12rem}
+.sb-email{text-align:center;font-size:.68rem;color:var(--text2);margin-bottom:1.35rem;word-break:break-all}
+.snav{display:flex;flex-direction:column;gap:.18rem}
+.snav-btn{padding:.52rem .78rem;border-radius:9px;border:none;background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.48rem}
+.snav-btn:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.snav-btn.on{background:rgba(0,229,200,.08);color:var(--c1)}
+.logout-btn{width:100%;margin-top:1.2rem;padding:.58rem;border-radius:10px;background:rgba(240,80,96,.06);border:1px solid rgba(240,80,96,.2);color:#fca5a5;font-family:'DM Sans',sans-serif;font-size:.81rem;font-weight:600;cursor:pointer;transition:all .2s}
+.logout-btn:hover{background:rgba(240,80,96,.12)}
+
+/* CONTENT */
+.content{display:flex;flex-direction:column;gap:1.15rem;animation:fadeUp .5s ease .08s both}
+.pnl{display:none}.pnl.on{display:block}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:1.75rem}
+.card-title{font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700;margin-bottom:1.2rem;display:flex;align-items:center;gap:.45rem}
+
+/* SUBSCRIPTION */
+.sub-hero{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding:1.1rem 1.15rem;background:var(--bg);border:1px solid var(--border);border-radius:12px;margin-bottom:.9rem}
+.sbadge{padding:.24rem .65rem;border-radius:99px;font-size:.65rem;font-weight:700;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em}
+.sb-a{background:rgba(32,212,144,.12);color:var(--green);border:1px solid rgba(32,212,144,.3)}
+.sb-i{background:rgba(240,80,96,.12);color:var(--red);border:1px solid rgba(240,80,96,.3)}
+.sb-t{background:rgba(0,229,200,.1);color:var(--c1);border:1px solid rgba(0,229,200,.3)}
+.sub-stats{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:1.25rem}
+.ss{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:.85rem;text-align:center}
+.ssv{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--c1)}
+.ssl{font-size:.6rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-top:.14rem}
+
+/* FORM */
+.fg{margin-bottom:.9rem}
+.fl{display:block;font-size:.72rem;font-weight:600;color:var(--text2);margin-bottom:.36rem;letter-spacing:.02em}
+.fi{width:100%;padding:.7rem .95rem;border-radius:9px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;transition:border-color .18s,box-shadow .18s;outline:none}
+.fi:focus{border-color:rgba(0,229,200,.38);box-shadow:0 0 0 3px rgba(0,229,200,.07)}
+.fi::placeholder{color:var(--text3)}
+.fi[readonly]{opacity:.5;cursor:not-allowed}
+.fsub{padding:.78rem 1.75rem;border-radius:10px;border:none;background:var(--c1);color:#020B14;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer;transition:all .22s;box-shadow:0 0 20px rgba(0,229,200,.2);display:inline-flex;align-items:center;justify-content:center;gap:.4rem}
+.fsub:hover:not(:disabled){box-shadow:0 0 34px rgba(0,229,200,.4);transform:translateY(-1px)}
+.fsub:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+/* ALERT */
+.alertbox{padding:.7rem .95rem;border-radius:9px;font-size:.79rem;margin-bottom:.85rem;display:flex;align-items:flex-start;gap:.45rem;line-height:1.5}
+.ae{background:rgba(240,80,96,.1);border:1px solid rgba(240,80,96,.3);color:#fca5a5}
+.as{background:rgba(32,212,144,.1);border:1px solid rgba(32,212,144,.3);color:#6ee7b7}
+.ai{background:rgba(0,229,200,.07);border:1px solid rgba(0,229,200,.22);color:var(--c1)}
+.spin{width:14px;height:14px;border:2px solid rgba(0,0,0,.2);border-top-color:#000;border-radius:50%;animation:_s .55s linear infinite;display:inline-block;flex-shrink:0}
+
+/* DOWNLOAD */
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:11px;padding:1.2rem;font-family:'JetBrains Mono',monospace;font-size:.71rem;color:var(--text2);line-height:1.9}
+.code-block .cm{color:var(--text3)}
+.code-block .vl{color:var(--c1)}
+
+/* ACTION ROW */
+.action-row{display:flex;gap:.65rem;flex-wrap:wrap;margin-top:1.1rem;padding-top:1.1rem;border-top:1px solid var(--border)}
+.btn-ghost{padding:.55rem 1.1rem;border-radius:9px;background:transparent;border:1px solid var(--border);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:.3rem}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2rem max(1.5rem,calc(50vw - 590px));display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;position:relative;z-index:1}
+.footer-copy{font-size:.7rem;color:var(--text3)}
+.footer-links{display:flex;gap:1.3rem;flex-wrap:wrap}
+.footer-links a{color:var(--text3);text-decoration:none;font-size:.72rem;transition:color .2s}
+.footer-links a:hover{color:var(--text2)}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-logo">PRESTILON</div>
+  <div class="loading-spin"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="/">
+    <div class="logo-icon">P</div>
+    <div class="logo-name">PRESTILON</div>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="/">Home</a>
+    <a class="nav-link" href="/support">Support</a>
+    <a class="nav-link active" href="/account">Account</a>
+    <button class="logout-nav" onclick="doLogout()">Sign Out</button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="page-header">
+    <div class="page-h1">My Account</div>
+    <div class="page-sub">Manage your subscription, profile, and security settings.</div>
+  </div>
+
+  <div id="acctAlert"></div>
+
+  <div class="acct-layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="av" id="acctAv">P</div>
+      <div class="sb-name" id="acctName">—</div>
+      <div class="sb-email" id="acctEmail">—</div>
+      <div class="snav">
+        <button class="snav-btn on" onclick="showTab('sub',this)">💳 Subscription</button>
+        <button class="snav-btn" onclick="showTab('profile',this)">👤 Profile</button>
+        <button class="snav-btn" onclick="showTab('security',this)">🔒 Security</button>
+        <button class="snav-btn" onclick="showTab('download',this)">⬇ Download</button>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- SUBSCRIPTION -->
+      <div class="pnl on card" id="tabSub">
+        <div class="card-title">💳 Subscription</div>
+        <div class="sub-hero">
+          <div>
+            <div style="font-weight:700;font-size:.92rem;margin-bottom:.18rem" id="subName">Loading…</div>
+            <div style="font-size:.72rem;color:var(--text2)" id="subExp">—</div>
+          </div>
+          <div id="subBadge"></div>
+        </div>
+        <div class="sub-stats" id="subStats"></div>
+        <div class="action-row">
+          <a href="https://billing.stripe.com" target="_blank" class="btn-ghost">Manage Billing →</a>
+          <a href="/" class="btn-ghost">View Plans</a>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="pnl card" id="tabProfile">
+        <div class="card-title">👤 Profile</div>
+        <div class="fg"><label class="fl">Display name</label><input type="text" id="pName" class="fi" placeholder="Your name"/></div>
+        <div class="fg"><label class="fl">Email address</label><input type="email" id="pEmail" class="fi" readonly/></div>
+        <button class="fsub" id="saveProfileBtn" onclick="saveProfile()">Save Changes</button>
+      </div>
+
+      <!-- SECURITY -->
+      <div class="pnl card" id="tabSecurity">
+        <div class="card-title">🔒 Change Password</div>
+        <div class="fg"><label class="fl">New password</label><input type="password" id="np" class="fi" placeholder="min. 8 characters"/></div>
+        <div class="fg"><label class="fl">Confirm new password</label><input type="password" id="cp2" class="fi" placeholder="••••••••"/></div>
+        <button class="fsub" id="savePwBtn" onclick="changePwd()">Update Password</button>
+      </div>
+
+      <!-- DOWNLOAD -->
+      <div class="pnl card" id="tabDownload">
+        <div class="card-title">⬇ Download PRESTILON</div>
+        <div class="alertbox ai" style="margin-bottom:1.15rem">Windows installer coming soon. You'll be notified by email at launch.</div>
+        <div class="code-block">
+          <div class="cm"># System Requirements</div>
+          <div>Windows 10 / 11 (64-bit)</div>
+          <div>Node.js 18 or higher</div>
+          <div>Klipper + Moonraker on each printer</div>
+          <div>Local network access to printer IP</div>
+          <br>
+          <div class="cm"># After install, open:</div>
+          <div class="vl">http://localhost:3002</div>
+          <br>
+          <div class="cm"># Your data stays local.</div>
+          <div>Only license validation uses the internet.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div>
+    <a class="logo" href="/"><div class="logo-icon" style="width:28px;height:28px;font-size:.68rem">P</div><div class="logo-name" style="font-size:.88rem">PRESTILON</div></a>
+    <div class="footer-copy" style="margin-top:.2rem">© 2026 PRESTILON. All rights reserved.</div>
+  </div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/support">Support</a>
+    <a href="mailto:support@prestilon.com">Email Us</a>
+  </div>
+</footer>
+
+<script>
+/* Canvas */
+;(()=>{
+  const c=document.getElementById('bg'),ctx=c.getContext('2d')
+  let W,H,pts=[]
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  function init(){pts=[];for(let i=0;i<45;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.14,vy:(Math.random()-.5)*.14})}
+  function draw(){
+    ctx.clearRect(0,0,W,H)
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy)
+        if(d<110){ctx.beginPath();ctx.strokeStyle=`rgba(0,229,200,${.03*(1-d/110)})`;ctx.lineWidth=.5;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke()}
+      }
+      ctx.beginPath();ctx.arc(pts[i].x,pts[i].y,1,0,Math.PI*2);ctx.fillStyle='rgba(0,229,200,0.13)';ctx.fill()
+      pts[i].x+=pts[i].vx;pts[i].y+=pts[i].vy
+      if(pts[i].x<0||pts[i].x>W)pts[i].vx*=-1
+      if(pts[i].y<0||pts[i].y>H)pts[i].vy*=-1
+    }
+    requestAnimationFrame(draw)
+  }
+  window.addEventListener('resize',()=>{resize();init()})
+  resize();init();draw()
+})()
+
+function showTab(tab, btn){
+  const map={sub:'tabSub',profile:'tabProfile',security:'tabSecurity',download:'tabDownload'}
+  document.querySelectorAll('.content .pnl').forEach(p=>p.classList.remove('on'))
+  document.querySelectorAll('.snav-btn').forEach(b=>b.classList.remove('on'))
+  document.getElementById(map[tab])?.classList.add('on')
+  if(btn) btn.classList.add('on')
+  document.getElementById('acctAlert').innerHTML=''
+}
+function showAlert(msg,type){
+  const cls={error:'ae',success:'as',info:'ai'}[type]||'ae'
+  document.getElementById('acctAlert').innerHTML=`<div class="alertbox ${cls}">${msg}</div>`
+  document.getElementById('acctAlert').scrollIntoView({behavior:'smooth',block:'nearest'})
+}
+function setLoading(id,on,txt){
+  const b=document.getElementById(id);if(!b)return
+  b.disabled=on;b.innerHTML=on?`<span class="spin"></span> ${txt}`:txt
+}
+</script>
+
+<script type="module">
+import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+const sb=createClient('https://ryftlimrjhhoymyfzusq.supabase.co','sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86')
+
+const overlay=document.getElementById('loadingOverlay')
+
+/* Auth guard — redirect to login if not signed in */
+const{data:{session}}=await sb.auth.getSession()
+if(!session){
+  window.location.href='/login'
+}else{
+  await loadAccount(session.user)
+  overlay.classList.add('hidden')
+}
+
+sb.auth.onAuthStateChange(async(e,s)=>{
+  if(e==='SIGNED_OUT') window.location.href='/'
+  if(e==='USER_UPDATED'&&s?.user) await loadAccount(s.user)
+})
+
+async function loadAccount(u){
+  const n=u.user_metadata?.full_name||u.email?.split('@')[0]||'User'
+  const e=u.email||''
+  document.getElementById('acctAv').textContent=n.charAt(0).toUpperCase()
+  document.getElementById('acctName').textContent=n
+  document.getElementById('acctEmail').textContent=e
+  document.getElementById('pName').value=n
+  document.getElementById('pEmail').value=e
+
+  const{data:sub}=await sb.from('subscriptions').select('*').eq('user_id',u.id).single()
+  const pm={starter:'Basic',professional:'Pro',enterprise:'Enterprise'}
+  document.getElementById('subName').textContent=sub?(pm[sub.plan]||sub.plan)+' Plan':'No active plan'
+  document.getElementById('subExp').textContent=sub?.valid_until?'Valid until: '+new Date(sub.valid_until).toLocaleDateString('en-GB'):'—'
+  const bc={active:'sb-a',trial:'sb-t',trialing:'sb-t',expired:'sb-i',cancelled:'sb-i',inactive:'sb-i'}
+  const st=sub?.status||'inactive'
+  document.getElementById('subBadge').innerHTML=`<span class="sbadge ${bc[st]||'sb-i'}">${st}</span>`
+  document.getElementById('subStats').innerHTML=sub?`
+    <div class="ss"><div class="ssv">${sub.printer_limit}</div><div class="ssl">Printer Limit</div></div>
+    <div class="ss"><div class="ssv" style="font-size:.82rem">${(sub.plan||'—').toUpperCase()}</div><div class="ssl">Plan Tier</div></div>
+  `:`<div class="alertbox ae" style="grid-column:span 2;margin:0">No active subscription found.</div>`
+}
+
+window.doLogout=async()=>{
+  await sb.auth.signOut()
+  window.location.href='/'
+}
+window.saveProfile=async()=>{
+  const n=document.getElementById('pName').value.trim()
+  if(!n){showAlert('Name cannot be empty.','error');return}
+  setLoading('saveProfileBtn',true,'Saving…')
+  const{error}=await sb.auth.updateUser({data:{full_name:n}})
+  setLoading('saveProfileBtn',false,'Save Changes')
+  if(error){showAlert(error.message,'error');return}
+  document.getElementById('acctName').textContent=n
+  document.getElementById('acctAv').textContent=n.charAt(0).toUpperCase()
+  showAlert('✅ Profile updated successfully.','success')
+}
+window.changePwd=async()=>{
+  const p=document.getElementById('np').value
+  const c=document.getElementById('cp2').value
+  if(p.length<8){showAlert('Password must be at least 8 characters.','error');return}
+  if(p!==c){showAlert('Passwords do not match.','error');return}
+  setLoading('savePwBtn',true,'Updating…')
+  const{error}=await sb.auth.updateUser({password:p})
+  setLoading('savePwBtn',false,'Update Password')
+  if(error){showAlert(error.message,'error');return}
+  document.getElementById('np').value=''
+  document.getElementById('cp2').value=''
+  showAlert('✅ Password updated successfully.','success')
+}
+</script>
+</body>
+</html>

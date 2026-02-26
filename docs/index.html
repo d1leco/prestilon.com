@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<meta name="description" content="PRESTILON — AI Fleet Intelligence for 3D printer fleets. Real-time anomaly detection, failure prediction, and automated maintenance — running locally on your hardware."/>
+<meta name="description" content="PRESTILON — AI Fleet Intelligence for 3D printer fleets. Real-time anomaly detection, failure prediction, and automated maintenance."/>
 <title>PRESTILON — AI Fleet Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,410 +11,173 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#020B14;
-  --bg2:#050F1C;
-  --bg3:#081524;
-  --bg4:#0A1A2E;
-  --c1:#00E5C8;
-  --c2:#00B8A0;
-  --c3:#007A6B;
-  --purple:#7B5CF0;
-  --text:#E8F0FB;
-  --text2:#8A9BB8;
-  --text3:#3D5070;
-  --border:rgba(0,229,200,.07);
-  --border2:rgba(0,229,200,.2);
-  --border3:rgba(0,229,200,.35);
-  --red:#F05060;
-  --amber:#F0A830;
-  --green:#20D490;
+  --bg:#020B14;--bg2:#050F1C;--bg3:#081524;--bg4:#0A1A2E;
+  --c1:#00E5C8;--c2:#00B8A0;--purple:#7B5CF0;
+  --text:#E8F0FB;--text2:#8A9BB8;--text3:#3D5070;
+  --border:rgba(0,229,200,.07);--border2:rgba(0,229,200,.2);
+  --red:#F05060;--green:#20D490;--amber:#F0A830;
 }
 html{background:var(--bg);scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh}
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7}
 
-canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7}
-
-/* ── ANNOUNCEMENT BAR ── */
+/* ── ANN BAR ── */
 .ann-bar{
-  position:relative;z-index:100;
-  background:linear-gradient(90deg,rgba(0,229,200,.08),rgba(123,92,240,.08),rgba(0,229,200,.08));
+  position:relative;z-index:10;
+  background:linear-gradient(90deg,rgba(0,229,200,.07),rgba(123,92,240,.07),rgba(0,229,200,.07));
   border-bottom:1px solid var(--border);
-  padding:.6rem 1rem;
-  text-align:center;
-  font-size:.78rem;
-  color:var(--text2);
+  padding:.58rem 1rem;text-align:center;
+  font-size:.78rem;color:var(--text2);
   display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap;
 }
 .ann-bar strong{color:var(--text);font-weight:600}
 .ann-link{
   color:var(--c1);text-decoration:none;font-weight:600;
-  display:inline-flex;align-items:center;gap:.25rem;
   border:1px solid rgba(0,229,200,.3);border-radius:99px;
-  padding:.18rem .65rem;font-size:.72rem;transition:all .2s;
+  padding:.17rem .65rem;font-size:.72rem;transition:all .2s;display:inline-flex;align-items:center;gap:.25rem;
 }
 .ann-link:hover{background:rgba(0,229,200,.08);border-color:var(--c1)}
 
 /* ── NAV ── */
 nav{
-  position:sticky;top:0;left:0;right:0;z-index:999;height:64px;
+  position:sticky;top:0;z-index:999;height:62px;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 max(1.5rem,calc(50vw - 620px));
-  background:rgba(2,11,20,.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  background:rgba(2,11,20,.9);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
   border-bottom:1px solid var(--border);
-  transition:border-color .3s;
 }
-nav.scrolled{border-bottom-color:rgba(0,229,200,.12)}
-.logo{display:flex;align-items:center;gap:.7rem;cursor:pointer;text-decoration:none;border:none;background:none;padding:0;flex-shrink:0}
-.logo-icon{
-  width:34px;height:34px;border-radius:9px;
-  background:linear-gradient(135deg,var(--c1),var(--c2));
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-size:.8rem;font-weight:800;color:#020B14;
-  box-shadow:0 0 16px rgba(0,229,200,.28);flex-shrink:0;
-}
+.logo{display:flex;align-items:center;gap:.7rem;text-decoration:none;flex-shrink:0}
+.logo-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--c1),var(--c2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:800;color:#020B14;box-shadow:0 0 16px rgba(0,229,200,.28);flex-shrink:0}
 .logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;letter-spacing:.08em;color:var(--c1)}
-.logo-tag{font-size:.5rem;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.1em;line-height:1}
-.nav-mid{display:flex;align-items:center;gap:0}
-.nav-link{
-  padding:.45rem .85rem;color:var(--text2);font-size:.86rem;font-weight:500;
-  border:none;background:transparent;cursor:pointer;border-radius:7px;
-  transition:color .2s,background .2s;white-space:nowrap;
-}
+.logo-tag{font-size:.5rem;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.1em}
+.nav-mid{display:flex;align-items:center}
+.nav-link{padding:.42rem .82rem;color:var(--text2);font-size:.85rem;font-weight:500;text-decoration:none;border-radius:7px;transition:color .2s,background .2s;white-space:nowrap}
 .nav-link:hover{color:var(--text);background:rgba(255,255,255,.04)}
 .nav-right{display:flex;align-items:center;gap:.4rem}
-.nbtn-ghost{padding:.42rem .85rem;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;background:transparent;color:var(--text2);transition:all .2s}
+.nbtn-ghost{padding:.42rem .85rem;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:500;background:transparent;color:var(--text2);transition:all .2s;text-decoration:none;display:inline-flex;align-items:center}
 .nbtn-ghost:hover{color:var(--text);background:rgba(255,255,255,.04)}
-.nbtn-cta{
-  padding:.48rem 1.2rem;border-radius:8px;border:none;cursor:pointer;
-  font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:700;
-  background:var(--c1);color:#020B14;
-  box-shadow:0 0 18px rgba(0,229,200,.25);transition:all .2s;
-}
+.nbtn-cta{padding:.48rem 1.2rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:700;background:var(--c1);color:#020B14;box-shadow:0 0 18px rgba(0,229,200,.25);transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;border:none;cursor:pointer}
 .nbtn-cta:hover{box-shadow:0 0 28px rgba(0,229,200,.42);transform:translateY(-1px)}
 
-/* ── PAGE SYSTEM ── */
-.page{display:none;position:relative;z-index:2}
-.page.active{display:block}
-.wrap{max-width:1240px;margin:0 auto;padding:0 max(1.5rem,calc(50vw - 620px))}
+/* ── WRAP / SECTION ── */
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(1.5rem,calc(50vw - 620px));position:relative;z-index:1}
+.section{padding:90px max(1.5rem,calc(50vw - 620px));position:relative;z-index:1}
+.s-tag{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.16em;color:var(--c1);text-transform:uppercase;margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem}
+.s-tag::before{content:'//';opacity:.45}
+.s-h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.6rem,3.5vw,2.5rem);line-height:1.12;margin-bottom:.75rem}
+.s-sub{color:var(--text2);font-size:.97rem;line-height:1.75;max-width:540px}
+.divider{height:1px;background:var(--border);position:relative;z-index:1}
 
 /* ── HERO ── */
 .hero{
-  min-height:calc(100vh - 105px);
-  display:grid;grid-template-columns:1fr 1fr;gap:3rem;
-  align-items:center;
-  padding:80px max(1.5rem,calc(50vw - 620px)) 60px;
-  position:relative;overflow:hidden;
+  min-height:calc(100vh - 105px);display:grid;grid-template-columns:1fr 1fr;gap:3rem;
+  align-items:center;padding:80px max(1.5rem,calc(50vw - 620px)) 60px;position:relative;z-index:1;
 }
 @media(max-width:900px){.hero{grid-template-columns:1fr;padding:60px 1.5rem 40px}}
-.hero-left{display:flex;flex-direction:column;align-items:flex-start;gap:0}
-.hero-tag{
-  display:inline-flex;align-items:center;gap:.5rem;
-  padding:.3rem .85rem .3rem .55rem;
-  border-radius:99px;border:1px solid rgba(0,229,200,.22);
-  background:rgba(0,229,200,.05);
-  font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.06em;color:var(--c1);
-  margin-bottom:1.6rem;
-  animation:fadeUp .7s ease both;
-}
-.tag-dot{width:7px;height:7px;border-radius:50%;background:var(--c1);box-shadow:0 0 6px var(--c1);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @keyframes shimmer{to{background-position:200% center}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-.hero-h1{
-  font-family:'Syne',sans-serif;font-weight:800;
-  font-size:clamp(2rem,4.5vw,3.6rem);line-height:1.08;letter-spacing:-.03em;
-  margin-bottom:1.2rem;
-  animation:fadeUp .7s ease .08s both;
-}
-.hero-h1 .accent{
-  background:linear-gradient(90deg,var(--c1),#7B5CF0,var(--c1));
-  background-size:200%;
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:shimmer 5s linear infinite;
-}
-.hero-p{
-  color:var(--text2);font-size:1rem;line-height:1.75;max-width:480px;
-  margin-bottom:2rem;
-  animation:fadeUp .7s ease .16s both;
-}
-.hero-actions{
-  display:flex;gap:.85rem;flex-wrap:wrap;margin-bottom:3.5rem;
-  animation:fadeUp .7s ease .24s both;
-}
-.btn{
-  padding:.75rem 1.75rem;border-radius:10px;border:none;cursor:pointer;
-  font-family:'DM Sans',sans-serif;font-weight:700;font-size:.93rem;
-  display:inline-flex;align-items:center;gap:.45rem;text-decoration:none;transition:all .22s;
-}
+.hero-tag{display:inline-flex;align-items:center;gap:.5rem;padding:.3rem .85rem .3rem .55rem;border-radius:99px;border:1px solid rgba(0,229,200,.22);background:rgba(0,229,200,.05);font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.06em;color:var(--c1);margin-bottom:1.6rem;animation:fadeUp .7s ease both}
+.tag-dot{width:7px;height:7px;border-radius:50%;background:var(--c1);box-shadow:0 0 6px var(--c1);animation:pulse 2s infinite}
+.hero-h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,4.5vw,3.6rem);line-height:1.08;letter-spacing:-.03em;margin-bottom:1.2rem;animation:fadeUp .7s ease .08s both}
+.hero-h1 .accent{background:linear-gradient(90deg,var(--c1),#7B5CF0,var(--c1));background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 5s linear infinite}
+.hero-p{color:var(--text2);font-size:1rem;line-height:1.75;max-width:480px;margin-bottom:2rem;animation:fadeUp .7s ease .16s both}
+.hero-actions{display:flex;gap:.85rem;flex-wrap:wrap;margin-bottom:3.5rem;animation:fadeUp .7s ease .24s both}
+.btn{padding:.75rem 1.75rem;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.93rem;display:inline-flex;align-items:center;gap:.45rem;text-decoration:none;transition:all .22s}
 .btn-primary{background:var(--c1);color:#020B14;box-shadow:0 0 26px rgba(0,229,200,.3)}
 .btn-primary:hover{box-shadow:0 0 42px rgba(0,229,200,.5);transform:translateY(-2px)}
 .btn-secondary{background:rgba(255,255,255,.04);color:var(--text);border:1px solid rgba(255,255,255,.1)}
 .btn-secondary:hover{background:rgba(255,255,255,.08);border-color:rgba(0,229,200,.28)}
 
-/* ── STATS ROW ── */
-.stats-row{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  border:1px solid var(--border);border-radius:14px;
-  background:rgba(8,21,36,.6);
-  overflow:hidden;
-  animation:fadeUp .7s ease .32s both;
-  max-width:520px;
-}
-.stat-item{
-  padding:1.15rem 1rem;text-align:center;position:relative;
-}
-.stat-item+.stat-item::before{
-  content:'';position:absolute;left:0;top:18%;bottom:18%;width:1px;background:var(--border);
-}
-.stat-val{
-  font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--c1);line-height:1;margin-bottom:.25rem;
-}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);border-radius:14px;background:rgba(8,21,36,.6);overflow:hidden;animation:fadeUp .7s ease .32s both;max-width:520px}
+.stat-item{padding:1.15rem 1rem;text-align:center;position:relative}
+.stat-item+.stat-item::before{content:'';position:absolute;left:0;top:18%;bottom:18%;width:1px;background:var(--border)}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--c1);line-height:1;margin-bottom:.25rem}
 .stat-lbl{font-size:.62rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.1em;line-height:1.4}
 
-/* ── HERO VISUAL ── */
-.hero-right{
-  display:flex;align-items:center;justify-content:center;
-  animation:fadeUp .7s ease .2s both;
-}
+/* ── ORBITAL ── */
+.hero-right{display:flex;align-items:center;justify-content:center;animation:fadeUp .7s ease .2s both}
 @media(max-width:900px){.hero-right{display:none}}
-.orb-wrap{
-  position:relative;width:480px;height:480px;flex-shrink:0;
-}
-.orb-center{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:140px;height:140px;border-radius:32px;
-  background:linear-gradient(135deg,rgba(0,229,200,.15),rgba(123,92,240,.1));
-  border:1px solid rgba(0,229,200,.3);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 60px rgba(0,229,200,.12),0 0 120px rgba(0,229,200,.06);
-}
+.orb-wrap{position:relative;width:480px;height:480px;flex-shrink:0}
+.orb-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:140px;height:140px;border-radius:32px;background:linear-gradient(135deg,rgba(0,229,200,.15),rgba(123,92,240,.1));border:1px solid rgba(0,229,200,.3);display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(0,229,200,.12),0 0 120px rgba(0,229,200,.06)}
 .orb-icon{font-size:3rem;filter:drop-shadow(0 0 12px rgba(0,229,200,.6))}
-.orb-ring{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  border-radius:50%;border:1px solid var(--border);
-}
-.orb-r1{width:220px;height:220px;animation:spin1 14s linear infinite}
-.orb-r2{width:340px;height:340px;animation:spin1 22s linear infinite reverse}
-.orb-r3{width:450px;height:450px;animation:spin1 34s linear infinite;border-style:dashed;opacity:.4}
-@keyframes spin1{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
-.orb-dot{
-  position:absolute;width:38px;height:38px;border-radius:10px;
-  background:var(--bg2);border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;font-size:.9rem;
-  box-shadow:0 4px 20px rgba(0,0,0,.4);
-  transition:transform .3s;
-}
-.orb-dot:hover{transform:scale(1.15) !important}
-/* dots on ring 1 - 3 dots */
+.orb-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;border:1px solid var(--border)}
+.orb-r1{width:220px;height:220px;animation:_spin 14s linear infinite}
+.orb-r2{width:340px;height:340px;animation:_spin 22s linear infinite reverse}
+.orb-r3{width:450px;height:450px;animation:_spin 34s linear infinite;border-style:dashed;opacity:.4}
+@keyframes _spin{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+.orb-dot{position:absolute;width:38px;height:38px;border-radius:10px;background:var(--bg2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.9rem;box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .od-1a{top:0;left:50%;transform:translate(-50%,-50%)}
 .od-1b{top:50%;right:0;transform:translate(50%,-50%)}
 .od-1c{bottom:0;left:50%;transform:translate(-50%,50%)}
-/* dots on ring 2 - 4 dots */
 .od-2a{top:12%;left:15%;transform:translate(-50%,-50%)}
 .od-2b{top:15%;right:12%;transform:translate(50%,-50%)}
 .od-2c{bottom:12%;right:15%;transform:translate(50%,50%)}
 .od-2d{bottom:15%;left:12%;transform:translate(-50%,50%)}
-/* floating label */
-.orb-float{
-  position:absolute;
-  background:var(--bg2);border:1px solid var(--border2);border-radius:10px;
-  padding:.5rem .85rem;
-  display:flex;align-items:center;gap:.45rem;
-  box-shadow:0 8px 32px rgba(0,0,0,.5);
-  white-space:nowrap;
-}
-.fl-a{top:22%;right:-10px;animation:float1 3.2s ease-in-out infinite}
-.fl-b{bottom:22%;left:-10px;animation:float1 3.8s ease-in-out infinite .6s}
-@keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.orb-float{position:absolute;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:.5rem .85rem;display:flex;align-items:center;gap:.45rem;box-shadow:0 8px 32px rgba(0,0,0,.5);white-space:nowrap}
+.fl-a{top:22%;right:-10px;animation:_float 3.2s ease-in-out infinite}
+.fl-b{bottom:22%;left:-10px;animation:_float 3.8s ease-in-out infinite .6s}
+@keyframes _float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .fl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .fl-text{font-size:.7rem;font-weight:600;font-family:'JetBrains Mono',monospace}
 .fl-sub{font-size:.58rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
 
-/* ── SECTION BASE ── */
-.section{padding:90px max(1.5rem,calc(50vw - 620px))}
-.s-tag{
-  font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.16em;
-  color:var(--c1);text-transform:uppercase;margin-bottom:.6rem;
-  display:flex;align-items:center;gap:.4rem;
-}
-.s-tag::before{content:'//';opacity:.45}
-.s-h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.6rem,3.5vw,2.5rem);line-height:1.12;margin-bottom:.75rem}
-.s-sub{color:var(--text2);font-size:.97rem;line-height:1.75;max-width:540px}
-
-/* ── FEATURES GRID ── */
+/* ── FEATURES ── */
 .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:3.5rem}
 @media(max-width:900px){.feat-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.feat-grid{grid-template-columns:1fr}}
-.feat{
-  background:linear-gradient(160deg,rgba(8,21,36,.9),rgba(5,15,28,.95));
-  border:1px solid var(--border);border-radius:16px;
-  padding:1.65rem;position:relative;overflow:hidden;transition:border-color .3s,transform .28s;
-}
-.feat::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--c1),transparent);
-  opacity:0;transition:opacity .3s;
-}
+.feat{background:linear-gradient(160deg,rgba(8,21,36,.9),rgba(5,15,28,.95));border:1px solid var(--border);border-radius:16px;padding:1.65rem;position:relative;overflow:hidden;transition:border-color .3s,transform .28s}
+.feat::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c1),transparent);opacity:0;transition:opacity .3s}
 .feat:hover{border-color:rgba(0,229,200,.22);transform:translateY(-3px)}
 .feat:hover::after{opacity:1}
 .feat-num{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--text3);margin-bottom:.8rem;letter-spacing:.08em}
 .feat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.9rem}
 .feat h3{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:.4rem}
 .feat p{font-size:.81rem;color:var(--text2);line-height:1.72}
-.feat-chip{
-  margin-top:.75rem;display:inline-block;padding:.18rem .55rem;
-  border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.56rem;font-weight:500;
-  letter-spacing:.03em;
-}
+.feat-chip{margin-top:.75rem;display:inline-block;padding:.18rem .55rem;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.56rem;font-weight:500;letter-spacing:.03em}
 
-/* ── DIVIDER ── */
-.divider{height:1px;background:var(--border);max-width:none}
-
-/* ── ARCH SECTION ── */
-.arch-flow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0;margin-top:3rem}
-.arch-node{
-  background:var(--bg2);border:1px solid var(--border);border-radius:14px;
-  padding:1.3rem 1.1rem;text-align:center;min-width:140px;
-}
-.arch-node .an-icon{font-size:1.6rem;margin-bottom:.35rem}
-.arch-node .an-title{font-size:.78rem;font-weight:700;margin-bottom:.18rem;font-family:'Syne',sans-serif}
-.arch-node .an-sub{font-size:.62rem;color:var(--text2);font-family:'JetBrains Mono',monospace}
-.arch-arr{font-family:'JetBrains Mono',monospace;font-size:1rem;color:var(--text3);padding:0 .6rem;flex-shrink:0}
-@media(max-width:680px){.arch-flow{flex-direction:column}.arch-arr{transform:rotate(90deg)}}
-.cloud-strip{
-  display:flex;justify-content:center;margin-top:1.25rem;
-}
-.cloud-box{
-  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
-  padding:.75rem 1.75rem;display:flex;align-items:center;gap:2.5rem;flex-wrap:wrap;justify-content:center;
-}
-.ci{text-align:center}
-.ci .ci-icon{font-size:1rem;margin-bottom:.15rem}
-.ci .ci-name{font-size:.68rem;font-weight:700}
-.ci .ci-sub{font-size:.58rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
-
-/* ── DIAG GRID ── */
+/* ── DIAGNOSTICS ── */
 .diag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-top:2.5rem}
 @media(max-width:780px){.diag-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:500px){.diag-grid{grid-template-columns:1fr}}
-.dcard{
-  background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:1.2rem;transition:all .25s;
-}
+.dcard{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:1.2rem;transition:all .25s}
 .dcard:hover{border-color:var(--border2);transform:translateY(-2px)}
 .dcard-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:.65rem;font-size:1rem}
 .dcard h4{font-size:.82rem;font-weight:700;margin-bottom:.28rem}
 .dcard p{font-size:.73rem;color:var(--text2);line-height:1.6}
 .dcard-chip{margin-top:.55rem;padding:.18rem .5rem;background:rgba(0,229,200,.06);border:1px solid rgba(0,229,200,.14);border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--c1);display:inline-block}
 
-/* ── CTA BOX ── */
-.cta-sec{padding:80px max(1.5rem,calc(50vw - 620px))}
-.cta-box{
-  background:linear-gradient(135deg,rgba(0,229,200,.05),rgba(123,92,240,.06),rgba(0,229,200,.04));
-  border:1px solid var(--border2);border-radius:20px;
-  padding:4.5rem 2rem;text-align:center;position:relative;overflow:hidden;
-}
-.cta-box::before{
-  content:'';position:absolute;bottom:-60px;left:50%;transform:translateX(-50%);
-  width:600px;height:200px;pointer-events:none;
-  background:radial-gradient(ellipse,rgba(0,229,200,.07),transparent 65%);
-}
+/* ── ARCH ── */
+.arch-flow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0;margin-top:3rem}
+.arch-node{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.3rem 1.1rem;text-align:center;min-width:140px}
+.arch-node .an-icon{font-size:1.6rem;margin-bottom:.35rem}
+.arch-node .an-title{font-size:.78rem;font-weight:700;margin-bottom:.18rem;font-family:'Syne',sans-serif}
+.arch-node .an-sub{font-size:.62rem;color:var(--text2);font-family:'JetBrains Mono',monospace}
+.arch-arr{font-family:'JetBrains Mono',monospace;font-size:1rem;color:var(--text3);padding:0 .6rem;flex-shrink:0}
+@media(max-width:680px){.arch-flow{flex-direction:column}.arch-arr{transform:rotate(90deg)}}
+.cloud-strip{display:flex;justify-content:center;margin-top:1.25rem}
+.cloud-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:.75rem 1.75rem;display:flex;align-items:center;gap:2.5rem;flex-wrap:wrap;justify-content:center}
+.ci{text-align:center}
+.ci .ci-icon{font-size:1rem;margin-bottom:.15rem}
+.ci .ci-name{font-size:.68rem;font-weight:700}
+.ci .ci-sub{font-size:.58rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+
+/* ── CTA ── */
+.cta-sec{padding:80px max(1.5rem,calc(50vw - 620px));position:relative;z-index:1}
+.cta-box{background:linear-gradient(135deg,rgba(0,229,200,.05),rgba(123,92,240,.06),rgba(0,229,200,.04));border:1px solid var(--border2);border-radius:20px;padding:4.5rem 2rem;text-align:center;position:relative;overflow:hidden}
+.cta-box::before{content:'';position:absolute;bottom:-60px;left:50%;transform:translateX(-50%);width:600px;height:200px;pointer-events:none;background:radial-gradient(ellipse,rgba(0,229,200,.07),transparent 65%)}
 .cta-box h2{font-family:'Syne',sans-serif;font-size:clamp(1.4rem,3.2vw,2.2rem);font-weight:800;margin-bottom:.65rem;position:relative;z-index:1}
 .cta-box p{color:var(--text2);margin-bottom:2rem;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.7;position:relative;z-index:1;font-size:.95rem}
 .cta-btns{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
 .cta-note{margin-top:1.25rem;font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em;position:relative;z-index:1}
 
 /* ── FOOTER ── */
-footer{
-  border-top:1px solid var(--border);
-  padding:2.25rem max(1.5rem,calc(50vw - 620px));
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
-}
+footer{border-top:1px solid var(--border);padding:2.25rem max(1.5rem,calc(50vw - 620px));display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;position:relative;z-index:1}
 .footer-copy{font-size:.7rem;color:var(--text3);margin-top:.25rem}
 .footer-links{display:flex;gap:1.4rem;flex-wrap:wrap}
 .footer-links a{color:var(--text3);text-decoration:none;font-size:.74rem;transition:color .2s}
 .footer-links a:hover{color:var(--text2)}
-
-/* ── AUTH ── */
-.auth-wrap{min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:3rem 1.5rem}
-.auth-card{
-  width:100%;max-width:420px;
-  background:var(--bg2);
-  border:1px solid var(--border2);border-radius:20px;
-  padding:2.5rem 2.25rem;
-  box-shadow:0 0 70px rgba(0,229,200,.06),0 40px 80px rgba(0,0,0,.5);
-}
-.auth-logo-wrap{text-align:center;margin-bottom:1.5rem}
-.auth-logo-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--c1),var(--c2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:#020B14;margin:0 auto .5rem;box-shadow:0 0 18px rgba(0,229,200,.25)}
-.auth-logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--c1);letter-spacing:.08em}
-.auth-meta{text-align:center;color:var(--text2);font-size:.82rem;margin-bottom:1.75rem}
-.auth-tabs{display:flex;background:var(--bg);border-radius:10px;padding:3px;margin-bottom:1.5rem;border:1px solid var(--border)}
-.at{flex:1;padding:.5rem;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:600;transition:all .18s;background:transparent;color:var(--text3)}
-.at.on{background:var(--bg2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.35)}
-.fg{margin-bottom:.9rem}
-.fl{display:block;font-size:.72rem;font-weight:600;color:var(--text2);margin-bottom:.35rem;letter-spacing:.02em}
-.fi{
-  width:100%;padding:.7rem .95rem;border-radius:9px;
-  background:var(--bg);border:1px solid var(--border);
-  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;
-  transition:all .18s;outline:none;
-}
-.fi:focus{border-color:rgba(0,229,200,.38);box-shadow:0 0 0 3px rgba(0,229,200,.07)}
-.fi::placeholder{color:var(--text3)}
-.fsub{
-  width:100%;padding:.82rem;border-radius:10px;border:none;
-  background:var(--c1);color:#020B14;
-  font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:800;
-  cursor:pointer;transition:all .22s;margin-top:.4rem;
-  box-shadow:0 0 22px rgba(0,229,200,.22);
-}
-.fsub:hover{box-shadow:0 0 36px rgba(0,229,200,.4);transform:translateY(-1px)}
-.fsub:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.adiv{text-align:center;position:relative;margin:1.1rem 0}
-.adiv::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)}
-.adiv span{position:relative;background:var(--bg2);padding:0 .65rem;font-size:.7rem;color:var(--text3)}
-.alink{color:var(--c1);text-decoration:none;font-weight:600;font-size:.82rem}
-.alink:hover{text-decoration:underline}
-.alertbox{padding:.7rem .9rem;border-radius:9px;font-size:.78rem;margin-bottom:.85rem;display:flex;align-items:flex-start;gap:.45rem;line-height:1.5}
-.ae{background:rgba(240,80,96,.1);border:1px solid rgba(240,80,96,.3);color:#fca5a5}
-.as{background:rgba(32,212,144,.1);border:1px solid rgba(32,212,144,.3);color:#6ee7b7}
-.ai{background:rgba(0,229,200,.07);border:1px solid rgba(0,229,200,.22);color:var(--c1)}
-.tab-pnl{display:none}.tab-pnl.on{display:block}
-.spin{width:15px;height:15px;border:2px solid rgba(0,0,0,.2);border-top-color:#000;border-radius:50%;animation:_s .55s linear infinite;display:inline-block;vertical-align:middle;margin-right:.3rem}
-@keyframes _s{to{transform:rotate(360deg)}}
-.back-link{text-align:center;margin-top:1.5rem}
-.back-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:.73rem;font-family:'DM Sans',sans-serif;transition:color .2s}
-.back-btn:hover{color:var(--text2)}
-
-/* ── ACCOUNT ── */
-.acct-wrap{max-width:940px;margin:0 auto;padding:60px max(1.5rem,calc(50vw - 470px)) 4rem}
-.acct-header{margin-bottom:2.25rem}
-.acct-h1{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:.25rem}
-.acct-sub{color:var(--text2);font-size:.85rem}
-.acct-layout{display:grid;grid-template-columns:220px 1fr;gap:1.25rem;align-items:start}
-@media(max-width:700px){.acct-layout{grid-template-columns:1fr}}
-.acct-sidebar{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.3rem 1rem;position:sticky;top:76px}
-.av{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--c1),var(--c2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;color:#020B14;margin:0 auto .6rem}
-.an{text-align:center;font-weight:700;font-size:.88rem;margin-bottom:.12rem}
-.ae2{text-align:center;font-size:.68rem;color:var(--text2);margin-bottom:1.25rem}
-.snav{display:flex;flex-direction:column;gap:.15rem}
-.snav-btn{padding:.5rem .75rem;border-radius:8px;border:none;background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:.81rem;font-weight:500;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.45rem}
-.snav-btn:hover{background:rgba(255,255,255,.04);color:var(--text)}
-.snav-btn.on{background:rgba(0,229,200,.08);color:var(--c1)}
-.logout-btn{width:100%;margin-top:1.1rem;padding:.55rem;border-radius:9px;background:rgba(240,80,96,.06);border:1px solid rgba(240,80,96,.2);color:#fca5a5;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
-.logout-btn:hover{background:rgba(240,80,96,.12)}
-.acct-content{display:flex;flex-direction:column;gap:1.1rem}
-.acct-sec{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.65rem}
-.acct-stitle{font-size:.88rem;font-weight:700;margin-bottom:1.1rem;display:flex;align-items:center;gap:.4rem;font-family:'Syne',sans-serif}
-.sub-hero{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding:1.1rem;background:var(--bg);border:1px solid var(--border);border-radius:11px}
-.sbadge{padding:.24rem .65rem;border-radius:99px;font-size:.65rem;font-weight:700;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em}
-.sb-a{background:rgba(32,212,144,.12);color:var(--green);border:1px solid rgba(32,212,144,.3)}
-.sb-i{background:rgba(240,80,96,.12);color:var(--red);border:1px solid rgba(240,80,96,.3)}
-.sb-t{background:rgba(0,229,200,.1);color:var(--c1);border:1px solid rgba(0,229,200,.3)}
-.sub-stats{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-top:.65rem}
-.ss{background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:.8rem;text-align:center}
-.ssv{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;color:var(--c1)}
-.ssl{font-size:.58rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-top:.12rem}
 
 /* ── REVEAL ── */
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease}
@@ -422,83 +185,55 @@ footer{
 </style>
 </head>
 <body>
+<canvas id="bg"></canvas>
 
-<canvas id="bg-canvas"></canvas>
-
-<!-- ══════ ANNOUNCEMENT BAR ══════ -->
-<div class="ann-bar" id="page-ann">
+<!-- ANN BAR -->
+<div class="ann-bar">
   <strong>PRESTILON</strong> — Military-grade AI for 3D printer fleets. Now in early access.
-  <a href="#" class="ann-link" onclick="goAuth('register');return false">Get Early Access →</a>
+  <a href="/login" class="ann-link">Get Early Access →</a>
 </div>
 
-<!-- ══════ NAV ══════ -->
-<nav id="main-nav">
-  <button class="logo" onclick="goHome()">
+<!-- NAV -->
+<nav>
+  <a class="logo" href="/">
     <div class="logo-icon">P</div>
     <div>
       <div class="logo-name">PRESTILON</div>
       <div class="logo-tag">AI FLEET INTELLIGENCE</div>
     </div>
-  </button>
-
-  <div class="nav-mid" id="navMid">
-    <button class="nav-link" onclick="goSection('features')">Features</button>
-    <button class="nav-link" onclick="goSection('howit')">How It Works</button>
-    <button class="nav-link" onclick="goSection('diagnostics')">Diagnostics</button>
+  </a>
+  <div class="nav-mid">
+    <a class="nav-link" href="#features">Features</a>
+    <a class="nav-link" href="#howit">How It Works</a>
+    <a class="nav-link" href="#diagnostics">Diagnostics</a>
+    <a class="nav-link" href="/support">Support</a>
   </div>
-
   <div class="nav-right">
-    <button class="nbtn-ghost" id="navAcct" onclick="goAcct()" style="display:none">Account</button>
-    <button class="nbtn-ghost" id="navLogin" onclick="goAuth('login')">Sign In</button>
-    <button class="nbtn-cta" id="navStart" onclick="goAuth('register')">Get Started →</button>
+    <a class="nbtn-ghost" id="navAcct" href="/account" style="display:none">Account</a>
+    <a class="nbtn-ghost" id="navLogin" href="/login">Sign In</a>
+    <a class="nbtn-cta" href="/login">Get Started →</a>
   </div>
 </nav>
 
-<!-- ══════════════════════ HOME ══════════════════════ -->
-<div id="page-home" class="page active">
-
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-left">
-    <div class="hero-tag">
-      <span class="tag-dot"></span>
-      AI · LOCAL · ZERO CLOUD LATENCY
-    </div>
-
-    <h1 class="hero-h1">
-      Your 3D Printer Fleet.<br>
-      <span class="accent">Monitored & Protected.</span>
-    </h1>
-
-    <p class="hero-p">
-      PRESTILON deploys a full AI stack directly on your Windows machine — anomaly detection, wear modeling, failure prediction, and autonomous correction — all at localhost speed.
-    </p>
-
+  <div style="display:flex;flex-direction:column;align-items:flex-start">
+    <div class="hero-tag"><span class="tag-dot"></span>AI · LOCAL · ZERO CLOUD LATENCY</div>
+    <h1 class="hero-h1">Your 3D Printer Fleet.<br><span class="accent">Monitored & Protected.</span></h1>
+    <p class="hero-p">PRESTILON deploys a full AI stack directly on your Windows machine — anomaly detection, wear modeling, failure prediction, and autonomous correction — all at localhost speed.</p>
     <div class="hero-actions">
-      <button class="btn btn-primary" onclick="goAuth('register')">⚡ Start Free Trial</button>
-      <button class="btn btn-secondary" onclick="goSection('features')">See Features →</button>
+      <a class="btn btn-primary" href="/login">⚡ Start Free Trial</a>
+      <a class="btn btn-secondary" href="#features">See Features →</a>
     </div>
-
     <div class="stats-row">
-      <div class="stat-item">
-        <div class="stat-val" id="sv1">0</div>
-        <div class="stat-lbl">Max Printers<br>Per Fleet</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val">&lt;1ms</div>
-        <div class="stat-lbl">Local AI<br>Latency</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val" id="sv2">0</div>
-        <div class="stat-lbl">Hardware<br>Diagnostics</div>
-      </div>
+      <div class="stat-item"><div class="stat-val" id="sv1">0</div><div class="stat-lbl">Max Printers<br>Per Fleet</div></div>
+      <div class="stat-item"><div class="stat-val">&lt;1ms</div><div class="stat-lbl">Local AI<br>Latency</div></div>
+      <div class="stat-item"><div class="stat-val" id="sv2">0</div><div class="stat-lbl">Hardware<br>Diagnostics</div></div>
     </div>
   </div>
 
-  <!-- ORBITAL VISUAL -->
   <div class="hero-right">
     <div class="orb-wrap">
-      <!-- Rings -->
       <div class="orb-ring orb-r3"></div>
       <div class="orb-ring orb-r2">
         <div class="orb-dot od-2a">🖨️</div>
@@ -511,11 +246,7 @@ footer{
         <div class="orb-dot od-1b">📡</div>
         <div class="orb-dot od-1c">🛡️</div>
       </div>
-      <!-- Center -->
-      <div class="orb-center">
-        <span class="orb-icon">⚙️</span>
-      </div>
-      <!-- Floating cards -->
+      <div class="orb-center"><span class="orb-icon">⚙️</span></div>
       <div class="orb-float fl-a">
         <div class="fl-dot" style="background:var(--green)"></div>
         <div><div class="fl-text" style="color:var(--green)">AI Engine LIVE</div><div class="fl-sub">Ender-5 Pro · 87% health</div></div>
@@ -531,57 +262,16 @@ footer{
 <!-- FEATURES -->
 <section class="section reveal" id="features">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:end;margin-bottom:.25rem">
-    <div>
-      <div class="s-tag">CAPABILITIES</div>
-      <h2 class="s-h2">A full AI engine.<br>Not a wrapper.</h2>
-    </div>
-    <div style="padding-bottom:.2rem">
-      <p class="s-sub">Every subsystem — signal filtering to wear prediction — runs entirely on your hardware. No third-party AI APIs. No printer data leaving your network.</p>
-    </div>
+    <div><div class="s-tag">CAPABILITIES</div><h2 class="s-h2">A full AI engine.<br>Not a wrapper.</h2></div>
+    <div style="padding-bottom:.2rem"><p class="s-sub">Every subsystem — signal filtering to wear prediction — runs entirely on your hardware. No third-party AI APIs. No printer data leaving your network.</p></div>
   </div>
   <div class="feat-grid">
-    <div class="feat">
-      <div class="feat-num">01 — SIGNAL PROCESSING</div>
-      <div class="feat-icon" style="background:rgba(0,229,200,.1)">📡</div>
-      <h3>Kalman Filter Engine</h3>
-      <p>Per-sensor Kalman filters estimate true state from noisy measurements in real-time — hotend temp, bed temp, motor loads — with tunable noise coefficients per plan.</p>
-      <span class="feat-chip" style="background:rgba(0,229,200,.08);color:var(--c1)">kalman · Q/R tuning · per-sensor</span>
-    </div>
-    <div class="feat">
-      <div class="feat-num">02 — ANOMALY DETECTION</div>
-      <div class="feat-icon" style="background:rgba(123,92,240,.1)">🔬</div>
-      <h3>CUSUM Change Detection</h3>
-      <p>CUSUM control charts catch belt wear, clog onset, and thermal runaway risk at the earliest statistical moment — before symptoms become visible.</p>
-      <span class="feat-chip" style="background:rgba(123,92,240,.1);color:#a78bfa">cusum · 5 streams · σ thresholds</span>
-    </div>
-    <div class="feat">
-      <div class="feat-num">03 — HEALTH SCORING</div>
-      <div class="feat-icon" style="background:rgba(32,212,144,.1)">💚</div>
-      <h3>AI Health Orchestrator</h3>
-      <p>A multi-factor health score (0–100) synthesizes anomaly data, diagnostics, wear coefficients, and maintenance history through a weighted AI pipeline.</p>
-      <span class="feat-chip" style="background:rgba(32,212,144,.1);color:var(--green)">0–100 · orchestrated · tier-tuned</span>
-    </div>
-    <div class="feat">
-      <div class="feat-num">04 — FAILURE PREDICTION</div>
-      <div class="feat-icon" style="background:rgba(240,168,48,.1)">⚠️</div>
-      <h3>Multi-Modal Prediction</h3>
-      <p>Separate models for thermal runaway, belt degradation, clog risk, bed adhesion, and extruder wear — each outputs risk level, probability, and time-to-failure.</p>
-      <span class="feat-chip" style="background:rgba(240,168,48,.1);color:var(--amber)">shouldPause · shouldAbort · ETA</span>
-    </div>
-    <div class="feat">
-      <div class="feat-num">05 — AI AUTONOMY</div>
-      <div class="feat-icon" style="background:rgba(240,80,96,.1)">🤖</div>
-      <h3>3-Level Autonomy Control</h3>
-      <p><strong>L0 Passive</strong> — observe. <strong>L1 Recommend</strong> — surface actions. <strong>L2 Automatic</strong> — execute safe corrective GCode without approval. Per-printer override.</p>
-      <span class="feat-chip" style="background:rgba(240,80,96,.1);color:var(--red)">L0 · L1 · L2 · per-printer</span>
-    </div>
-    <div class="feat">
-      <div class="feat-num">06 — REAL-TIME TELEMETRY</div>
-      <div class="feat-icon" style="background:rgba(59,130,246,.1)">⚡</div>
-      <h3>WebSocket Pipeline</h3>
-      <p>Persistent WebSocket connections to Moonraker/Klipper deliver temperatures, print progress, positions, and fan states with under 50ms round-trip latency.</p>
-      <span class="feat-chip" style="background:rgba(59,130,246,.1);color:#60a5fa">websocket · moonraker · &lt;50ms</span>
-    </div>
+    <div class="feat"><div class="feat-num">01 — SIGNAL PROCESSING</div><div class="feat-icon" style="background:rgba(0,229,200,.1)">📡</div><h3>Kalman Filter Engine</h3><p>Per-sensor Kalman filters estimate true state from noisy measurements in real-time — hotend temp, bed temp, motor loads — with tunable noise coefficients per plan.</p><span class="feat-chip" style="background:rgba(0,229,200,.08);color:var(--c1)">kalman · Q/R tuning · per-sensor</span></div>
+    <div class="feat"><div class="feat-num">02 — ANOMALY DETECTION</div><div class="feat-icon" style="background:rgba(123,92,240,.1)">🔬</div><h3>CUSUM Change Detection</h3><p>CUSUM control charts catch belt wear, clog onset, and thermal runaway risk at the earliest statistical moment — before symptoms become visible to the naked eye.</p><span class="feat-chip" style="background:rgba(123,92,240,.1);color:#a78bfa">cusum · 5 streams · σ thresholds</span></div>
+    <div class="feat"><div class="feat-num">03 — HEALTH SCORING</div><div class="feat-icon" style="background:rgba(32,212,144,.1)">💚</div><h3>AI Health Orchestrator</h3><p>A multi-factor health score (0–100) synthesizes anomaly data, diagnostics, wear coefficients, and maintenance history through a weighted AI pipeline.</p><span class="feat-chip" style="background:rgba(32,212,144,.1);color:var(--green)">0–100 · orchestrated · tier-tuned</span></div>
+    <div class="feat"><div class="feat-num">04 — FAILURE PREDICTION</div><div class="feat-icon" style="background:rgba(240,168,48,.1)">⚠️</div><h3>Multi-Modal Prediction</h3><p>Separate models for thermal runaway, belt degradation, clog risk, bed adhesion, and extruder wear — each outputs risk level, probability, and time-to-failure.</p><span class="feat-chip" style="background:rgba(240,168,48,.1);color:var(--amber)">shouldPause · shouldAbort · ETA</span></div>
+    <div class="feat"><div class="feat-num">05 — AI AUTONOMY</div><div class="feat-icon" style="background:rgba(240,80,96,.1)">🤖</div><h3>3-Level Autonomy Control</h3><p><strong>L0 Passive</strong> — observe. <strong>L1 Recommend</strong> — surface actions. <strong>L2 Automatic</strong> — execute safe corrective GCode without approval. Per-printer override.</p><span class="feat-chip" style="background:rgba(240,80,96,.1);color:var(--red)">L0 · L1 · L2 · per-printer</span></div>
+    <div class="feat"><div class="feat-num">06 — REAL-TIME TELEMETRY</div><div class="feat-icon" style="background:rgba(59,130,246,.1)">⚡</div><h3>WebSocket Pipeline</h3><p>Persistent WebSocket connections to Moonraker/Klipper deliver temperatures, print progress, positions, and fan states with under 50ms round-trip latency.</p><span class="feat-chip" style="background:rgba(59,130,246,.1);color:#60a5fa">websocket · moonraker · &lt;50ms</span></div>
   </div>
 </section>
 
@@ -593,77 +283,30 @@ footer{
   <h2 class="s-h2">6 tests. Real GCode.<br>Baseline-scored results.</h2>
   <p class="s-sub">PRESTILON sends actual GCode to your printer and measures the response. Every result is benchmarked against a real-world fleet baseline.</p>
   <div class="diag-grid">
-    <div class="dcard">
-      <div class="dcard-icon" style="background:rgba(0,229,200,.1)">🛡️</div>
-      <h4>Printer Status Check</h4>
-      <p>M115 firmware query and M105 sensor validation. Non-invasive — no movement required.</p>
-      <span class="dcard-chip">~5s · no movement</span>
-    </div>
-    <div class="dcard">
-      <div class="dcard-icon" style="background:rgba(59,130,246,.1)">⚡</div>
-      <h4>Extrusion Flow Test</h4>
-      <p>Preheats, homes, extrudes 5mm, retracts. Measures flow consistency and pressure response.</p>
-      <span class="dcard-chip">~60–90s · physical</span>
-    </div>
-    <div class="dcard">
-      <div class="dcard-icon" style="background:rgba(123,92,240,.1)">↔️</div>
-      <h4>Movement & Axes</h4>
-      <p>Triple G28 X/Y homing for belt tension analysis. Backlash measurement and motor load scoring.</p>
-      <span class="dcard-chip">~40–60s · XY homing ×3</span>
-    </div>
-    <div class="dcard">
-      <div class="dcard-icon" style="background:rgba(240,168,48,.1)">🌡️</div>
-      <h4>Temperature Stability</h4>
-      <p>5-second continuous sampling of hotend and bed temperature variance against stability thresholds.</p>
-      <span class="dcard-chip">~7s · sensor only</span>
-    </div>
-    <div class="dcard">
-      <div class="dcard-icon" style="background:rgba(32,212,144,.1)">🎯</div>
-      <h4>Retraction & Pressure</h4>
-      <p>Primes 3mm filament, retracts, measures pressure drop curve. Clog risk and pressure scoring.</p>
-      <span class="dcard-chip">~7s (+preheat if cold)</span>
-    </div>
-    <div class="dcard" style="border-color:rgba(240,168,48,.2);background:rgba(240,168,48,.02)">
-      <div class="dcard-icon" style="background:rgba(240,168,48,.12)">🏆</div>
-      <h4>Full System Diagnostic</h4>
-      <p>All 5 tests sequentially. Composite health score, fleet percentile rank, and full diagnostic report.</p>
-      <span class="dcard-chip">~50s idle · complete report</span>
-    </div>
+    <div class="dcard"><div class="dcard-icon" style="background:rgba(0,229,200,.1)">🛡️</div><h4>Printer Status Check</h4><p>M115 firmware query and M105 sensor validation. Non-invasive — no movement required.</p><span class="dcard-chip">~5s · no movement</span></div>
+    <div class="dcard"><div class="dcard-icon" style="background:rgba(59,130,246,.1)">⚡</div><h4>Extrusion Flow Test</h4><p>Preheats, homes, extrudes 5mm, retracts. Measures flow consistency and pressure response.</p><span class="dcard-chip">~60–90s · physical</span></div>
+    <div class="dcard"><div class="dcard-icon" style="background:rgba(123,92,240,.1)">↔️</div><h4>Movement & Axes</h4><p>Triple G28 X/Y homing for belt tension analysis. Backlash measurement and motor load scoring.</p><span class="dcard-chip">~40–60s · XY homing ×3</span></div>
+    <div class="dcard"><div class="dcard-icon" style="background:rgba(240,168,48,.1)">🌡️</div><h4>Temperature Stability</h4><p>5-second continuous sampling of hotend and bed temperature variance against stability thresholds.</p><span class="dcard-chip">~7s · sensor only</span></div>
+    <div class="dcard"><div class="dcard-icon" style="background:rgba(32,212,144,.1)">🎯</div><h4>Retraction & Pressure</h4><p>Primes 3mm filament, retracts, measures pressure drop curve. Clog risk and pressure scoring.</p><span class="dcard-chip">~7s (+preheat if cold)</span></div>
+    <div class="dcard" style="border-color:rgba(240,168,48,.2);background:rgba(240,168,48,.02)"><div class="dcard-icon" style="background:rgba(240,168,48,.12)">🏆</div><h4>Full System Diagnostic</h4><p>All 5 tests sequentially. Composite health score, fleet percentile rank, and full diagnostic report.</p><span class="dcard-chip">~50s idle · complete report</span></div>
   </div>
 </section>
 
 <div class="divider wrap reveal"></div>
 
-<!-- ARCHITECTURE -->
+<!-- ARCH -->
 <section class="section reveal" id="howit">
   <div class="s-tag">ARCHITECTURE</div>
   <h2 class="s-h2">Local AI.<br>Cloud auth. Zero compromise.</h2>
   <p class="s-sub">The entire AI engine runs on your Windows machine. Only license validation uses the internet. Your printer data never leaves your network.</p>
-
   <div class="arch-flow">
-    <div class="arch-node">
-      <div class="an-icon">🖨️</div>
-      <div class="an-title">Klipper / Moonraker</div>
-      <div class="an-sub">On your printer</div>
-    </div>
+    <div class="arch-node"><div class="an-icon">🖨️</div><div class="an-title">Klipper / Moonraker</div><div class="an-sub">On your printer</div></div>
     <div class="arch-arr">→</div>
-    <div class="arch-node" style="border-color:var(--border2)">
-      <div class="an-icon">⚡</div>
-      <div class="an-title">PRESTILON Backend</div>
-      <div class="an-sub">localhost:3002 · Fastify</div>
-    </div>
+    <div class="arch-node" style="border-color:var(--border2)"><div class="an-icon">⚡</div><div class="an-title">PRESTILON Backend</div><div class="an-sub">localhost:3002 · Fastify</div></div>
     <div class="arch-arr">→</div>
-    <div class="arch-node" style="border-color:var(--border2)">
-      <div class="an-icon">🧠</div>
-      <div class="an-title">AI Engine</div>
-      <div class="an-sub">Kalman + CUSUM + Models</div>
-    </div>
+    <div class="arch-node" style="border-color:var(--border2)"><div class="an-icon">🧠</div><div class="an-title">AI Engine</div><div class="an-sub">Kalman + CUSUM + Models</div></div>
     <div class="arch-arr">→</div>
-    <div class="arch-node">
-      <div class="an-icon">📊</div>
-      <div class="an-title">Dashboard</div>
-      <div class="an-sub">localhost:3002 · Live</div>
-    </div>
+    <div class="arch-node"><div class="an-icon">📊</div><div class="an-title">Dashboard</div><div class="an-sub">localhost:3002 · Live</div></div>
   </div>
   <div class="cloud-strip">
     <div class="cloud-box">
@@ -682,8 +325,8 @@ footer{
       <h2>Enterprise AI for your printer fleet.<br>Running locally. Today.</h2>
       <p>Create your account and have your first printer monitored in under 5 minutes.</p>
       <div class="cta-btns">
-        <button class="btn btn-primary" onclick="goAuth('register')">⚡ Create Free Account</button>
-        <button class="btn btn-secondary" onclick="goSection('features')">Learn More</button>
+        <a class="btn btn-primary" href="/login">⚡ Create Free Account</a>
+        <a class="btn btn-secondary" href="#features">Learn More</a>
       </div>
       <div class="cta-note">WINDOWS 10/11 · NODE.JS 18+ · KLIPPER / MOONRAKER REQUIRED</div>
     </div>
@@ -692,252 +335,28 @@ footer{
 
 <footer>
   <div>
-    <button class="logo" onclick="goHome()" style="display:inline-flex">
-      <div class="logo-icon" style="width:28px;height:28px;font-size:.68rem">P</div>
-      <div><div class="logo-name" style="font-size:.88rem">PRESTILON</div></div>
-    </button>
+    <a class="logo" href="/"><div class="logo-icon" style="width:28px;height:28px;font-size:.68rem">P</div><div class="logo-name" style="font-size:.88rem">PRESTILON</div></a>
     <div class="footer-copy">© 2026 PRESTILON. All rights reserved.</div>
   </div>
   <div class="footer-links">
-    <a href="#" onclick="goSection('features');return false">Features</a>
-    <a href="#" onclick="goSection('howit');return false">How It Works</a>
-    <a href="mailto:support@prestilon.com">Support</a>
-    <a href="#" onclick="goAuth('login');return false">Sign In</a>
+    <a href="#features">Features</a>
+    <a href="#howit">How It Works</a>
+    <a href="/support">Support</a>
+    <a href="/login">Sign In</a>
   </div>
 </footer>
-</div>
 
-<!-- ══════════════════════ AUTH ══════════════════════ -->
-<div id="page-auth" class="page">
-  <div class="auth-wrap">
-    <div class="auth-card">
-      <div class="auth-logo-wrap">
-        <div class="auth-logo-icon">P</div>
-        <div class="auth-logo-name">PRESTILON</div>
-      </div>
-      <div class="auth-meta" id="authMeta">Sign in to your account</div>
-      <div class="auth-tabs" id="authTabs">
-        <button class="at on" id="tabLogin" onclick="switchTab('login')">Sign In</button>
-        <button class="at" id="tabRegister" onclick="switchTab('register')">Register</button>
-      </div>
-      <div id="alertBox"></div>
-
-      <!-- LOGIN -->
-      <div class="tab-pnl on" id="pnlLogin">
-        <div class="fg"><label class="fl">Email address</label><input type="email" id="lEmail" class="fi" placeholder="you@example.com" autocomplete="email"/></div>
-        <div class="fg">
-          <label class="fl" style="display:flex;justify-content:space-between">
-            Password
-            <a href="#" class="alink" onclick="switchTab('forgot');return false" style="font-size:.7rem">Forgot password?</a>
-          </label>
-          <input type="password" id="lPass" class="fi" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
-        </div>
-        <button class="fsub" id="loginBtn" onclick="doLogin()">Sign In</button>
-        <div class="adiv"><span>New to PRESTILON?</span></div>
-        <div style="text-align:center"><a href="#" class="alink" onclick="switchTab('register');return false">Create an account →</a></div>
-      </div>
-
-      <!-- REGISTER -->
-      <div class="tab-pnl" id="pnlRegister">
-        <div class="fg"><label class="fl">Full name</label><input type="text" id="rName" class="fi" placeholder="Jane Doe" autocomplete="name"/></div>
-        <div class="fg"><label class="fl">Email address</label><input type="email" id="rEmail" class="fi" placeholder="you@example.com" autocomplete="email"/></div>
-        <div class="fg"><label class="fl">Password</label><input type="password" id="rPass" class="fi" placeholder="min. 8 characters" autocomplete="new-password"/></div>
-        <div class="fg"><label class="fl">Confirm password</label><input type="password" id="rConf" class="fi" placeholder="••••••••" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()"/></div>
-        <button class="fsub" id="regBtn" onclick="doRegister()">Create Account</button>
-        <div class="adiv"><span>Already have an account?</span></div>
-        <div style="text-align:center"><a href="#" class="alink" onclick="switchTab('login');return false">Sign in →</a></div>
-      </div>
-
-      <!-- FORGOT -->
-      <div class="tab-pnl" id="pnlForgot">
-        <div class="alertbox ai">Enter your email and we'll send a password reset link.</div>
-        <div class="fg"><label class="fl">Email address</label><input type="email" id="fEmail" class="fi" placeholder="you@example.com" autocomplete="email"/></div>
-        <button class="fsub" id="forgotBtn" onclick="doForgot()">Send Reset Link</button>
-        <div style="text-align:center;margin-top:1rem"><a href="#" class="alink" onclick="switchTab('login');return false">← Back to Sign In</a></div>
-      </div>
-
-      <div class="back-link">
-        <button onclick="goHome()" class="back-btn">← Back to prestilon.com</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════ ACCOUNT ══════════════════════ -->
-<div id="page-account" class="page">
-  <div class="acct-wrap">
-    <div class="acct-header">
-      <div class="acct-h1">My Account</div>
-      <div class="acct-sub">Manage your subscription, profile, and security settings.</div>
-    </div>
-    <div class="acct-layout">
-      <div class="acct-sidebar">
-        <div class="av" id="acctAv">P</div>
-        <div class="an" id="acctName">—</div>
-        <div class="ae2" id="acctEmail">—</div>
-        <div class="snav">
-          <button class="snav-btn on" id="sBtn0" onclick="showAcctTab('sub',this)">💳 Subscription</button>
-          <button class="snav-btn" id="sBtn1" onclick="showAcctTab('profile',this)">👤 Profile</button>
-          <button class="snav-btn" id="sBtn2" onclick="showAcctTab('security',this)">🔒 Security</button>
-          <button class="snav-btn" id="sBtn3" onclick="showAcctTab('download',this)">⬇ Download</button>
-        </div>
-        <button class="logout-btn" onclick="doLogout()">Sign Out</button>
-      </div>
-      <div class="acct-content">
-        <div id="acctAlert"></div>
-
-        <!-- SUBSCRIPTION -->
-        <div class="tab-pnl on acct-sec" id="acSub">
-          <div class="acct-stitle">💳 Subscription</div>
-          <div class="sub-hero">
-            <div>
-              <div style="font-weight:700;font-size:.9rem;margin-bottom:.18rem" id="subName">Loading…</div>
-              <div style="font-size:.72rem;color:var(--text2)" id="subExp">—</div>
-            </div>
-            <div id="subBadge"></div>
-          </div>
-          <div class="sub-stats" id="subStats"></div>
-          <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)">
-            <div style="font-size:.78rem;font-weight:700;margin-bottom:.65rem">Manage Plan</div>
-            <div style="display:flex;gap:.65rem;flex-wrap:wrap">
-              <a href="https://billing.stripe.com" target="_blank" class="btn btn-secondary" style="font-size:.78rem;padding:.5rem 1rem">Manage Billing →</a>
-              <button class="btn btn-primary" style="font-size:.78rem;padding:.5rem 1rem" onclick="goHome()">View Plans</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- PROFILE -->
-        <div class="tab-pnl acct-sec" id="acProfile">
-          <div class="acct-stitle">👤 Profile</div>
-          <div class="fg"><label class="fl">Display name</label><input type="text" id="pName" class="fi" placeholder="Your name"/></div>
-          <div class="fg"><label class="fl">Email address</label><input type="email" id="pEmail" class="fi" readonly style="opacity:.5;cursor:not-allowed"/></div>
-          <button class="fsub" style="max-width:175px;margin-top:.2rem" onclick="saveProfile()">Save Changes</button>
-        </div>
-
-        <!-- SECURITY -->
-        <div class="tab-pnl acct-sec" id="acSec">
-          <div class="acct-stitle">🔒 Change Password</div>
-          <div class="fg"><label class="fl">New password</label><input type="password" id="np" class="fi" placeholder="min. 8 characters"/></div>
-          <div class="fg"><label class="fl">Confirm new password</label><input type="password" id="cp2" class="fi" placeholder="••••••••"/></div>
-          <button class="fsub" style="max-width:190px;margin-top:.2rem" onclick="changePwd()">Update Password</button>
-        </div>
-
-        <!-- DOWNLOAD -->
-        <div class="tab-pnl acct-sec" id="acDown">
-          <div class="acct-stitle">⬇ Download PRESTILON</div>
-          <div class="alertbox ai" style="margin-bottom:1.1rem">Windows installer coming soon. You'll be notified by email at launch.</div>
-          <div style="background:var(--bg);border:1px solid var(--border);border-radius:11px;padding:1.2rem">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:.71rem;color:var(--text2);line-height:1.9">
-              <div style="color:var(--text3);margin-bottom:.25rem"># System Requirements</div>
-              <div>Windows 10 / 11 (64-bit)</div>
-              <div>Node.js 18 or higher</div>
-              <div>Klipper + Moonraker on each printer</div>
-              <div>Local network access to printer IP</div>
-              <div style="margin-top:.65rem;color:var(--text3)"># After install, open:</div>
-              <div style="color:var(--c1)">http://localhost:3002</div>
-              <div style="margin-top:.65rem;color:var(--text3)"># Your data stays local.</div>
-              <div>Only license validation uses the internet.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════ SCRIPTS ══════════════════════ -->
 <script>
-/* ── NAVIGATION ── */
-function goHome(){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
-  document.getElementById('page-home').classList.add('active')
-  const ann=document.getElementById('page-ann')
-  if(ann)ann.style.display=''
-  window.scrollTo({top:0})
-}
-function goAuth(tab){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
-  document.getElementById('page-auth').classList.add('active')
-  const ann=document.getElementById('page-ann')
-  if(ann)ann.style.display='none'
-  window.scrollTo({top:0})
-  switchTab(tab||'login')
-  clearAlerts()
-}
-function goAcct(){
-  if(!window._user){goAuth('login');return}
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
-  document.getElementById('page-account').classList.add('active')
-  const ann=document.getElementById('page-ann')
-  if(ann)ann.style.display='none'
-  window.scrollTo({top:0})
-  clearAlerts()
-}
-function goSection(id){
-  goHome()
-  setTimeout(()=>{const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},60)
-}
-function switchTab(t){
-  ;['login','register','forgot'].forEach(x=>{
-    const p=document.getElementById('pnl'+cap(x))
-    const b=document.getElementById('tab'+cap(x))
-    if(p)p.classList.remove('on')
-    if(b)b.classList.remove('on')
-  })
-  const p=document.getElementById('pnl'+cap(t))
-  const b=document.getElementById('tab'+cap(t))
-  if(p)p.classList.add('on')
-  if(b)b.classList.add('on')
-  const tabs=document.getElementById('authTabs')
-  if(tabs)tabs.style.display=t==='forgot'?'none':''
-  const meta=document.getElementById('authMeta')
-  const titles={login:'Sign in to your account',register:'Create your account',forgot:'Reset your password'}
-  if(meta)meta.textContent=titles[t]||''
-  clearAlerts()
-}
-function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
-function showAlert(msg,type,target){
-  target=target||'alertBox'
-  const el=document.getElementById(target);if(!el)return
-  const cls={error:'ae',success:'as',info:'ai'}[type]||'ae'
-  el.innerHTML=`<div class="alertbox ${cls}">${msg}</div>`
-}
-function clearAlerts(){
-  ;['alertBox','acctAlert'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=''})
-}
-function setLoading(id,on,txt){
-  const b=document.getElementById(id);if(!b)return
-  b.disabled=on
-  b.innerHTML=on?`<span class="spin"></span>${txt}`:txt
-}
-window._user=null
-
-function showAcctTab(tab,btn){
-  const map={sub:'acSub',profile:'acProfile',security:'acSec',download:'acDown'}
-  document.querySelectorAll('.acct-content .tab-pnl').forEach(p=>p.classList.remove('on'))
-  document.querySelectorAll('.snav-btn').forEach(b=>b.classList.remove('on'))
-  const panel=document.getElementById(map[tab])
-  if(panel)panel.classList.add('on')
-  if(btn)btn.classList.add('on')
-}
-
-/* ── NAV SCROLL ── */
-window.addEventListener('scroll',()=>{
-  document.getElementById('main-nav').classList.toggle('scrolled',window.scrollY>20)
-})
-
-/* ── CANVAS PARTICLES ── */
+/* Canvas */
 ;(()=>{
-  const c=document.getElementById('bg-canvas')
-  const ctx=c.getContext('2d')
+  const c=document.getElementById('bg'),ctx=c.getContext('2d')
   let W,H,pts=[]
-  const N=55
   function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
-  function init(){pts=[];for(let i=0;i<N;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.18,vy:(Math.random()-.5)*.18})}
+  function init(){pts=[];for(let i=0;i<55;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.18,vy:(Math.random()-.5)*.18})}
   function draw(){
     ctx.clearRect(0,0,W,H)
-    for(let i=0;i<N;i++){
-      for(let j=i+1;j<N;j++){
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
         const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy)
         if(d<120){ctx.beginPath();ctx.strokeStyle=`rgba(0,229,200,${.04*(1-d/120)})`;ctx.lineWidth=.5;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke()}
       }
@@ -952,15 +371,15 @@ window.addEventListener('scroll',()=>{
   resize();init();draw()
 })()
 
-/* ── COUNTER ── */
-function countUp(id,target,suffix){
+/* Counters */
+function countUp(id,target){
   let v=0;const el=document.getElementById(id);if(!el)return
   const step=Math.ceil(target/45)
-  const t=setInterval(()=>{v=Math.min(v+step,target);el.textContent=v+(suffix||'');if(v>=target)clearInterval(t)},28)
+  const t=setInterval(()=>{v=Math.min(v+step,target);el.textContent=v;if(v>=target)clearInterval(t)},28)
 }
-setTimeout(()=>{countUp('sv1',50,'');countUp('sv2',6,'')},500)
+setTimeout(()=>{countUp('sv1',50);countUp('sv2',6)},500)
 
-/* ── SCROLL REVEAL ── */
+/* Reveal */
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.07})
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el))
 </script>
@@ -968,101 +387,11 @@ document.querySelectorAll('.reveal').forEach(el=>obs.observe(el))
 <script type="module">
 import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 const sb=createClient('https://ryftlimrjhhoymyfzusq.supabase.co','sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86')
-
-function updNav(){
-  const li=!!window._user
-  document.getElementById('navLogin').style.display=li?'none':''
-  document.getElementById('navStart').style.display=li?'none':''
-  document.getElementById('navAcct').style.display=li?'':'none'
-}
-
-sb.auth.onAuthStateChange(async(e,s)=>{
-  window._user=s?.user??null
-  updNav()
-  if(window._user)await loadAcct()
-})
-
-async function loadAcct(){
-  const u=window._user;if(!u)return
-  const n=u.user_metadata?.full_name||u.email?.split('@')[0]||'User'
-  const e=u.email||''
-  document.getElementById('acctAv').textContent=n.charAt(0).toUpperCase()
-  document.getElementById('acctName').textContent=n
-  document.getElementById('acctEmail').textContent=e
-  document.getElementById('pName').value=n
-  document.getElementById('pEmail').value=e
-  const{data:sub}=await sb.from('subscriptions').select('*').eq('user_id',u.id).single()
-  const pm={starter:'Basic',professional:'Pro',enterprise:'Enterprise'}
-  document.getElementById('subName').textContent=sub?(pm[sub.plan]||sub.plan)+' Plan':'No active plan'
-  document.getElementById('subExp').textContent=sub?.valid_until?'Valid until: '+new Date(sub.valid_until).toLocaleDateString('en-GB'):'—'
-  const bc={active:'sb-a',trial:'sb-t',trialing:'sb-t',expired:'sb-i',cancelled:'sb-i',inactive:'sb-i'}
-  const st=sub?.status||'inactive'
-  document.getElementById('subBadge').innerHTML=`<span class="sbadge ${bc[st]||'sb-i'}">${st}</span>`
-  document.getElementById('subStats').innerHTML=sub?`
-    <div class="ss"><div class="ssv">${sub.printer_limit}</div><div class="ssl">Printer Limit</div></div>
-    <div class="ss"><div class="ssv" style="font-size:.8rem;font-family:'Syne',sans-serif">${(sub.plan||'—').toUpperCase()}</div><div class="ssl">Plan</div></div>
-  `:`<div class="alertbox ae" style="grid-column:span 2;margin:0">No active subscription.</div>`
-}
-
-window.doLogin=async()=>{
-  const e=document.getElementById('lEmail').value.trim()
-  const p=document.getElementById('lPass').value
-  if(!e||!p){showAlert('Please fill in all fields.');return}
-  setLoading('loginBtn',true,'Signing in…')
-  const{error}=await sb.auth.signInWithPassword({email:e,password:p})
-  setLoading('loginBtn',false,'Sign In')
-  if(error){showAlert(error.message,'error');return}
-  goAcct()
-}
-window.doRegister=async()=>{
-  const n=document.getElementById('rName').value.trim()
-  const e=document.getElementById('rEmail').value.trim()
-  const p=document.getElementById('rPass').value
-  const c=document.getElementById('rConf').value
-  if(!n||!e||!p){showAlert('Please fill in all fields.');return}
-  if(p.length<8){showAlert('Password must be at least 8 characters.');return}
-  if(p!==c){showAlert('Passwords do not match.');return}
-  setLoading('regBtn',true,'Creating account…')
-  const{error}=await sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}})
-  setLoading('regBtn',false,'Create Account')
-  if(error){showAlert(error.message,'error');return}
-  showAlert('✅ Account created! Check your email to confirm, then sign in.','success')
-  setTimeout(()=>switchTab('login'),3000)
-}
-window.doForgot=async()=>{
-  const e=document.getElementById('fEmail').value.trim()
-  if(!e){showAlert('Please enter your email.');return}
-  setLoading('forgotBtn',true,'Sending…')
-  const{error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin})
-  setLoading('forgotBtn',false,'Send Reset Link')
-  if(error){showAlert(error.message,'error');return}
-  showAlert('✅ Reset link sent! Check your inbox.','success')
-}
-window.doLogout=async()=>{
-  await sb.auth.signOut();window._user=null;updNav();goHome()
-}
-window.saveProfile=async()=>{
-  const n=document.getElementById('pName').value.trim()
-  if(!n){showAlert('Name cannot be empty.','error','acctAlert');return}
-  const{error}=await sb.auth.updateUser({data:{full_name:n}})
-  if(error){showAlert(error.message,'error','acctAlert');return}
-  document.getElementById('acctName').textContent=n
-  document.getElementById('acctAv').textContent=n.charAt(0).toUpperCase()
-  showAlert('✅ Profile updated.','success','acctAlert')
-}
-window.changePwd=async()=>{
-  const p=document.getElementById('np').value
-  const c=document.getElementById('cp2').value
-  if(p.length<8){showAlert('Password must be at least 8 characters.','error','acctAlert');return}
-  if(p!==c){showAlert('Passwords do not match.','error','acctAlert');return}
-  const{error}=await sb.auth.updateUser({password:p})
-  if(error){showAlert(error.message,'error','acctAlert');return}
-  document.getElementById('np').value='';document.getElementById('cp2').value=''
-  showAlert('✅ Password updated.','success','acctAlert')
-}
 const{data:{session}}=await sb.auth.getSession()
-if(session){window._user=session.user;updNav();await loadAcct()}
-updNav()
+if(session){
+  document.getElementById('navLogin').style.display='none'
+  document.getElementById('navAcct').style.display=''
+}
 </script>
 </body>
 </html>
