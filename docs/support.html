@@ -35,7 +35,7 @@ nav{
   position:sticky;top:0;z-index:999;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 1.5rem 0 0;
-  height:64px;overflow:hidden;
+  height:64px;
   background:rgba(6,15,26,.9);
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   border-bottom:1px solid var(--border);
@@ -43,11 +43,11 @@ nav{
 .logo{display:flex;align-items:center;text-decoration:none;transition:opacity .2s}
 .logo:hover{opacity:.85}
 .logo-img{height:120px;width:auto;mix-blend-mode:screen;display:block}
-@media(max-width:600px){
+@media(max-width:640px){
   nav{padding:0 .75rem 0 0;height:52px}
   .logo-img{height:36px}
-  .nl{display:none}
-  .nc{padding:.38rem .7rem;font-size:.75rem;margin-left:.3rem}
+  .nl{font-size:.75rem;padding:.3rem .5rem}
+  .nc{padding:.35rem .65rem;font-size:.72rem;margin-left:.2rem;white-space:nowrap}
 }
 .nav-r{display:flex;align-items:center;gap:.15rem}
 .nl{padding:.42rem .85rem;color:var(--text2);font-size:.88rem;font-weight:500;text-decoration:none;border-radius:7px;transition:color .18s,background .18s}
