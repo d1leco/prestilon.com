@@ -1,61 +1,1135 @@
 <!DOCTYPE html>
-<html lang="lv" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/prestige-icon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0a0a0f" />
-    <meta name="description" content="PRESTIGE - Multi-Printer AI Dashboard" />
-    
-    <title>PRESTIGE Dashboard</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- GitHub Pages SPA routing fix -->
-    <script>
-      (function() {
-        var redirect = sessionStorage.redirect;
-        delete sessionStorage.redirect;
-        if (redirect && redirect !== location.href) {
-          history.replaceState(null, null, redirect);
-        }
-        // Also handle ?p= query param from 404.html
-        var search = window.location.search;
-        if (search.startsWith('?p=')) {
-          var path = decodeURIComponent(search.slice(3));
-          history.replaceState(null, null, path);
-        }
-      })();
-    </script>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="PRESTILON — AI-Powered 3D Printer Fleet Management. Monitor, predict, optimize." />
+  <title>PRESTILON — AI Printer Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <!-- Prevent FOUC -->
-    <style>
-      html {
-        background-color: #0a0a0f;
-      }
-      body {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-      body.loaded {
-        opacity: 1;
-      }
-    </style>
-    <script type="module" crossorigin src="/assets/index-BE_1invv.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BYLxcFek.css">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script>
-      // Mark body as loaded after fonts
-      document.fonts.ready.then(() => {
-        document.body.classList.add('loaded');
-      });
-      // Fallback
-      setTimeout(() => document.body.classList.add('loaded'), 500);
-    </script>
-  </body>
+    :root {
+      --bg:        #070710;
+      --bg2:       #0d0d1a;
+      --bg3:       #111122;
+      --border:    rgba(0,220,255,0.08);
+      --border2:   rgba(0,220,255,0.18);
+      --cyan:      #00dcff;
+      --cyan2:     #00aacc;
+      --blue:      #2563eb;
+      --purple:    #7c3aed;
+      --green:     #10b981;
+      --red:       #ef4444;
+      --amber:     #f59e0b;
+      --text:      #e8eaf0;
+      --text2:     #8892a4;
+      --text3:     #4a5568;
+      --glow:      rgba(0,220,255,0.15);
+    }
+
+    html { background: var(--bg); scroll-behavior: smooth; }
+    body { font-family: 'Syne', sans-serif; color: var(--text); min-height: 100vh; overflow-x: hidden; }
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(0,100,180,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(0,220,255,0.06) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(124,58,237,0.04) 0%, transparent 60%);
+    }
+
+    /* ── GRID OVERLAY ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        linear-gradient(rgba(0,220,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,220,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* ── PAGES ── */
+    .page { display: none; position: relative; z-index: 1; min-height: 100vh; }
+    .page.active { display: block; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 64px;
+      background: rgba(7,7,16,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Orbitron', monospace; font-weight: 800; font-size: 1.2rem;
+      color: var(--cyan); letter-spacing: 0.15em; cursor: pointer;
+      text-shadow: 0 0 20px rgba(0,220,255,0.4);
+    }
+    .nav-logo span { color: var(--text2); font-weight: 400; font-size: 0.75rem; letter-spacing: 0.1em; display: block; }
+    .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+    .nav-btn {
+      padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.85rem;
+      font-family: 'Syne', sans-serif; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; border: none; text-decoration: none;
+    }
+    .nav-btn-ghost { background: transparent; color: var(--text2); }
+    .nav-btn-ghost:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-btn-primary {
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      color: #000; font-weight: 700;
+      box-shadow: 0 0 20px rgba(0,220,255,0.25);
+    }
+    .nav-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 25px rgba(0,220,255,0.4); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 140px 2rem 80px;
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+    }
+    @media(max-width:768px) { .hero { grid-template-columns: 1fr; padding: 120px 1.5rem 60px; } }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.35rem 0.9rem; border-radius: 999px;
+      border: 1px solid rgba(0,220,255,0.3);
+      background: rgba(0,220,255,0.05);
+      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+      color: var(--cyan); letter-spacing: 0.05em; margin-bottom: 1.5rem;
+    }
+    .hero-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .hero h1 {
+      font-family: 'Orbitron', monospace; font-weight: 900;
+      font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.05;
+      margin-bottom: 1.2rem;
+    }
+    .hero h1 .accent { color: var(--cyan); text-shadow: 0 0 30px rgba(0,220,255,0.5); }
+    .hero p { color: var(--text2); font-size: 1.05rem; line-height: 1.7; margin-bottom: 2rem; }
+
+    .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-xl {
+      padding: 0.85rem 2rem; border-radius: 12px; font-size: 0.95rem;
+      font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer;
+      transition: all 0.25s; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--cyan), #0088cc);
+      color: #000; box-shadow: 0 0 30px rgba(0,220,255,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 35px rgba(0,220,255,0.45); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border2);
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.04); border-color: rgba(0,220,255,0.4); }
+
+    /* ── STATS ── */
+    .hero-stats {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 1px;
+      background: var(--border); border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--border); margin-top: 2.5rem;
+    }
+    .stat { background: var(--bg2); padding: 1.2rem; text-align: center; }
+    .stat-val { font-family: 'Orbitron', monospace; font-size: 1.6rem; font-weight: 800; color: var(--cyan); }
+    .stat-lbl { font-size: 0.7rem; color: var(--text3); letter-spacing: 0.05em; margin-top: 0.2rem; }
+
+    /* ── DASHBOARD PREVIEW ── */
+    .hero-visual {
+      position: relative;
+    }
+    .dashboard-mock {
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 0 60px rgba(0,220,255,0.08), 0 40px 80px rgba(0,0,0,0.5);
+    }
+    .mock-bar {
+      background: var(--bg3); padding: 0.7rem 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mock-title { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--text3); margin-left: auto; }
+    .mock-body { padding: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .mock-card {
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem;
+    }
+    .mock-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--text3); margin-bottom: 0.4rem; }
+    .mock-val { font-family: 'Orbitron', monospace; font-size: 1.1rem; font-weight: 700; }
+    .mock-val.cyan { color: var(--cyan); }
+    .mock-val.green { color: var(--green); }
+    .mock-val.amber { color: var(--amber); }
+    .mock-bar-chart { display: flex; align-items: flex-end; gap: 3px; height: 36px; margin-top: 0.5rem; }
+    .mock-bar-item { flex: 1; background: rgba(0,220,255,0.2); border-radius: 2px; transition: height 1s ease; }
+    .mock-bar-item:nth-child(odd) { background: rgba(0,220,255,0.35); }
+    .health-ring {
+      width: 60px; height: 60px; margin: 0 auto;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      background: conic-gradient(var(--cyan) 310deg, rgba(0,220,255,0.1) 0deg);
+      font-family: 'Orbitron', monospace; font-size: 0.75rem; font-weight: 800; color: var(--cyan);
+      position: relative;
+    }
+    .health-ring::before {
+      content: ''; position: absolute; inset: 6px; border-radius: 50%; background: var(--bg3);
+    }
+    .health-ring span { position: relative; z-index: 1; }
+
+    /* ── FEATURES ── */
+    .section { padding: 80px 2rem; max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em;
+      color: var(--cyan); margin-bottom: 0.75rem; text-transform: uppercase;
+    }
+    .section-title {
+      font-family: 'Orbitron', monospace; font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 800; margin-bottom: 1rem; line-height: 1.2;
+    }
+    .section-sub { color: var(--text2); font-size: 1rem; line-height: 1.7; max-width: 540px; }
+
+    .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
+    @media(max-width:900px) { .features-grid { grid-template-columns: 1fr 1fr; } }
+    @media(max-width:580px) { .features-grid { grid-template-columns: 1fr; } }
+
+    .feature-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.75rem;
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feature-card:hover { border-color: var(--border2); transform: translateY(-3px); background: var(--bg3); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 1rem;
+    }
+    .feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .feature-card p { font-size: 0.85rem; color: var(--text2); line-height: 1.65; }
+
+    /* ── PRICING ── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.25rem; margin-top: 3rem; }
+    @media(max-width:1000px) { .pricing-grid { grid-template-columns: 1fr 1fr; } }
+    @media(max-width:580px) { .pricing-grid { grid-template-columns: 1fr; } }
+
+    .plan-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 18px; padding: 1.75rem; display: flex; flex-direction: column;
+      position: relative; transition: all 0.3s; overflow: hidden;
+    }
+    .plan-card.featured {
+      border-color: rgba(0,220,255,0.4);
+      box-shadow: 0 0 40px rgba(0,220,255,0.08);
+    }
+    .plan-card:hover { transform: translateY(-4px); border-color: var(--border2); }
+    .plan-badge {
+      position: absolute; top: -1px; right: 1.25rem;
+      padding: 0.3rem 0.8rem; border-radius: 0 0 10px 10px;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em;
+    }
+    .plan-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+    .plan-name { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .plan-price { font-family: 'Orbitron', monospace; font-size: 1.9rem; font-weight: 900; margin: 0.75rem 0 0.25rem; }
+    .plan-price span { font-size: 0.9rem; font-weight: 400; color: var(--text2); }
+    .plan-vat { font-size: 0.7rem; color: var(--text3); margin-bottom: 1rem; }
+    .plan-features { list-style: none; flex: 1; margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .plan-features li {
+      font-size: 0.8rem; color: var(--text2); display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+    .plan-features li::before { content: '✓'; color: var(--cyan); font-weight: 700; flex-shrink: 0; font-size: 0.75rem; margin-top: 0.05rem; }
+    .plan-btn {
+      width: 100%; padding: 0.75rem; border-radius: 10px; border: none;
+      font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .plan-btn-primary {
+      background: linear-gradient(135deg, var(--cyan), #0088cc);
+      color: #000; box-shadow: 0 0 20px rgba(0,220,255,0.25);
+    }
+    .plan-btn-primary:hover { box-shadow: 0 0 30px rgba(0,220,255,0.4); transform: translateY(-1px); }
+    .plan-btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border2); }
+    .plan-btn-outline:hover { background: rgba(255,255,255,0.04); }
+
+    /* ── AUTH PAGES ── */
+    .auth-wrapper {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 80px 1.5rem 2rem;
+    }
+    .auth-card {
+      width: 100%; max-width: 420px;
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: 24px; padding: 2.5rem;
+      box-shadow: 0 0 60px rgba(0,220,255,0.06), 0 40px 80px rgba(0,0,0,0.5);
+    }
+    .auth-logo {
+      font-family: 'Orbitron', monospace; font-weight: 800; font-size: 1.4rem;
+      color: var(--cyan); text-align: center; margin-bottom: 0.3rem;
+      text-shadow: 0 0 20px rgba(0,220,255,0.4);
+    }
+    .auth-subtitle { text-align: center; color: var(--text2); font-size: 0.85rem; margin-bottom: 2rem; }
+    .auth-tabs { display: flex; background: var(--bg3); border-radius: 10px; padding: 4px; margin-bottom: 1.75rem; }
+    .auth-tab {
+      flex: 1; padding: 0.55rem; border-radius: 8px; border: none;
+      font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text3);
+    }
+    .auth-tab.active { background: var(--bg2); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text2); margin-bottom: 0.45rem; letter-spacing: 0.02em; }
+    .form-input {
+      width: 100%; padding: 0.75rem 1rem; border-radius: 10px;
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); font-family: 'Syne', sans-serif; font-size: 0.9rem;
+      transition: all 0.2s; outline: none;
+    }
+    .form-input:focus { border-color: rgba(0,220,255,0.4); box-shadow: 0 0 0 3px rgba(0,220,255,0.08); }
+    .form-input::placeholder { color: var(--text3); }
+
+    .form-submit {
+      width: 100%; padding: 0.85rem; border-radius: 12px; border: none;
+      background: linear-gradient(135deg, var(--cyan), #0088cc);
+      color: #000; font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 800;
+      cursor: pointer; transition: all 0.25s; margin-top: 0.5rem;
+      box-shadow: 0 0 25px rgba(0,220,255,0.25);
+    }
+    .form-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 30px rgba(0,220,255,0.4); }
+    .form-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .auth-divider { text-align: center; position: relative; margin: 1.25rem 0; }
+    .auth-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border); }
+    .auth-divider span { position: relative; background: var(--bg2); padding: 0 0.75rem; font-size: 0.75rem; color: var(--text3); }
+
+    .auth-link { color: var(--cyan); text-decoration: none; font-weight: 600; font-size: 0.85rem; }
+    .auth-link:hover { text-decoration: underline; }
+
+    .alert {
+      padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.82rem;
+      margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+    .alert-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+    .alert-success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
+    .alert-info { background: rgba(0,220,255,0.08); border: 1px solid rgba(0,220,255,0.25); color: var(--cyan); }
+
+    /* ── ACCOUNT PAGE ── */
+    .account-wrapper { max-width: 900px; margin: 0 auto; padding: 100px 2rem 4rem; }
+    .account-header { margin-bottom: 2.5rem; }
+    .account-header h1 { font-family: 'Orbitron', monospace; font-size: 1.5rem; font-weight: 800; color: var(--text); }
+    .account-header p { color: var(--text2); font-size: 0.9rem; margin-top: 0.35rem; }
+
+    .account-grid { display: grid; grid-template-columns: 260px 1fr; gap: 1.5rem; align-items: start; }
+    @media(max-width:700px) { .account-grid { grid-template-columns: 1fr; } }
+
+    .account-sidebar {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; position: sticky; top: 80px;
+    }
+    .account-avatar {
+      width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 0.75rem;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', monospace; font-size: 1.4rem; font-weight: 800; color: #000;
+    }
+    .account-name { text-align: center; font-weight: 700; font-size: 0.95rem; }
+    .account-email { text-align: center; font-size: 0.75rem; color: var(--text2); margin-bottom: 1.25rem; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 0.25rem; }
+    .sidebar-nav-btn {
+      padding: 0.6rem 0.9rem; border-radius: 8px; border: none;
+      background: transparent; color: var(--text2); font-family: 'Syne', sans-serif;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; text-align: left;
+      transition: all 0.15s; display: flex; align-items: center; gap: 0.6rem;
+    }
+    .sidebar-nav-btn:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .sidebar-nav-btn.active { background: rgba(0,220,255,0.08); color: var(--cyan); }
+    .sidebar-nav-btn .icon { font-size: 0.95rem; width: 18px; text-align: center; }
+
+    .account-content { display: flex; flex-direction: column; gap: 1.25rem; }
+    .account-section {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem;
+    }
+    .account-section-title {
+      font-size: 0.95rem; font-weight: 700; margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .sub-status-card {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem; background: var(--bg3); border-radius: 12px;
+      border: 1px solid var(--border); flex-wrap: wrap; gap: 1rem;
+    }
+    .status-badge {
+      padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700;
+    }
+    .status-active { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+    .status-inactive { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+    .status-trial { background: rgba(0,220,255,0.1); color: var(--cyan); border: 1px solid rgba(0,220,255,0.3); }
+    .logout-btn {
+      width: 100%; margin-top: 1rem; padding: 0.65rem; border-radius: 10px;
+      background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+      color: #fca5a5; font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .logout-btn:hover { background: rgba(239,68,68,0.15); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 2.5rem 2rem;
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 800; color: var(--cyan); }
+    .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .footer-links a { color: var(--text3); text-decoration: none; font-size: 0.8rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text2); }
+    .footer-copy { font-size: 0.75rem; color: var(--text3); }
+
+    /* ── SPINNER ── */
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── DOWNLOAD SECTION ── */
+    .download-section {
+      background: linear-gradient(135deg, rgba(0,220,255,0.05), rgba(37,99,235,0.05));
+      border: 1px solid var(--border2); border-radius: 24px;
+      padding: 3rem 2rem; text-align: center; margin: 0 2rem 4rem;
+      max-width: 1100px; margin: 0 auto 4rem; position: relative; overflow: hidden;
+    }
+    .download-section::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(0,220,255,0.06), transparent);
+    }
+    .download-section h2 { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .download-section p { color: var(--text2); margin-bottom: 2rem; }
+
+    /* ── HIDDEN ── */
+    .hidden { display: none !important; }
+
+    /* ── TAB PANELS ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════ NAV ══════════════════════════════════ -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">
+    PRESTILON
+    <span>AI PRINTER INTELLIGENCE</span>
+  </div>
+  <div class="nav-links" id="navLinks">
+    <button class="nav-btn nav-btn-ghost" onclick="showPage('home')">Home</button>
+    <button class="nav-btn nav-btn-ghost" onclick="scrollToPricing()">Pricing</button>
+    <button class="nav-btn nav-btn-ghost" id="navAccountBtn" onclick="showPage('account')" style="display:none">Account</button>
+    <button class="nav-btn nav-btn-ghost" id="navLoginBtn" onclick="showPage('auth')">Sign In</button>
+    <button class="nav-btn nav-btn-primary" id="navSignupBtn" onclick="showPage('auth'); switchTab('register')">Get Started</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════ HOME PAGE ══════════════════════════════ -->
+<div id="page-home" class="page active">
+
+  <!-- HERO -->
+  <section style="padding-top:0">
+    <div class="hero">
+      <div>
+        <div class="hero-badge">AI-POWERED · REAL-TIME · PREDICTIVE</div>
+        <h1>Your 3D Printers.<br>Under <span class="accent">AI Control.</span></h1>
+        <p>PRESTILON runs locally on your Windows PC and gives your entire printer fleet intelligent monitoring, anomaly detection, and predictive maintenance — powered by Kalman filters and CUSUM analytics.</p>
+        <div class="hero-cta">
+          <button class="btn-xl btn-primary" onclick="showPage('auth'); switchTab('register')">
+            ⚡ Start Free Trial
+          </button>
+          <button class="btn-xl btn-outline" onclick="scrollToPricing()">
+            View Plans →
+          </button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-val">50</div>
+            <div class="stat-lbl">Max Printers</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val">&lt;1ms</div>
+            <div class="stat-lbl">Local Latency</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val">AI</div>
+            <div class="stat-lbl">Health Score</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="dashboard-mock">
+          <div class="mock-bar">
+            <div class="mock-dot" style="background:#ef4444"></div>
+            <div class="mock-dot" style="background:#f59e0b"></div>
+            <div class="mock-dot" style="background:#10b981"></div>
+            <div class="mock-title">PRESTILON Dashboard — localhost:3002</div>
+          </div>
+          <div class="mock-body">
+            <div class="mock-card">
+              <div class="mock-label">HOTEND TEMP</div>
+              <div class="mock-val cyan">215.3°C</div>
+              <div class="mock-bar-chart" id="barChart1"></div>
+            </div>
+            <div class="mock-card">
+              <div class="mock-label">HEALTH SCORE</div>
+              <div class="health-ring"><span id="healthVal">87</span></div>
+            </div>
+            <div class="mock-card">
+              <div class="mock-label">PRINT STATUS</div>
+              <div class="mock-val green">ACTIVE</div>
+              <div style="font-size:0.65rem;color:var(--text3);margin-top:0.25rem;font-family:'JetBrains Mono',monospace">72% complete</div>
+            </div>
+            <div class="mock-card">
+              <div class="mock-label">AI ANOMALIES</div>
+              <div class="mock-val amber">2</div>
+              <div style="font-size:0.65rem;color:var(--text3);margin-top:0.25rem;font-family:'JetBrains Mono',monospace">belt wear · clog risk</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section reveal" id="features">
+    <div class="section-label">// CAPABILITIES</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start">
+      <div>
+        <div class="section-title">Everything your fleet needs. Running locally.</div>
+      </div>
+      <div>
+        <p class="section-sub">PRESTILON installs on your Windows machine and connects directly to your printers via Moonraker/Klipper. No cloud latency. No data leaving your network. Full AI analytics, locally.</p>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(0,220,255,0.1)">🧠</div>
+        <h3>Kalman + CUSUM AI</h3>
+        <p>Advanced signal filtering and change detection algorithms watch every temperature curve and motion pattern for early anomaly signals.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(16,185,129,0.1)">📊</div>
+        <h3>Health Scoring</h3>
+        <p>Each printer gets a continuous 0–100 health score based on diagnostics, wear models, and historical patterns. Know before it fails.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(245,158,11,0.1)">⚡</div>
+        <h3>Real-time WebSocket</h3>
+        <p>Live telemetry at millisecond precision. Temperature, progress, states — all streamed directly from Klipper to your dashboard.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(124,58,237,0.1)">🔮</div>
+        <h3>Failure Prediction</h3>
+        <p>Wear models and trend analysis predict nozzle clogs, belt degradation, and thermal issues before they cause a failed print.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(37,99,235,0.1)">🖨️</div>
+        <h3>Multi-Printer Fleet</h3>
+        <p>Manage up to 50 printers from one dashboard. Each with its own AI pipeline, telemetry history, and maintenance log.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(0,220,255,0.08)">🔒</div>
+        <h3>Local First</h3>
+        <p>Your printer data never leaves your machine. Only subscription validation uses the internet. Full privacy, full control.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section reveal" id="pricing">
+    <div class="section-label">// PRICING</div>
+    <div class="section-title">Simple, honest pricing.</div>
+    <p class="section-sub">Choose the plan that fits your fleet. All plans include AI analytics, local installation, and Supabase-backed subscription management.</p>
+    <div class="pricing-grid">
+      <div class="plan-card">
+        <div class="plan-icon">⚡</div>
+        <div class="plan-name" style="color:var(--text2)">BASIC</div>
+        <div class="plan-price" style="color:var(--text)">€20 <span>/mo</span></div>
+        <div class="plan-vat">+ 21% VAT · €3/printer/mo</div>
+        <ul class="plan-features">
+          <li>Real-time printer status</li>
+          <li>Basic monitoring</li>
+          <li>Email notifications</li>
+          <li>30-day history</li>
+          <li>€3 per printer / month</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="showPage('auth');switchTab('register')">Get Started</button>
+      </div>
+
+      <div class="plan-card featured">
+        <div class="plan-badge" style="background:var(--cyan);color:#000">Most Popular</div>
+        <div class="plan-icon">🚀</div>
+        <div class="plan-name" style="color:var(--cyan)">PRO</div>
+        <div class="plan-price" style="color:var(--cyan)">€50 <span>/mo</span></div>
+        <div class="plan-vat">+ 21% VAT · 15 printers included</div>
+        <ul class="plan-features">
+          <li>15 printers included</li>
+          <li>AI anomaly detection</li>
+          <li>Kalman / CUSUM analytics</li>
+          <li>Failure prediction</li>
+          <li>90-day history</li>
+          <li>Priority support</li>
+        </ul>
+        <button class="plan-btn plan-btn-primary" onclick="showPage('auth');switchTab('register')">Choose Pro</button>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-badge" style="background:var(--purple);color:#fff">Save 29%</div>
+        <div class="plan-icon">👑</div>
+        <div class="plan-name" style="color:#c084fc">ULTRA</div>
+        <div class="plan-price" style="color:#c084fc">€280 <span>/ 6 mo</span></div>
+        <div class="plan-vat">VAT included · up to 50 printers</div>
+        <ul class="plan-features">
+          <li>Up to 50 printers</li>
+          <li>All Pro features</li>
+          <li>AI cloud constants</li>
+          <li>1-year history</li>
+          <li>Priority support</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="showPage('auth');switchTab('register')">Choose Ultra</button>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-badge" style="background:var(--amber);color:#000">Save 55%</div>
+        <div class="plan-icon">📅</div>
+        <div class="plan-name" style="color:var(--amber)">ANNUAL</div>
+        <div class="plan-price" style="color:var(--amber)">€540 <span>/ year</span></div>
+        <div class="plan-vat">VAT included · up to 50 printers</div>
+        <ul class="plan-features">
+          <li>Up to 50 printers</li>
+          <li>All Ultra features</li>
+          <li>Enterprise AI constants</li>
+          <li>Unlimited history</li>
+          <li>24/7 VIP support + SLA</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="showPage('auth');switchTab('register')">Choose Annual</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section style="padding: 0 2rem 80px; max-width:1100px; margin:0 auto;" class="reveal">
+    <div class="download-section">
+      <h2>Ready to get started?</h2>
+      <p>Download PRESTILON, create your account, and have your first printer connected in under 5 minutes.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <button class="btn-xl btn-primary" onclick="showPage('auth');switchTab('register')">⚡ Create Account</button>
+        <button class="btn-xl btn-outline" disabled style="opacity:0.4;cursor:not-allowed">
+          ⬇ Download (coming soon)
+        </button>
+      </div>
+      <p style="margin-top:1.5rem;font-size:0.75rem;color:var(--text3)">Windows 10/11 · Node.js 18+ required · Runs on localhost:3002</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">PRESTILON</div>
+    <div class="footer-links">
+      <a href="#" onclick="scrollToPricing()">Pricing</a>
+      <a href="mailto:support@prestilon.com">Support</a>
+      <a href="#" onclick="showPage('auth')">Sign In</a>
+    </div>
+    <div class="footer-copy">© 2026 PRESTILON. All rights reserved.</div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════ AUTH PAGE ═══════════════════════════════ -->
+<div id="page-auth" class="page">
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-logo">PRESTILON</div>
+      <div class="auth-subtitle" id="authSubtitle">Sign in to your account</div>
+
+      <div class="auth-tabs" id="authTabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <div id="alertBox"></div>
+
+      <!-- LOGIN FORM -->
+      <div id="panel-login" class="tab-panel active">
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <input type="email" id="loginEmail" class="form-input" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="display:flex;justify-content:space-between">
+            Password
+            <a href="#" class="auth-link" onclick="switchTab('forgot')">Forgot?</a>
+          </label>
+          <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" />
+        </div>
+        <button class="form-submit" id="loginBtn" onclick="doLogin()">Sign In</button>
+        <div class="auth-divider"><span>New to PRESTILON?</span></div>
+        <div style="text-align:center">
+          <a href="#" class="auth-link" onclick="switchTab('register')">Create an account →</a>
+        </div>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="panel-register" class="tab-panel">
+        <div class="form-group">
+          <label class="form-label">Full name</label>
+          <input type="text" id="regName" class="form-input" placeholder="John Doe" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <input type="email" id="regEmail" class="form-input" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="regPassword" class="form-input" placeholder="min. 8 characters" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm password</label>
+          <input type="password" id="regConfirm" class="form-input" placeholder="••••••••" />
+        </div>
+        <button class="form-submit" id="registerBtn" onclick="doRegister()">Create Account</button>
+        <div class="auth-divider"><span>Already have an account?</span></div>
+        <div style="text-align:center">
+          <a href="#" class="auth-link" onclick="switchTab('login')">Sign in →</a>
+        </div>
+      </div>
+
+      <!-- FORGOT PASSWORD FORM -->
+      <div id="panel-forgot" class="tab-panel">
+        <div class="alert alert-info">Enter your email and we'll send you a reset link.</div>
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <input type="email" id="forgotEmail" class="form-input" placeholder="you@example.com" />
+        </div>
+        <button class="form-submit" id="forgotBtn" onclick="doForgot()">Send Reset Link</button>
+        <div style="text-align:center;margin-top:1rem">
+          <a href="#" class="auth-link" onclick="switchTab('login')">← Back to Sign In</a>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:1.5rem">
+        <button class="nav-btn nav-btn-ghost" style="font-size:0.78rem;color:var(--text3)" onclick="showPage('home')">← Back to prestilon.com</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ ACCOUNT PAGE ════════════════════════════ -->
+<div id="page-account" class="page">
+  <div class="account-wrapper">
+    <div class="account-header">
+      <h1>Account</h1>
+      <p>Manage your subscription, profile, and security settings.</p>
+    </div>
+
+    <div class="account-grid">
+      <!-- SIDEBAR -->
+      <div class="account-sidebar">
+        <div class="account-avatar" id="accountAvatar">P</div>
+        <div class="account-name" id="accountName">—</div>
+        <div class="account-email" id="accountEmail">—</div>
+
+        <div class="sidebar-nav">
+          <button class="sidebar-nav-btn active" onclick="showAccountTab('subscription')">
+            <span class="icon">💳</span> Subscription
+          </button>
+          <button class="sidebar-nav-btn" onclick="showAccountTab('profile')">
+            <span class="icon">👤</span> Profile
+          </button>
+          <button class="sidebar-nav-btn" onclick="showAccountTab('security')">
+            <span class="icon">🔒</span> Security
+          </button>
+          <button class="sidebar-nav-btn" onclick="showAccountTab('download')">
+            <span class="icon">⬇</span> Download
+          </button>
+        </div>
+
+        <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="account-content">
+        <div id="accountAlert"></div>
+
+        <!-- SUBSCRIPTION TAB -->
+        <div id="acct-subscription" class="tab-panel active account-section">
+          <div class="account-section-title">💳 Subscription</div>
+          <div class="sub-status-card" id="subStatusCard">
+            <div>
+              <div style="font-weight:700;margin-bottom:0.25rem" id="subPlanName">Loading...</div>
+              <div style="font-size:0.78rem;color:var(--text2)" id="subExpiry">—</div>
+            </div>
+            <div id="subBadge"></div>
+          </div>
+          <div id="subDetails" style="margin-top:1rem;font-size:0.82rem;color:var(--text2)"></div>
+
+          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+            <div style="font-size:0.85rem;font-weight:700;margin-bottom:0.75rem">Manage Plan</div>
+            <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+              <a href="https://billing.stripe.com" target="_blank" class="btn-xl btn-outline" style="font-size:0.82rem;padding:0.6rem 1.2rem">
+                Manage Billing →
+              </a>
+              <button class="btn-xl btn-primary" style="font-size:0.82rem;padding:0.6rem 1.2rem" onclick="showPage('home');scrollToPricing()">
+                Upgrade Plan
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROFILE TAB -->
+        <div id="acct-profile" class="tab-panel account-section">
+          <div class="account-section-title">👤 Profile</div>
+          <div class="form-group">
+            <label class="form-label">Display name</label>
+            <input type="text" id="profileName" class="form-input" placeholder="Your name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email address</label>
+            <input type="email" id="profileEmail" class="form-input" placeholder="you@example.com" />
+          </div>
+          <button class="form-submit" style="max-width:200px" onclick="saveProfile()">Save Changes</button>
+        </div>
+
+        <!-- SECURITY TAB -->
+        <div id="acct-security" class="tab-panel account-section">
+          <div class="account-section-title">🔒 Change Password</div>
+          <div class="form-group">
+            <label class="form-label">New password</label>
+            <input type="password" id="newPassword" class="form-input" placeholder="min. 8 characters" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm new password</label>
+            <input type="password" id="confirmPassword" class="form-input" placeholder="••••••••" />
+          </div>
+          <button class="form-submit" style="max-width:220px" onclick="changePassword()">Update Password</button>
+        </div>
+
+        <!-- DOWNLOAD TAB -->
+        <div id="acct-download" class="tab-panel account-section">
+          <div class="account-section-title">⬇ Download PRESTILON</div>
+          <div class="alert alert-info" style="margin-bottom:1.25rem">
+            Download coming soon. The backend will be packaged as a Windows installer.
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.25rem">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text2);line-height:1.8">
+              <div style="color:var(--text3);margin-bottom:0.5rem"># Requirements</div>
+              <div>Windows 10 / 11 (64-bit)</div>
+              <div>Node.js 18 or higher</div>
+              <div>Klipper + Moonraker on your printer</div>
+              <div style="margin-top:0.75rem;color:var(--text3)"># After install, open:</div>
+              <div style="color:var(--cyan)">http://localhost:3002</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ SCRIPTS ════════════════════════════════ -->
+<script type="module">
+  // ── SUPABASE ───────────────────────────────────────────────────────────────
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+  const SUPABASE_URL  = 'https://ryftlimrjhhoymyfzusq.supabase.co'
+  const SUPABASE_KEY  = 'sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86'
+
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY)
+  window._sb = sb
+
+  // ── STATE ──────────────────────────────────────────────────────────────────
+  let currentUser = null
+  let currentSub  = null
+
+  // ── AUTH STATE LISTENER ────────────────────────────────────────────────────
+  sb.auth.onAuthStateChange(async (event, session) => {
+    currentUser = session?.user ?? null
+    updateNav()
+    if (currentUser) await loadAccountData()
+  })
+
+  // ── NAV ────────────────────────────────────────────────────────────────────
+  function updateNav() {
+    const loggedIn = !!currentUser
+    document.getElementById('navLoginBtn').style.display  = loggedIn ? 'none' : ''
+    document.getElementById('navSignupBtn').style.display = loggedIn ? 'none' : ''
+    document.getElementById('navAccountBtn').style.display = loggedIn ? '' : 'none'
+  }
+
+  // ── PAGES ──────────────────────────────────────────────────────────────────
+  window.showPage = function(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+    document.getElementById('page-' + name).classList.add('active')
+    window.scrollTo(0, 0)
+    clearAlert()
+    if (name === 'account' && !currentUser) {
+      showPage('auth')
+      return
+    }
+  }
+
+  // ── AUTH TABS ──────────────────────────────────────────────────────────────
+  window.switchTab = function(tab) {
+    ;['login','register','forgot'].forEach(t => {
+      document.getElementById('panel-' + t).classList.remove('active')
+      const btn = document.getElementById('tab-' + t)
+      if (btn) btn.classList.remove('active')
+    })
+    document.getElementById('panel-' + tab).classList.add('active')
+    const btn = document.getElementById('tab-' + tab)
+    if (btn) btn.classList.add('active')
+
+    const titles = { login: 'Sign in to your account', register: 'Create your account', forgot: 'Reset your password' }
+    document.getElementById('authSubtitle').textContent = titles[tab] || ''
+    document.getElementById('authTabs').style.display = tab === 'forgot' ? 'none' : ''
+    clearAlert()
+  }
+
+  // ── ALERTS ─────────────────────────────────────────────────────────────────
+  function showAlert(msg, type = 'error', target = 'alertBox') {
+    const el = document.getElementById(target)
+    if (!el) return
+    el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`
+  }
+  function clearAlert(target = 'alertBox') {
+    const el = document.getElementById(target)
+    if (el) el.innerHTML = ''
+    const acc = document.getElementById('accountAlert')
+    if (acc) acc.innerHTML = ''
+  }
+  function setLoading(btnId, loading, text) {
+    const btn = document.getElementById(btnId)
+    if (!btn) return
+    btn.disabled = loading
+    btn.innerHTML = loading ? `<span class="spinner"></span> ${text}` : text
+  }
+
+  // ── LOGIN ──────────────────────────────────────────────────────────────────
+  window.doLogin = async function() {
+    const email = document.getElementById('loginEmail').value.trim()
+    const pass  = document.getElementById('loginPassword').value
+    if (!email || !pass) { showAlert('Please fill in all fields.'); return }
+
+    setLoading('loginBtn', true, 'Signing in...')
+    clearAlert()
+
+    const { error } = await sb.auth.signInWithPassword({ email, password: pass })
+    setLoading('loginBtn', false, 'Sign In')
+
+    if (error) { showAlert(error.message); return }
+    showPage('account')
+  }
+
+  // ── REGISTER ───────────────────────────────────────────────────────────────
+  window.doRegister = async function() {
+    const name    = document.getElementById('regName').value.trim()
+    const email   = document.getElementById('regEmail').value.trim()
+    const pass    = document.getElementById('regPassword').value
+    const confirm = document.getElementById('regConfirm').value
+
+    if (!name || !email || !pass) { showAlert('Please fill in all fields.'); return }
+    if (pass.length < 8) { showAlert('Password must be at least 8 characters.'); return }
+    if (pass !== confirm) { showAlert('Passwords do not match.'); return }
+
+    setLoading('registerBtn', true, 'Creating account...')
+    clearAlert()
+
+    const { error } = await sb.auth.signUp({
+      email, password: pass,
+      options: { data: { full_name: name } }
+    })
+    setLoading('registerBtn', false, 'Create Account')
+
+    if (error) { showAlert(error.message); return }
+    showAlert('✅ Account created! Check your email to confirm your address, then sign in.', 'success')
+    setTimeout(() => switchTab('login'), 3000)
+  }
+
+  // ── FORGOT PASSWORD ────────────────────────────────────────────────────────
+  window.doForgot = async function() {
+    const email = document.getElementById('forgotEmail').value.trim()
+    if (!email) { showAlert('Please enter your email address.'); return }
+
+    setLoading('forgotBtn', true, 'Sending...')
+    clearAlert()
+
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/?page=reset-password'
+    })
+    setLoading('forgotBtn', false, 'Send Reset Link')
+
+    if (error) { showAlert(error.message); return }
+    showAlert('✅ Reset link sent! Check your email inbox.', 'success')
+  }
+
+  // ── LOGOUT ─────────────────────────────────────────────────────────────────
+  window.doLogout = async function() {
+    await sb.auth.signOut()
+    currentUser = null
+    currentSub  = null
+    updateNav()
+    showPage('home')
+  }
+
+  // ── LOAD ACCOUNT DATA ──────────────────────────────────────────────────────
+  async function loadAccountData() {
+    if (!currentUser) return
+
+    // Profile
+    const name = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User'
+    const email = currentUser.email || ''
+
+    document.getElementById('accountAvatar').textContent = name.charAt(0).toUpperCase()
+    document.getElementById('accountName').textContent   = name
+    document.getElementById('accountEmail').textContent  = email
+    document.getElementById('profileName').value  = name
+    document.getElementById('profileEmail').value = email
+
+    // Subscription
+    const { data: sub } = await sb
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .single()
+
+    currentSub = sub
+
+    const planNames = { starter: 'Basic', professional: 'Pro', enterprise: 'Enterprise' }
+    const planName  = sub ? (planNames[sub.plan] || sub.plan) : 'No active plan'
+    document.getElementById('subPlanName').textContent = planName
+
+    if (sub) {
+      const expiry = sub.valid_until
+        ? 'Valid until: ' + new Date(sub.valid_until).toLocaleDateString('en-GB')
+        : 'No expiry date set'
+      document.getElementById('subExpiry').textContent = expiry
+      document.getElementById('subBadge').innerHTML = `<span class="status-badge status-${sub.status}">${sub.status}</span>`
+      document.getElementById('subDetails').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.5rem">
+          <div style="background:var(--bg3);padding:0.85rem;border-radius:10px;border:1px solid var(--border)">
+            <div style="font-size:0.65rem;color:var(--text3);margin-bottom:0.25rem">PRINTER LIMIT</div>
+            <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:800;color:var(--cyan)">${sub.printer_limit}</div>
+          </div>
+          <div style="background:var(--bg3);padding:0.85rem;border-radius:10px;border:1px solid var(--border)">
+            <div style="font-size:0.65rem;color:var(--text3);margin-bottom:0.25rem">PLAN</div>
+            <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:800;color:var(--cyan)">${sub.plan.toUpperCase()}</div>
+          </div>
+        </div>
+      `
+    } else {
+      document.getElementById('subBadge').innerHTML = `<span class="status-badge status-inactive">inactive</span>`
+      document.getElementById('subDetails').innerHTML = `
+        <div class="alert alert-error" style="margin-top:0.75rem">
+          No active subscription found. Choose a plan to unlock the AI dashboard.
+        </div>
+      `
+    }
+  }
+
+  // ── SAVE PROFILE ───────────────────────────────────────────────────────────
+  window.saveProfile = async function() {
+    const name = document.getElementById('profileName').value.trim()
+    if (!name) { showAlert('Name cannot be empty.', 'error', 'accountAlert'); return }
+
+    const { error } = await sb.auth.updateUser({ data: { full_name: name } })
+    if (error) { showAlert(error.message, 'error', 'accountAlert'); return }
+    document.getElementById('accountName').textContent = name
+    document.getElementById('accountAvatar').textContent = name.charAt(0).toUpperCase()
+    showAlert('✅ Profile updated.', 'success', 'accountAlert')
+  }
+
+  // ── CHANGE PASSWORD ────────────────────────────────────────────────────────
+  window.changePassword = async function() {
+    const pass    = document.getElementById('newPassword').value
+    const confirm = document.getElementById('confirmPassword').value
+
+    if (pass.length < 8) { showAlert('Password must be at least 8 characters.', 'error', 'accountAlert'); return }
+    if (pass !== confirm) { showAlert('Passwords do not match.', 'error', 'accountAlert'); return }
+
+    const { error } = await sb.auth.updateUser({ password: pass })
+    if (error) { showAlert(error.message, 'error', 'accountAlert'); return }
+    document.getElementById('newPassword').value    = ''
+    document.getElementById('confirmPassword').value = ''
+    showAlert('✅ Password updated successfully.', 'success', 'accountAlert')
+  }
+
+  // ── ACCOUNT TABS ───────────────────────────────────────────────────────────
+  window.showAccountTab = function(tab) {
+    document.querySelectorAll('.account-content .tab-panel').forEach(p => p.classList.remove('active'))
+    document.querySelectorAll('.sidebar-nav-btn').forEach(b => b.classList.remove('active'))
+    document.getElementById('acct-' + tab).classList.add('active')
+    event.currentTarget.classList.add('active')
+  }
+
+  // ── SCROLL TO PRICING ──────────────────────────────────────────────────────
+  window.scrollToPricing = function() {
+    showPage('home')
+    setTimeout(() => {
+      document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+  }
+
+  // ── HANDLE RESET PASSWORD REDIRECT ────────────────────────────────────────
+  const hash = window.location.hash
+  if (hash.includes('type=recovery')) {
+    showPage('auth')
+    switchTab('forgot')
+    // Supabase handles the token automatically via onAuthStateChange
+  }
+
+  // ── CHECK INITIAL SESSION ──────────────────────────────────────────────────
+  const { data: { session } } = await sb.auth.getSession()
+  if (session) {
+    currentUser = session.user
+    updateNav()
+    await loadAccountData()
+  }
+
+  updateNav()
+</script>
+
+<script>
+  // ── ANIMATIONS ─────────────────────────────────────────────────────────────
+  // Bar chart animation
+  const chart = document.getElementById('barChart1')
+  const heights = [60, 40, 80, 55, 70, 45, 90, 65, 50, 75]
+  heights.forEach(h => {
+    const bar = document.createElement('div')
+    bar.className = 'mock-bar-item'
+    bar.style.height = h + '%'
+    chart.appendChild(bar)
+  })
+
+  // Health score count-up
+  let health = 0
+  const target = 87
+  const healthEl = document.getElementById('healthVal')
+  const countUp = setInterval(() => {
+    health = Math.min(health + 3, target)
+    healthEl.textContent = health
+    if (health >= target) clearInterval(countUp)
+  }, 30)
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') })
+  }, { threshold: 0.1 })
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el))
+</script>
+
+</body>
 </html>
