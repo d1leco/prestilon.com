@@ -247,60 +247,39 @@ function startCountdown(){
 <script type="module">
 import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
-// detectSessionInUrl:true (default) — automatically parses #access_token from URL hash
 const sb=createClient(
   'https://ryftlimrjhhoymyfzusq.supabase.co',
   'sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86',
-  { auth:{ detectSessionInUrl:true, persistSession:true, flowType:'implicit' } }
+  { auth:{ detectSessionInUrl:false, persistSession:true, flowType:'implicit' } }
 )
 
 let handled=false
+function handleSuccess(){ if(handled)return; handled=true; show('stateSuccess'); startCountdown() }
+function handleError(){ if(handled)return; handled=true; show('stateError') }
 
-function handleSuccess(){
-  if(handled)return
-  handled=true
-  show('stateSuccess')
-  startCountdown()
-}
+// Manuāli izlasam tokenu no URL hash — strādā no JEBKURAS ierīces
+const hash=new URLSearchParams(window.location.hash.replace('#',''))
+const access_token=hash.get('access_token')
+const refresh_token=hash.get('refresh_token')
+const type=hash.get('type')
 
-function handleError(){
-  if(handled)return
-  handled=true
-  show('stateError')
-}
-
-// Detect both PKCE (?code=) and implicit (#access_token=) flows
-const _searchParams=new URLSearchParams(window.location.search)
-const _hashParams=new URLSearchParams(window.location.hash.replace('#',''))
-const _hasCode=_searchParams.has('code')          // PKCE flow (newer Supabase)
-const _hasToken=_hashParams.has('access_token')   // Implicit flow (older)
-const _hashType=_hashParams.get('type')
-
-// If recovery link lands here by mistake, redirect immediately
-if(_hashType==='recovery'){
+// Ja recovery link nokļuva šeit — redirect uz reset-password
+if(type==='recovery'){
   window.location.href='/reset-password'+window.location.hash
 }
 
-// Listen for auth state changes
-sb.auth.onAuthStateChange((event, session)=>{
-  if(handled)return
-  if((event==='SIGNED_IN'||event==='USER_UPDATED') && session?.user){
+if(access_token){
+  // Tieši uzstādam sesiju — nav nekādas auto-detection, strādā uz mobile/desktop/jebkur
+  const{data,error}=await sb.auth.setSession({access_token,refresh_token:refresh_token||''})
+  if(!error && data?.session?.user){
     handleSuccess()
+  } else {
+    handleError()
   }
-})
-
-// CRITICAL FIX: detectSessionInUrl var apstrādāt token PIRMS listener ir pievienots
-// (īpaši uz mobile). Tūlīt pārbaudam sesiju!
-const{data:{session:_earlySession}}=await sb.auth.getSession()
-if(!handled && _earlySession?.user){ handleSuccess() }
-
-// Fallback: ja nekas nav noticis 4s laikā
-const _fallbackTimer=setTimeout(async()=>{
-  if(handled)return
-  const{data:{session}}=await sb.auth.getSession()
-  if(session?.user){ handleSuccess(); return }
+} else {
+  // Nav tokena URL — kļūda vai nederīgs links
   handleError()
-}, _hasToken ? 4000 : 1500)
+}
 </script>
 </body>
 </html>
