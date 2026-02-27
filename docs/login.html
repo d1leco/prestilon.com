@@ -502,7 +502,7 @@ function checkStr(v){
 
 <script type="module">
 import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
-const sb=createClient('https://ryftlimrjhhoymyfzusq.supabase.co','sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86')
+const sb=createClient('https://ryftlimrjhhoymyfzusq.supabase.co','sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86',{auth:{detectSessionInUrl:true,persistSession:true,flowType:'pkce'}})
 window._sb=sb
 const{data:{session}}=await sb.auth.getSession()
 if(session)window.location.href='/account'
