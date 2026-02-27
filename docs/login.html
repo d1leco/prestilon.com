@@ -446,17 +446,66 @@ window.doLogin=async()=>{
   window.location.href='/account'
 }
 window.doRegister=async()=>{
-  const n=document.getElementById('rName').value.trim(),e=document.getElementById('rEmail').value.trim()
-  const p=document.getElementById('rPass').value,c=document.getElementById('rConf').value
-  if(!n||!e||!p){showAlert('Please fill in all fields.','error');return}
-  if(p.length<8){showAlert('Password must be at least 8 characters.','error');return}
-  if(p!==c){showAlert('Passwords do not match.','error');return}
+  const n=document.getElementById('rName').value.trim()
+  const e=document.getElementById('rEmail').value.trim()
+  const p=document.getElementById('rPass').value
+  const c=document.getElementById('rConf').value
+  const re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if(!n){showAlert('⚠ Please enter your full name.','error');return}
+  if(!re.test(e)){showAlert('⚠ Enter a valid email address.','error');return}
+  if(p.length<8){showAlert('⚠ Password must be at least 8 characters.','error');return}
+  if(p!==c){showAlert('⚠ Passwords do not match.','error');return}
   setLoading('regBtn',true,'Creating account…')
-  const{error}=await sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}})
+  const{data,error}=await sb.auth.signUp({
+    email:e,
+    password:p,
+    options:{
+      data:{full_name:n},
+      emailRedirectTo:location.origin+'/account'
+    }
+  })
+  if(error){
+    setLoading('regBtn',false,'Create Account')
+    showAlert(error.message,'error')
+    return
+  }
+  // Insert profile row immediately (SECURITY DEFINER trigger fallback)
+  if(data?.user){
+    try{
+      await sb.from('profiles').upsert({
+        id:data.user.id,
+        email:e,
+        full_name:n,
+        created_at:new Date().toISOString(),
+        updated_at:new Date().toISOString()
+      },{onConflict:'id'})
+    }catch(_){/* trigger will handle it if RLS blocks */}
+  }
   setLoading('regBtn',false,'Create Account')
+  // If session exists — email confirm is OFF, redirect immediately
+  if(data?.session){
+    window.location.href='/account'
+    return
+  }
+  // Email confirm is ON — show inbox message
+  document.getElementById('pnlRegister').innerHTML=`
+    <div style="text-align:center;padding:1.5rem 0">
+      <div style="font-size:2.5rem;margin-bottom:1rem">📧</div>
+      <div class="form-title" style="margin-bottom:.5rem">Check your inbox!</div>
+      <p style="color:var(--text2);font-size:.86rem;line-height:1.7;margin-bottom:1.25rem">
+        A confirmation link was sent to<br/>
+        <strong style="color:var(--c1)">${e}</strong><br/>
+        Click it to activate your account.
+      </p>
+      <p style="font-size:.75rem;color:var(--text3)">Didn't receive it? Check spam or <a href="#" class="slink" onclick="doResendConfirm('${e}');return false">resend</a>.</p>
+    </div>
+  `
+  document.getElementById('tabBar').style.display='none'
+}
+window.doResendConfirm=async(email)=>{
+  const{error}=await sb.auth.resend({type:'signup',email,options:{emailRedirectTo:location.origin+'/account'}})
   if(error){showAlert(error.message,'error');return}
-  showAlert('✅ Account created! Check your email to confirm.','success')
-  setTimeout(()=>sw('login'),3500)
+  showAlert('✅ Confirmation email resent to <strong>'+email+'</strong>.','success')
 }
 window.doForgot=async()=>{
   const e=document.getElementById('fEmail').value.trim()
