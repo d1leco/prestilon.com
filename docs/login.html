@@ -17,7 +17,7 @@
   --border:rgba(255,255,255,.07);--border2:rgba(14,165,233,.3);
   --red:#ef4444;--green:#10d48a;--amber:#f59e0b;
 }
-html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);overflow:hidden}
+html{background:var(--bg)}body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);min-height:100vh}
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(ellipse 65% 55% at 20% 50%,rgba(14,165,233,.07),transparent 60%),
   radial-gradient(ellipse 55% 65% at 80% 30%,rgba(124,58,237,.06),transparent 55%)}
@@ -53,8 +53,8 @@ nav{
 .back-link svg{opacity:.5}
 
 /* PAGE LAYOUT */
-.page{height:calc(100vh - 64px);display:grid;grid-template-columns:1fr 1fr;position:relative;z-index:1}
-@media(max-width:880px){.page{grid-template-columns:1fr;height:calc(100vh - 52px)}}
+.page{min-height:calc(100vh - 64px);display:grid;grid-template-columns:1fr 1fr;position:relative;z-index:1}
+@media(max-width:880px){.page{grid-template-columns:1fr;min-height:calc(100vh - 52px)}}
 
 /* LEFT PANEL */
 .left{
@@ -612,5 +612,16 @@ window.doForgot=async()=>{
   showAlert('✅ Reset link sent — check your inbox.','success')
 }
 </script>
+
+<footer style="position:relative;z-index:1;border-top:1px solid var(--border);padding:1.5rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">
+  <div style="font-size:.75rem;color:var(--text3);font-family:'JetBrains Mono',monospace">© 2026 PRESTILON. All rights reserved.</div>
+  <div style="display:flex;gap:1.2rem;flex-wrap:wrap">
+    <a href="/" style="font-size:.75rem;color:var(--text3);text-decoration:none">Home</a>
+    <a href="/support" style="font-size:.75rem;color:var(--text3);text-decoration:none">Support</a>
+    <a href="/privacy" style="font-size:.75rem;color:var(--text3);text-decoration:none">Privacy Policy</a>
+    <a href="/refund" style="font-size:.75rem;color:var(--text3);text-decoration:none">Refund Policy</a>
+    <a href="/terms" style="font-size:.75rem;color:var(--text3);text-decoration:none">Terms of Service</a>
+  </div>
+</footer>
 </body>
 </html>
