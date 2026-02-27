@@ -313,6 +313,14 @@ nav{
           </div>
         </div>
         <div class="fg">
+          <label class="fl">Username</label>
+          <div class="fi-wrap">
+            <span class="fi-ico"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3c1.5 0 3 .5 3 2s-1.5 2-3 2-3-.5-3-2 1.5-2 3-2z"/></svg></span>
+            <input type="text" id="rUsername" class="fi has-ico" placeholder="cooluser123" autocomplete="username" oninput="checkUsername(this.value)"/>
+          </div>
+          <div id="usernameHint" style="font-size:.68rem;margin-top:.3rem;min-height:.85rem"></div>
+        </div>
+        <div class="fg">
           <label class="fl">Email address</label>
           <div class="fi-wrap">
             <span class="fi-ico"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="22,6 12,13 2,6"/></svg></span>
@@ -418,6 +426,13 @@ function togglePw(id,btn){
   const fi=document.getElementById(id),t=fi.type==='text'
   fi.type=t?'password':'text'
 }
+window.checkUsername=function(v){
+  const hint=document.getElementById('usernameHint')
+  if(!v){hint.textContent='';return}
+  if(v.length<3){hint.style.color='#fca5a5';hint.textContent='✗ Min. 3 characters.';return}
+  if(!/^[a-zA-Z0-9_\.\-]+$/.test(v)){hint.style.color='#fca5a5';hint.textContent='✗ Only letters, numbers, _ . - allowed.';return}
+  hint.style.color='var(--green)';hint.textContent='✓ Looks good.'
+}
 function checkStr(v){
   const bars=[document.getElementById('pb1'),document.getElementById('pb2'),document.getElementById('pb3')]
   const lbl=document.getElementById('pwl')
@@ -447,20 +462,26 @@ window.doLogin=async()=>{
 }
 window.doRegister=async()=>{
   const n=document.getElementById('rName').value.trim()
+  const u=document.getElementById('rUsername').value.trim()
   const e=document.getElementById('rEmail').value.trim()
   const p=document.getElementById('rPass').value
   const c=document.getElementById('rConf').value
-  const re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if(!n){showAlert('⚠ Please enter your full name.','error');return}
-  if(!re.test(e)){showAlert('⚠ Enter a valid email address.','error');return}
-  if(p.length<8){showAlert('⚠ Password must be at least 8 characters.','error');return}
-  if(p!==c){showAlert('⚠ Passwords do not match.','error');return}
+  const reEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  // — Validation —
+  if(!n){showAlert('⚠️ Please enter your full name.','error');return}
+  if(!u||u.length<3){showAlert('⚠️ Username must be at least 3 characters.','error');return}
+  if(!/^[a-zA-Z0-9_\.\-]+$/.test(u)){showAlert('⚠️ Username: only letters, numbers, _ . - allowed.','error');return}
+  if(!reEmail.test(e)){showAlert('⚠️ Enter a valid email address.','error');return}
+  if(p.length<8){showAlert('⚠️ Password must be at least 8 characters.','error');return}
+  if(p!==c){showAlert('⚠️ Passwords do not match.','error');return}
+  // — Clear any previous error —
+  document.getElementById('alertBox').innerHTML=''
   setLoading('regBtn',true,'Creating account…')
   const{data,error}=await sb.auth.signUp({
     email:e,
     password:p,
     options:{
-      data:{full_name:n},
+      data:{full_name:n,username:u},
       emailRedirectTo:location.origin+'/account'
     }
   })
@@ -469,35 +490,39 @@ window.doRegister=async()=>{
     showAlert(error.message,'error')
     return
   }
-  // Insert profile row immediately (SECURITY DEFINER trigger fallback)
+  // Insert profile row (trigger fallback)
   if(data?.user){
     try{
       await sb.from('profiles').upsert({
         id:data.user.id,
         email:e,
         full_name:n,
+        Username:u,
         created_at:new Date().toISOString(),
         updated_at:new Date().toISOString()
       },{onConflict:'id'})
-    }catch(_){/* trigger will handle it if RLS blocks */}
+    }catch(_){/* trigger will handle it */}
   }
   setLoading('regBtn',false,'Create Account')
-  // If session exists — email confirm is OFF, redirect immediately
+  // Email confirm OFF — redirect directly
   if(data?.session){
     window.location.href='/account'
     return
   }
-  // Email confirm is ON — show inbox message
+  // Email confirm ON — show confirmation screen
+  document.getElementById('alertBox').innerHTML=''
   document.getElementById('pnlRegister').innerHTML=`
     <div style="text-align:center;padding:1.5rem 0">
-      <div style="font-size:2.5rem;margin-bottom:1rem">📧</div>
-      <div class="form-title" style="margin-bottom:.5rem">Check your inbox!</div>
-      <p style="color:var(--text2);font-size:.86rem;line-height:1.7;margin-bottom:1.25rem">
-        A confirmation link was sent to<br/>
+      <div style="font-size:2.8rem;margin-bottom:.85rem">📧</div>
+      <div class="form-title" style="margin-bottom:.45rem">Confirm your email</div>
+      <p style="color:var(--text2);font-size:.86rem;line-height:1.75;margin-bottom:1.25rem">
+        We sent a confirmation link to<br/>
         <strong style="color:var(--c1)">${e}</strong><br/>
         Click it to activate your account.
       </p>
-      <p style="font-size:.75rem;color:var(--text3)">Didn't receive it? Check spam or <a href="#" class="slink" onclick="doResendConfirm('${e}');return false">resend</a>.</p>
+      <p style="font-size:.74rem;color:var(--text3)">No email? Check spam or
+        <a href="#" class="slink" onclick="doResendConfirm('${e}');return false">resend the link</a>.
+      </p>
     </div>
   `
   document.getElementById('tabBar').style.display='none'
