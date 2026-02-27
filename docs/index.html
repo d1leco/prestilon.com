@@ -380,8 +380,11 @@ footer{
   position:relative;z-index:1;
 }
 .fc{font-size:.7rem;color:var(--text3);margin-top:.2rem}
-.footer-links{display:flex;gap:1.4rem;flex-wrap:wrap}
-.footer-links a{color:var(--text3);text-decoration:none;font-size:.75rem;transition:color .2s}
+/* ── FOOTER ── */
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.5rem var(--r);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
+.fc{font-size:.75rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.footer-links{display:flex;gap:1.2rem;flex-wrap:wrap}
+.footer-links a{font-size:.75rem;color:var(--text3);text-decoration:none;transition:color .18s}
 .footer-links a:hover{color:var(--text2)}
 
 /* ── REVEAL ── */
@@ -860,13 +863,13 @@ window.wlSubmit=async()=>{
 }
 </script>
 
-<footer style="position:relative;z-index:1;border-top:1px solid var(--border);padding:1.5rem var(--r);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">
-  <div style="font-size:.75rem;color:var(--text3);font-family:'JetBrains Mono',monospace">© 2026 PRESTILON. All rights reserved.</div>
-  <div style="display:flex;gap:1.2rem;flex-wrap:wrap">
-    <a href="/support" style="font-size:.75rem;color:var(--text3);text-decoration:none;transition:color .18s" onmouseover="this.style.color='var(--text2)'" onmouseout="this.style.color='var(--text3)'">Support</a>
-    <a href="/privacy" style="font-size:.75rem;color:var(--text3);text-decoration:none;transition:color .18s" onmouseover="this.style.color='var(--text2)'" onmouseout="this.style.color='var(--text3)'">Privacy Policy</a>
-    <a href="/refund" style="font-size:.75rem;color:var(--text3);text-decoration:none;transition:color .18s" onmouseover="this.style.color='var(--text2)'" onmouseout="this.style.color='var(--text3)'">Refund Policy</a>
-    <a href="/terms" style="font-size:.75rem;color:var(--text3);text-decoration:none;transition:color .18s" onmouseover="this.style.color='var(--text2)'" onmouseout="this.style.color='var(--text3)'">Terms of Service</a>
+<footer>
+  <div class="fc">© 2026 PRESTILON. All rights reserved.</div>
+  <div class="footer-links">
+    <a href="/support">Support</a>
+    <a href="/privacy">Privacy Policy</a>
+    <a href="/refund">Refund Policy</a>
+    <a href="/terms">Terms of Service</a>
   </div>
 </footer>
 </body>
