@@ -269,43 +269,35 @@ function handleError(){
   show('stateError')
 }
 
-// Primary method: listen for auth state change
-// Supabase v2 auto-exchanges the token from URL hash and fires SIGNED_IN
+// Detect both PKCE (?code=) and implicit (#access_token=) flows
+const _searchParams=new URLSearchParams(window.location.search)
+const _hashParams=new URLSearchParams(window.location.hash.replace('#',''))
+const _hasCode=_searchParams.has('code')          // PKCE flow (newer Supabase)
+const _hasToken=_hashParams.has('access_token')   // Implicit flow (older)
+const _hashType=_hashParams.get('type')
+
+// If recovery link lands here by mistake, redirect immediately
+if(_hashType==='recovery'){
+  window.location.href='/reset-password'+window.location.hash
+}
+
+// Listen for auth state changes (fires after Supabase exchanges code/token)
 sb.auth.onAuthStateChange((event, session)=>{
   if(handled)return
-  if(event==='SIGNED_IN' && session?.user){
-    // Make sure this is an email confirmation, not password recovery
-    const hash=window.location.hash
-    const params=new URLSearchParams(hash.replace('#',''))
-    const type=params.get('type')
-    if(type==='recovery'){
-      // Wrong page — redirect to reset password
-      window.location.href='/reset-password'+window.location.hash
-      return
-    }
+  if((event==='SIGNED_IN'||event==='USER_UPDATED') && session?.user){
     handleSuccess()
   }
 })
 
-// Fallback: check if session already exists (e.g. link opened in same browser)
-setTimeout(async()=>{
+// Fallback: if no auth event in 6s
+const _fallbackTimer=setTimeout(async()=>{
   if(handled)return
+  // Last chance — check if session exists
   const{data:{session}}=await sb.auth.getSession()
-  if(session?.user){
-    handleSuccess()
-    return
-  }
-  // Check if there's a token in the URL hash manually
-  const hash=window.location.hash
-  if(hash && hash.includes('access_token')){
-    // Token is present but not yet processed — wait a bit more
-    setTimeout(()=>{
-      if(!handled)handleError()
-    },3000)
-  } else {
-    handleError()
-  }
-},4000)
+  if(session?.user){ handleSuccess(); return }
+  // No session, no token in URL = truly invalid/expired
+  handleError()
+}, _hasCode||_hasToken ? 8000 : 1500)
 </script>
 </body>
 </html>
