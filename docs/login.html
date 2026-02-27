@@ -122,22 +122,23 @@ nav{
 /* RIGHT PANEL */
 .right{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:100px max(1.5rem,3.5vw) 60px;
+  padding:0 max(1.5rem,3.5vw);
+  overflow-y:auto;
 }
-.form-wrap{width:100%;max-width:400px;animation:up .5s ease both}
+.form-wrap{width:100%;max-width:400px;animation:up .5s ease both;padding:1.2rem 0}
 
-.tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:4px;margin-bottom:1.65rem}
+.tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:4px;margin-bottom:1rem}
 .tab{flex:1;padding:.52rem;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;transition:all .18s;background:transparent;color:var(--text3)}
 .tab.on{background:var(--bg3);color:var(--text);box-shadow:0 2px 10px rgba(0,0,0,.4)}
 
-.form-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:.28rem}
-.form-sub{color:var(--text2);font-size:.83rem;margin-bottom:1.75rem;line-height:1.55}
+.form-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;margin-bottom:.18rem}
+.form-sub{color:var(--text2);font-size:.78rem;margin-bottom:1rem;line-height:1.45}
 
 .pnl{display:none}.pnl.on{display:block}
-.fg{margin-bottom:.9rem}
+.fg{margin-bottom:.6rem}
 .fl{display:block;font-size:.72rem;font-weight:600;color:var(--text2);margin-bottom:.38rem;letter-spacing:.02em}
 .fl-row{display:flex;justify-content:space-between;align-items:center}
-.fi{width:100%;padding:.74rem 1rem;border-radius:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;transition:border-color .2s,box-shadow .2s;outline:none}
+.fi{width:100%;padding:.56rem .9rem;border-radius:9px;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.87rem;transition:border-color .2s,box-shadow .2s;outline:none}
 .fi:focus{border-color:rgba(0,212,180,.42);box-shadow:0 0 0 3px rgba(0,212,180,.07)}
 .fi::placeholder{color:var(--text3)}
 .fi-wrap{position:relative}
@@ -150,18 +151,22 @@ nav{
 .alink{color:var(--c1);text-decoration:none;font-weight:600;font-size:.84rem}
 .alink:hover{text-decoration:underline}
 
-.fsub{width:100%;padding:.85rem;border-radius:10px;border:none;background:var(--c1);color:#060f1a;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:800;cursor:pointer;transition:all .22s;margin-top:.35rem;box-shadow:0 0 24px rgba(0,212,180,.22);display:flex;align-items:center;justify-content:center;gap:.4rem}
+.fsub{width:100%;padding:.72rem;border-radius:10px;border:none;background:var(--c1);color:#060f1a;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:800;cursor:pointer;transition:all .22s;margin-top:.25rem;box-shadow:0 0 24px rgba(0,212,180,.22);display:flex;align-items:center;justify-content:center;gap:.4rem}
 .fsub:hover:not(:disabled){box-shadow:0 0 40px rgba(0,212,180,.42);transform:translateY(-1px)}
 .fsub:disabled{opacity:.45;cursor:not-allowed;transform:none}
 
-.divid{text-align:center;position:relative;margin:1.25rem 0}
+.divid{text-align:center;position:relative;margin:.75rem 0}
 .divid::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)}
 .divid span{position:relative;background:var(--bg);padding:0 .7rem;font-size:.72rem;color:var(--text3)}
 
-.albox{padding:.72rem .95rem;border-radius:9px;font-size:.8rem;margin-bottom:.85rem;display:flex;align-items:flex-start;gap:.45rem;line-height:1.5}
-.ae{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);color:#fca5a5}
-.as{background:rgba(16,212,138,.08);border:1px solid rgba(16,212,138,.22);color:#6ee7b7}
-.ai{background:rgba(0,212,180,.07);border:1px solid var(--border2);color:var(--c1)}
+.albox{
+  padding:.6rem .85rem;border-radius:10px;font-size:.78rem;margin-bottom:.7rem;
+  display:flex;align-items:center;gap:.5rem;line-height:1.45;
+  border-left-width:3px;border-left-style:solid;
+}
+.ae{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.18);border-left-color:#ef4444;color:#fca5a5}
+.as{background:rgba(16,212,138,.07);border:1px solid rgba(16,212,138,.18);border-left-color:#10d48a;color:#6ee7b7}
+.ai{background:rgba(0,212,180,.06);border:1px solid rgba(0,212,180,.18);border-left-color:var(--c1);color:var(--c1)}
 .spin{width:14px;height:14px;border:2px solid rgba(0,0,0,.15);border-top-color:#060f1a;border-radius:50%;animation:_sp .55s linear infinite;display:inline-block;flex-shrink:0}
 
 .pw-bar-row{margin-top:.4rem;display:flex;gap:.28rem;align-items:center}
@@ -169,11 +174,11 @@ nav{
 .pw-bar.w{background:var(--red)}.pw-bar.m{background:var(--amber)}.pw-bar.s{background:var(--green)}
 .pw-lbl{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3);width:42px;text-align:right;transition:color .3s}
 
-.trust-row{display:flex;align-items:center;justify-content:center;gap:1.25rem;margin-top:1.8rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap}
+.trust-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-top:1rem;padding-top:.85rem;border-top:1px solid var(--border);flex-wrap:wrap}
 .ti{display:flex;align-items:center;gap:.38rem;font-size:.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
 .ti svg{color:var(--c1)}
 
-.form-footer{text-align:center;margin-top:1.3rem;font-size:.73rem;color:var(--text3)}
+.form-footer{text-align:center;margin-top:.65rem;font-size:.73rem;color:var(--text3)}
 .form-footer a{color:var(--text2);text-decoration:none}
 .form-footer a:hover{color:var(--text)}
 </style>
@@ -419,7 +424,8 @@ function sw(t){
 }
 function showAlert(msg,type){
   const cls={error:'ae',success:'as',info:'ai'}[type]||'ae'
-  document.getElementById('alertBox').innerHTML=`<div class="albox ${cls}">${msg}</div>`
+  const ico={error:'⚠',success:'✓',info:'ℹ'}[type]||'⚠'
+  document.getElementById('alertBox').innerHTML=`<div class="albox ${cls}"><span style="flex-shrink:0;font-size:.85rem">${ico}</span><span>${msg}</span></div>`
 }
 function setLoading(id,on,txt){const b=document.getElementById(id);if(!b)return;b.disabled=on;b.innerHTML=on?`<span class="spin"></span> ${txt}`:txt}
 function togglePw(id,btn){
