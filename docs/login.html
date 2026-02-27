@@ -481,6 +481,11 @@ window.doRegister=async()=>{
   if(p!==c){showAlert('⚠️ Passwords do not match.','error');return}
   // — Clear any previous error —
   document.getElementById('alertBox').innerHTML=''
+  // — Pārbauda vai username jau aizņemts —
+  setLoading('regBtn',true,'Checking username…')
+  const{data:existing,error:chkErr}=await sb.from('profiles').select('id').ilike('Username',u).maybeSingle()
+  if(chkErr&&chkErr.code!=='PGRST116'){setLoading('regBtn',false,'Create Account');showAlert('⚠️ Could not verify username. Try again.','error');return}
+  if(existing){setLoading('regBtn',false,'Create Account');showAlert('⚠️ Username <strong>'+u+'</strong> is already taken. Please choose another.','error');return}
   setLoading('regBtn',true,'Creating account…')
   const{data,error}=await sb.auth.signUp({
     email:e,
