@@ -329,8 +329,9 @@ nav{
           <label class="fl">Email address</label>
           <div class="fi-wrap">
             <span class="fi-ico"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="22,6 12,13 2,6"/></svg></span>
-            <input type="email" id="rEmail" class="fi has-ico" placeholder="you@example.com" autocomplete="off"/>
+            <input type="email" id="rEmail" class="fi has-ico" placeholder="you@example.com" autocomplete="off" oninput="checkEmailAvail(this.value)"/>
           </div>
+          <div id="emailHint" style="font-size:.68rem;margin-top:.2rem;min-height:.85rem"></div>
         </div>
         <div class="fg">
           <label class="fl">Password</label>
@@ -424,20 +425,43 @@ function sw(t){
 }
 function showAlert(msg,type){
   const cls={error:'ae',success:'as',info:'ai'}[type]||'ae'
-  const ico={error:'⚠',success:'✓',info:'ℹ'}[type]||'⚠'
-  document.getElementById('alertBox').innerHTML=`<div class="albox ${cls}"><span style="flex-shrink:0;font-size:.85rem">${ico}</span><span>${msg}</span></div>`
+  const ico={error:'<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>','success':'<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M20 6L9 17l-5-5"/></svg>','info':'<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 16v-4M12 8h.01"/></svg>'}[type]||''
+  document.getElementById('alertBox').innerHTML=`<div class="albox ${cls}"><span style="flex-shrink:0;display:flex">${ico}</span><span>${msg}</span></div>`
 }
 function setLoading(id,on,txt){const b=document.getElementById(id);if(!b)return;b.disabled=on;b.innerHTML=on?`<span class="spin"></span> ${txt}`:txt}
 function togglePw(id,btn){
   const fi=document.getElementById(id),t=fi.type==='text'
   fi.type=t?'password':'text'
 }
+// Debounce timers
+let _unTimer=null,_emTimer=null
 window.checkUsername=function(v){
   const hint=document.getElementById('usernameHint')
-  if(!v){hint.textContent='';return}
+  hint.textContent=''
+  if(!v)return
   if(v.length<3){hint.style.color='#fca5a5';hint.textContent='✗ Min. 3 characters.';return}
-  if(!/^[a-zA-Z0-9_\.\-]+$/.test(v)){hint.style.color='#fca5a5';hint.textContent='✗ Only letters, numbers, _ . - allowed.';return}
-  hint.style.color='var(--green)';hint.textContent='✓ Looks good.'
+  if(!/^[a-zA-Z0-9_.\-]+$/.test(v)){hint.style.color='#fca5a5';hint.textContent='✗ Only letters, numbers, _ . - allowed.';return}
+  hint.style.color='var(--text3)';hint.textContent='Checking…'
+  clearTimeout(_unTimer)
+  _unTimer=setTimeout(async()=>{
+    const{data}=await _sb.from('profiles').select('id').ilike('Username',v).maybeSingle().catch(()=>({data:null}))
+    if(data){hint.style.color='#fca5a5';hint.textContent='✗ Username already taken.'}
+    else{hint.style.color='var(--green)';hint.textContent='✓ Available!'}
+  },600)
+}
+window.checkEmailAvail=function(v){
+  const hint=document.getElementById('emailHint')
+  if(!hint)return
+  hint.textContent=''
+  const re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if(!re.test(v))return
+  hint.style.color='var(--text3)';hint.textContent='Checking…'
+  clearTimeout(_emTimer)
+  _emTimer=setTimeout(async()=>{
+    const{data}=await _sb.from('profiles').select('id').ilike('email',v).maybeSingle().catch(()=>({data:null}))
+    if(data){hint.style.color='#fca5a5';hint.textContent='✗ Email already registered.'}
+    else{hint.style.color='var(--green)';hint.textContent='✓ Looks good.'}
+  },600)
 }
 function checkStr(v){
   const bars=[document.getElementById('pb1'),document.getElementById('pb2'),document.getElementById('pb3')]
@@ -455,6 +479,7 @@ function checkStr(v){
 <script type="module">
 import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 const sb=createClient('https://ryftlimrjhhoymyfzusq.supabase.co','sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86')
+window._sb=sb
 const{data:{session}}=await sb.auth.getSession()
 if(session)window.location.href='/account'
 // Klausās reāllāikā — ja lietotājs apstiprina e-pastu citā tabā,
@@ -479,12 +504,12 @@ window.doRegister=async()=>{
   const c=document.getElementById('rConf').value
   const reEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
   // — Validation —
-  if(!n){showAlert('⚠️ Please enter your full name.','error');return}
-  if(!u||u.length<3){showAlert('⚠️ Username must be at least 3 characters.','error');return}
-  if(!/^[a-zA-Z0-9_\.\-]+$/.test(u)){showAlert('⚠️ Username: only letters, numbers, _ . - allowed.','error');return}
-  if(!reEmail.test(e)){showAlert('⚠️ Enter a valid email address.','error');return}
-  if(p.length<8){showAlert('⚠️ Password must be at least 8 characters.','error');return}
-  if(p!==c){showAlert('⚠️ Passwords do not match.','error');return}
+  if(!n){showAlert('Please enter your full name.','error');return}
+  if(!u||u.length<3){showAlert('Username must be at least 3 characters.','error');return}
+  if(!/^[a-zA-Z0-9_.\-]+$/.test(u)){showAlert('Username: only letters, numbers, _ . - allowed.','error');return}
+  if(!reEmail.test(e)){showAlert('Enter a valid email address.','error');return}
+  if(p.length<8){showAlert('Password must be at least 8 characters.','error');return}
+  if(p!==c){showAlert('Passwords do not match.','error');return}
   // — Clear any previous error —
   document.getElementById('alertBox').innerHTML=''
   // — Pārbauda vai username un e-pasts jau aizņemts —
@@ -495,12 +520,12 @@ window.doRegister=async()=>{
   ])
   if(exUser){
     setLoading('regBtn',false,'Create Account')
-    showAlert('⚠️ Username <strong>'+u+'</strong> is already taken. Please choose another.','error')
+    showAlert('Username <strong>'+u+'</strong> is already taken. Please choose another.','error')
     return
   }
   if(exEmail){
     setLoading('regBtn',false,'Create Account')
-    showAlert('⚠️ An account with this email already exists. <a href="#" onclick="sw(\'login\');return false" style="color:var(--c1)">Sign in instead →</a>','error')
+    showAlert('An account with this email already exists. <a href="#" onclick="sw(\'login\');return false" style="color:var(--c1);font-weight:600">Sign in instead →</a>','error')
     return
   }
   setLoading('regBtn',true,'Creating account…')
