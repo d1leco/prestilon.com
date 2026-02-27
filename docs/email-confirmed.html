@@ -15,7 +15,7 @@
   --c1:#0ea5e9;--c2:#0284c7;--purple:#7c3aed;
   --text:#f0f6ff;--text2:#c8dae8;--text3:#7a9ab8;
   --border:rgba(255,255,255,.07);--border2:rgba(14,165,233,.3);
-  --green:#10d48a;
+  --green:#10d48a;--red:#ef4444;
 }
 html,body{height:100%;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);overflow:hidden}
 body::before{
@@ -30,10 +30,8 @@ canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.3}
 @keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @keyframes pop{0%{opacity:0;transform:scale(.7)}60%{transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
 @keyframes ripple{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.2);opacity:0}}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
-@keyframes shimmer{to{background-position:200% center}}
-@keyframes _sp{to{transform:rotate(360deg)}}
-@keyframes countdown{from{stroke-dashoffset:0}to{stroke-dashoffset:126}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
 
 nav{
   position:sticky;top:0;z-index:999;
@@ -60,20 +58,24 @@ nav{
   animation:up .5s ease both;
 }
 
-/* Animated checkmark circle */
-.check-wrap{
-  position:relative;width:80px;height:80px;margin:0 auto 1.5rem;
+/* ── LOADING STATE ── */
+#stateLoading{padding:1rem 0}
+.spinner-ring{
+  width:52px;height:52px;border-radius:50%;
+  border:3px solid rgba(14,165,233,.12);
+  border-top-color:var(--c1);
+  animation:spin .9s linear infinite;
+  margin:0 auto 1.1rem;
 }
-.ripple{
-  position:absolute;inset:0;border-radius:50%;
-  border:2px solid rgba(16,212,138,.35);
-  animation:ripple 1.8s ease-out infinite;
-}
-.ripple2{
-  position:absolute;inset:0;border-radius:50%;
-  border:2px solid rgba(16,212,138,.2);
-  animation:ripple 1.8s ease-out .6s infinite;
-}
+.loading-dots{display:flex;justify-content:center;gap:.35rem;margin-top:.6rem}
+.loading-dots span{width:6px;height:6px;border-radius:50%;background:var(--c1);animation:pulse-dot 1.4s ease-in-out infinite}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+
+/* ── SUCCESS STATE ── */
+.check-wrap{position:relative;width:80px;height:80px;margin:0 auto 1.5rem}
+.ripple{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(16,212,138,.35);animation:ripple 1.8s ease-out infinite}
+.ripple2{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(16,212,138,.2);animation:ripple 1.8s ease-out .6s infinite}
 .check-circle{
   position:relative;z-index:1;
   width:80px;height:80px;border-radius:50%;
@@ -84,18 +86,11 @@ nav{
   box-shadow:0 0 40px rgba(16,212,138,.15);
 }
 
-.title{
-  font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;
-  margin-bottom:.5rem;letter-spacing:-.02em;
-}
-.title .gr{
-  background:linear-gradient(100deg,var(--green),var(--c1));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
+.title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;margin-bottom:.5rem;letter-spacing:-.02em}
+.title .gr{background:linear-gradient(100deg,var(--green),var(--c1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .subtitle{color:var(--text2);font-size:.85rem;line-height:1.7;margin-bottom:1.75rem}
 .subtitle strong{color:var(--text)}
 
-/* Auto-redirect countdown */
 .countdown-wrap{
   display:flex;align-items:center;justify-content:center;gap:.65rem;
   margin-bottom:1.5rem;padding:.55rem 1rem;
@@ -104,14 +99,10 @@ nav{
 .cd-ring{position:relative;width:28px;height:28px;flex-shrink:0}
 .cd-svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .cd-bg{fill:none;stroke:rgba(255,255,255,.06);stroke-width:3}
-.cd-fill{
-  fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round;
-  stroke-dasharray:126;stroke-dashoffset:0;
-}
+.cd-fill{fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round;stroke-dasharray:63;stroke-dashoffset:0;transition:stroke-dashoffset .9s linear}
 .cd-n{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.72rem;color:var(--green)}
 .cd-txt{font-size:.75rem;color:var(--text2);font-family:'JetBrains Mono',monospace}
 
-/* CTA button */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:.45rem;
   width:100%;padding:.6rem;border-radius:11px;border:none;
@@ -123,11 +114,19 @@ nav{
 }
 .btn:hover{box-shadow:0 0 48px rgba(14,165,233,.5);transform:translateY(-2px)}
 
-/* Features row */
-.feats{
-  display:flex;justify-content:center;gap:1.2rem;margin-top:1.5rem;
-  padding-top:1.2rem;border-top:1px solid var(--border);flex-wrap:wrap;
+/* ── ERROR STATE ── */
+#stateError{padding:.5rem 0}
+.err-icon{width:68px;height:68px;border-radius:50%;background:rgba(239,68,68,.08);border:2px solid rgba(239,68,68,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem}
+.btn-outline{
+  display:inline-flex;align-items:center;justify-content:center;gap:.45rem;
+  width:100%;padding:.58rem;border-radius:11px;
+  border:1px solid var(--border2);background:transparent;
+  color:var(--c1);font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:700;
+  cursor:pointer;transition:all .2s;text-decoration:none;margin-top:.75rem;
 }
+.btn-outline:hover{background:rgba(14,165,233,.06)}
+
+.feats{display:flex;justify-content:center;gap:1.2rem;margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid var(--border);flex-wrap:wrap}
 .feat{display:flex;align-items:center;gap:.38rem;font-size:.68rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
 .feat svg{color:var(--green);flex-shrink:0}
 </style>
@@ -142,52 +141,57 @@ nav{
 <div class="page">
   <div class="card">
 
-    <div class="check-wrap">
-      <div class="ripple"></div>
-      <div class="ripple2"></div>
-      <div class="check-circle">
-        <svg width="34" height="34" fill="none" viewBox="0 0 24 24">
-          <path stroke="#10d48a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M20 6L9 17l-5-5"/>
-        </svg>
+    <!-- LOADING -->
+    <div id="stateLoading">
+      <div class="spinner-ring"></div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.35rem">Verifying your email…</div>
+      <div style="font-size:.78rem;color:var(--text3)">Please wait while we confirm your address.</div>
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div id="stateSuccess" style="display:none">
+      <div class="check-wrap">
+        <div class="ripple"></div>
+        <div class="ripple2"></div>
+        <div class="check-circle">
+          <svg width="34" height="34" fill="none" viewBox="0 0 24 24">
+            <path stroke="#10d48a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+      </div>
+      <div class="title">Email <span class="gr">Confirmed!</span></div>
+      <p class="subtitle">Your email address has been successfully verified.<br/><strong>Welcome to PRESTILON</strong> — your account is now active.</p>
+      <div class="countdown-wrap">
+        <div class="cd-ring">
+          <svg class="cd-svg" viewBox="0 0 28 28" width="28" height="28">
+            <circle class="cd-bg" cx="14" cy="14" r="10"/>
+            <circle class="cd-fill" id="cdArc" cx="14" cy="14" r="10"/>
+          </svg>
+          <div class="cd-n" id="cdNum">5</div>
+        </div>
+        <div class="cd-txt">Redirecting to dashboard in <span id="cdSec">5</span>s…</div>
+      </div>
+      <a href="/account" class="btn" id="dashBtn">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect stroke="currentColor" stroke-width="2" x="2" y="3" width="20" height="14" rx="2"/><path stroke="currentColor" stroke-width="2" d="M8 21h8M12 17v4"/></svg>
+        Go to Dashboard
+      </a>
+      <div class="feats">
+        <div class="feat"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Secure account</div>
+        <div class="feat"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>AI engine ready</div>
+        <div class="feat"><svg width="11" height="11" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 8v4l3 3"/></svg>Real-time monitoring</div>
       </div>
     </div>
 
-    <div class="title">Email <span class="gr">Confirmed!</span></div>
-    <p class="subtitle">
-      Your email address has been successfully verified.<br/>
-      <strong>Welcome to PRESTILON</strong> — your account is now active.
-    </p>
-
-    <!-- Auto-redirect countdown -->
-    <div class="countdown-wrap">
-      <div class="cd-ring">
-        <svg class="cd-svg" viewBox="0 0 28 28" width="28" height="28">
-          <circle class="cd-bg" cx="14" cy="14" r="10"/>
-          <circle class="cd-fill" id="cdArc" cx="14" cy="14" r="10"/>
-        </svg>
-        <div class="cd-n" id="cdNum">5</div>
+    <!-- ERROR -->
+    <div id="stateError" style="display:none">
+      <div class="err-icon">
+        <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path stroke="#ef4444" stroke-width="2" stroke-linecap="round" d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
       </div>
-      <div class="cd-txt">Redirecting to your dashboard in <span id="cdSec">5</span>s…</div>
-    </div>
-
-    <a href="/account" class="btn" id="dashBtn">
-      <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect stroke="currentColor" stroke-width="2" stroke-linecap="round" x="2" y="3" width="20" height="14" rx="2"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M8 21h8M12 17v4"/></svg>
-      Go to Dashboard
-    </a>
-
-    <div class="feats">
-      <div class="feat">
-        <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Secure account
-      </div>
-      <div class="feat">
-        <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        AI engine ready
-      </div>
-      <div class="feat">
-        <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 8v4l3 3"/></svg>
-        Real-time monitoring
-      </div>
+      <div class="title" style="font-size:1.2rem;margin-bottom:.4rem">Link expired or invalid</div>
+      <p style="color:var(--text2);font-size:.82rem;line-height:1.65;margin-bottom:1.25rem">This confirmation link has expired or already been used. Please register again or request a new link.</p>
+      <a href="/login" class="btn">Back to Sign In</a>
+      <a href="/login?tab=register" class="btn-outline">Create new account</a>
     </div>
 
   </div>
@@ -216,35 +220,92 @@ nav{
   resize();init();draw()
 })()
 
-/* Countdown */
-const TOTAL=5
-const arc=document.getElementById('cdArc')
-const numEl=document.getElementById('cdNum')
-const secEl=document.getElementById('cdSec')
-const circumference=2*Math.PI*10  // r=10
-
-let secs=TOTAL
-function tick(){
-  secs--
-  numEl.textContent=secs
-  secEl.textContent=secs
-  // Animate arc: go from full circle to empty
-  const progress=(TOTAL-secs)/TOTAL
-  arc.style.strokeDashoffset=circumference*progress
-  if(secs<=0){
-    clearInterval(timer)
-    window.location.href='/account'
-  }
+function show(id){
+  ['stateLoading','stateSuccess','stateError'].forEach(s=>
+    document.getElementById(s).style.display=s===id?'':'none'
+  )
 }
-// Start arc fully filled
-arc.style.strokeDashoffset=0
-const timer=setInterval(tick,1000)
+
+let cdTimer=null
+function startCountdown(){
+  const arc=document.getElementById('cdArc')
+  const numEl=document.getElementById('cdNum')
+  const secEl=document.getElementById('cdSec')
+  const circumference=63 // 2 * PI * 10
+  let secs=5
+  arc.style.strokeDashoffset=0
+  cdTimer=setInterval(()=>{
+    secs--
+    numEl.textContent=secs
+    secEl.textContent=secs
+    arc.style.strokeDashoffset=(circumference*(5-secs)/5)
+    if(secs<=0){clearInterval(cdTimer);window.location.href='/account'}
+  },1000)
+}
 </script>
 
 <script type="module">
 import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
-const sb=createClient('https://ryftlimrjhhoymyfzusq.supabase.co','sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86')
-// Session will be set automatically by Supabase after redirect — nothing else needed here.
+
+// detectSessionInUrl:true (default) — automatically parses #access_token from URL hash
+const sb=createClient(
+  'https://ryftlimrjhhoymyfzusq.supabase.co',
+  'sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86',
+  { auth: { detectSessionInUrl: true, persistSession: true } }
+)
+
+let handled=false
+
+function handleSuccess(){
+  if(handled)return
+  handled=true
+  show('stateSuccess')
+  startCountdown()
+}
+
+function handleError(){
+  if(handled)return
+  handled=true
+  show('stateError')
+}
+
+// Primary method: listen for auth state change
+// Supabase v2 auto-exchanges the token from URL hash and fires SIGNED_IN
+sb.auth.onAuthStateChange((event, session)=>{
+  if(handled)return
+  if(event==='SIGNED_IN' && session?.user){
+    // Make sure this is an email confirmation, not password recovery
+    const hash=window.location.hash
+    const params=new URLSearchParams(hash.replace('#',''))
+    const type=params.get('type')
+    if(type==='recovery'){
+      // Wrong page — redirect to reset password
+      window.location.href='/reset-password'+window.location.hash
+      return
+    }
+    handleSuccess()
+  }
+})
+
+// Fallback: check if session already exists (e.g. link opened in same browser)
+setTimeout(async()=>{
+  if(handled)return
+  const{data:{session}}=await sb.auth.getSession()
+  if(session?.user){
+    handleSuccess()
+    return
+  }
+  // Check if there's a token in the URL hash manually
+  const hash=window.location.hash
+  if(hash && hash.includes('access_token')){
+    // Token is present but not yet processed — wait a bit more
+    setTimeout(()=>{
+      if(!handled)handleError()
+    },3000)
+  } else {
+    handleError()
+  }
+},4000)
 </script>
 </body>
 </html>
