@@ -42,20 +42,6 @@ nav{position:sticky;top:0;z-index:999;display:flex;align-items:center;justify-co
 .nl:hover{color:var(--text);background:rgba(255,255,255,.05)}
 .nc{margin-left:.5rem;padding:.5rem 1.25rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;background:var(--c1);color:#060f1a;text-decoration:none;box-shadow:0 0 20px rgba(0,212,180,.28);transition:all .2s;display:inline-flex;align-items:center;gap:.3rem}
 .nc:hover{box-shadow:0 0 34px rgba(0,212,180,.5);transform:translateY(-1px)}
-@media(max-width:640px){
-  nav{padding:0 .7rem 0 0;height:48px}
-  .logo{padding-left:.7rem;height:48px}
-  .logo-img{height:32px}
-  .nl{font-size:.68rem;padding:.2rem .32rem}
-  .nc{padding:.3rem .6rem;font-size:.7rem;margin-left:.1rem}
-  .hero{padding:36px 1rem 28px}
-  .hero-h1{font-size:clamp(1.5rem,7vw,2rem)}
-  .hero-meta{gap:.7rem;font-size:.6rem}
-  .content{padding:2rem 0 3rem}
-  footer{padding:1rem;flex-direction:column;align-items:flex-start;gap:.35rem}
-  .fl-links{gap:.4rem .9rem;flex-wrap:wrap}
-  .fl-links a{font-size:.62rem}
-}
 
 /* ── HERO ── */
 .hero{text-align:center;padding:72px var(--r) 56px;position:relative;z-index:1;border-bottom:1px solid var(--border)}
@@ -146,6 +132,21 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.
 .fl-links{display:flex;gap:1.2rem;flex-wrap:wrap}
 .fl-links a{font-size:.75rem;color:var(--text3);text-decoration:none;transition:color .18s}
 .fl-links a:hover{color:var(--text2)}
+
+@media(max-width:640px){
+  nav{padding:0 .7rem 0 0;height:48px}
+  .logo{padding-left:.7rem;height:48px}
+  .logo-img{height:32px}
+  .nl{font-size:.68rem;padding:.2rem .32rem}
+  .nc{padding:.3rem .6rem;font-size:.7rem;margin-left:.1rem}
+  .hero{padding:36px 1rem 28px}
+  .hero-h1{font-size:clamp(1.5rem,7vw,2rem)}
+  .hero-meta{gap:.7rem;font-size:.6rem}
+  .content{padding:2rem 0 3rem}
+  footer{padding:1rem;flex-direction:column;align-items:flex-start;gap:.35rem}
+  .fl-links{gap:.4rem .9rem;flex-wrap:wrap}
+  .fl-links a{font-size:.62rem}
+}
 </style>
 </head>
 <body>
