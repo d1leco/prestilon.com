@@ -257,27 +257,21 @@ let handled=false
 function handleSuccess(){ if(handled)return; handled=true; show('stateSuccess'); startCountdown() }
 function handleError(){ if(handled)return; handled=true; show('stateError') }
 
-// Manuāli izlasam tokenu no URL hash — strādā no JEBKURAS ierīces
-const hash=new URLSearchParams(window.location.hash.replace('#',''))
-const access_token=hash.get('access_token')
-const refresh_token=hash.get('refresh_token')
-const type=hash.get('type')
+// Supabase /auth/v1/verify redirect atdod #access_token= hash
+const _h=new URLSearchParams(window.location.hash.replace('#',''))
+const _access_token=_h.get('access_token')
+const _refresh_token=_h.get('refresh_token')
+const _type=_h.get('type')
 
-// Ja recovery link nokļuva šeit — redirect uz reset-password
-if(type==='recovery'){
+if(_type==='recovery'){
   window.location.href='/reset-password'+window.location.hash
 }
 
-if(access_token){
-  // Tieši uzstādam sesiju — nav nekādas auto-detection, strādā uz mobile/desktop/jebkur
-  const{data,error}=await sb.auth.setSession({access_token,refresh_token:refresh_token||''})
-  if(!error && data?.session?.user){
-    handleSuccess()
-  } else {
-    handleError()
-  }
+if(_access_token){
+  const{data,error}=await sb.auth.setSession({access_token:_access_token,refresh_token:_refresh_token||''})
+  if(!error && data?.session?.user){ handleSuccess() }
+  else { handleError() }
 } else {
-  // Nav tokena URL — kļūda vai nederīgs links
   handleError()
 }
 </script>
