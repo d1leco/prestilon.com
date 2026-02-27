@@ -13,7 +13,7 @@
 :root{
   --bg:#060f1a;--bg2:#0a1929;--bg3:#0e2035;
   --c1:#00d4b4;--c2:#00a896;--purple:#6c5ce7;
-  --text:#f0f6ff;--text2:#a8c0d4;--text3:#5a7a94;
+  --text:#f0f6ff;--text2:#c8dae8;--text3:#7a9ab8;
   --border:rgba(255,255,255,.07);--border2:rgba(0,212,180,.25);
   --red:#ef4444;--green:#10d48a;--amber:#f59e0b;
 }
@@ -132,15 +132,15 @@ nav{
 .tab.on{background:var(--bg3);color:var(--text);box-shadow:0 2px 10px rgba(0,0,0,.4)}
 
 .form-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.05rem}
-.form-sub{color:var(--text2);font-size:.72rem;margin-bottom:.45rem;line-height:1.35}
+.form-sub{color:#8aacca;font-size:.72rem;margin-bottom:.45rem;line-height:1.35}
 
 .pnl{display:none}.pnl.on{display:block}
 .fg{margin-bottom:.22rem}
-.fl{display:block;font-size:.65rem;font-weight:600;color:var(--text2);margin-bottom:.15rem;letter-spacing:.02em}
+.fl{display:block;font-size:.67rem;font-weight:700;color:#d0e4f0;margin-bottom:.15rem;letter-spacing:.03em;text-transform:uppercase}
 .fl-row{display:flex;justify-content:space-between;align-items:center}
-.fi{width:100%;padding:.36rem .88rem;border-radius:9px;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.84rem;transition:border-color .2s,box-shadow .2s;outline:none}
+.fi{width:100%;padding:.36rem .88rem;border-radius:9px;background:#0d1f30;border:1px solid rgba(255,255,255,.12);color:#f0f6ff;font-family:'DM Sans',sans-serif;font-size:.84rem;transition:border-color .2s,box-shadow .2s;outline:none}
 .fi:focus{border-color:rgba(0,212,180,.42);box-shadow:0 0 0 3px rgba(0,212,180,.07)}
-.fi::placeholder{color:var(--text3)}
+.fi::placeholder{color:#4a6a84}
 .fi-wrap{position:relative}
 .fi-ico{position:absolute;left:.95rem;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
 .fi.has-ico{padding-left:2.5rem}
@@ -449,7 +449,7 @@ window.checkUsername=function(v){
   if(!v)return
   if(v.length<3){hint.style.color='#fca5a5';hint.textContent='✗ Min. 3 characters.';return}
   if(!/^[a-zA-Z0-9_.\-]+$/.test(v)){hint.style.color='#fca5a5';hint.textContent='✗ Only letters, numbers, _ . - allowed.';return}
-  hint.style.color='var(--text3)';hint.textContent='Checking…'
+  hint.textContent=''
   clearTimeout(_unTimer)
   _unTimer=setTimeout(async()=>{
     if(!window._sb){hint.textContent='';return}
@@ -473,7 +473,7 @@ window.checkEmailAvail=function(v){
   hint.textContent=''
   const re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if(!re.test(v))return
-  hint.style.color='var(--text3)';hint.textContent='Checking…'
+  hint.textContent=''
   clearTimeout(_emTimer)
   _emTimer=setTimeout(async()=>{
     if(!window._sb){hint.textContent='';return}
