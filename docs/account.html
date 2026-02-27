@@ -344,14 +344,14 @@ footer{border-top:1px solid var(--border);padding:1.55rem var(--r);display:flex;
           <div class="fg">
             <label class="fl" for="newEmail">New Email Address</label>
             <div class="fi-wrap">
-              <input type="email" id="newEmail" class="fi" placeholder="new@example.com" oninput="checkEmailMatch()"/>
+              <input type="email" id="newEmail" class="fi" placeholder="new@example.com" autocomplete="off" oninput="checkEmailMatch()"/>
               <span id="em1Icon" style="position:absolute;right:.82rem;top:50%;transform:translateY(-50%);font-size:.82rem"></span>
             </div>
           </div>
           <div class="fg">
             <label class="fl" for="newEmail2">Confirm New Email</label>
             <div class="fi-wrap">
-              <input type="email" id="newEmail2" class="fi" placeholder="Repeat new address" oninput="checkEmailMatch()"/>
+              <input type="email" id="newEmail2" class="fi" placeholder="Repeat new address" autocomplete="off" oninput="checkEmailMatch()"/>
               <span id="em2Icon" style="position:absolute;right:.82rem;top:50%;transform:translateY(-50%);font-size:.82rem"></span>
             </div>
           </div>
@@ -360,7 +360,7 @@ footer{border-top:1px solid var(--border);padding:1.55rem var(--r);display:flex;
         <div class="fg" style="max-width:400px">
           <label class="fl" for="emailPwd">🔑 Confirm Current Password</label>
           <div class="fi-wrap">
-            <input type="password" id="emailPwd" class="fi" placeholder="Your current password" onkeydown="if(event.key==='Enter')changeEmail()"/>
+            <input type="password" id="emailPwd" class="fi" placeholder="Your current password" autocomplete="new-password" onkeydown="if(event.key==='Enter')changeEmail()"/>
             <button class="eye" type="button" onclick="togglePw('emailPwd')" tabindex="-1">
               <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle stroke="currentColor" stroke-width="2" cx="12" cy="12" r="3"/></svg>
             </button>
@@ -706,14 +706,16 @@ window.changeEmail=async()=>{
   const e1=document.getElementById('newEmail').value.trim()
   const e2=document.getElementById('newEmail2').value.trim()
   const pwd=document.getElementById('emailPwd').value
-  const cur=document.getElementById('pEmail').value.trim()
   const re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if(!re.test(e1)){showAlert('emailAlert','Enter a valid email address.','error');return}
   if(e1!==e2){showAlert('emailAlert','Email addresses do not match.','error');return}
-  if(e1===cur){showAlert('emailAlert','This is already your current email address.','error');return}
   if(!pwd){showAlert('emailAlert','Please confirm your current password.','error');return}
+  // Iegūst e-pastu tieši no aktīvās sesijas — nevis no DOM (autofill var sabojāt)
+  const{data:{session:curSess}}=await sb.auth.getSession()
+  const curEmail=curSess?.user?.email||''
+  if(e1===curEmail){showAlert('emailAlert','This is already your current email address.','error');return}
   setLoad('saveEmailBtn',true,'Verifying password…')
-  const{error:siErr}=await sb.auth.signInWithPassword({email:cur,password:pwd})
+  const{error:siErr}=await sb.auth.signInWithPassword({email:curEmail,password:pwd})
   if(siErr){
     setLoad('saveEmailBtn',false,'Send Confirmation')
     showAlert('emailAlert','❌ Incorrect password. Please try again.','error')
