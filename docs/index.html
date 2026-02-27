@@ -40,76 +40,6 @@ nav{
 .logo{display:flex;align-items:center;text-decoration:none;transition:opacity .2s;padding-left:1rem;overflow:hidden;height:64px}
 .logo:hover{opacity:.85}
 .logo-img{height:44px;width:auto;mix-blend-mode:screen;display:block;object-fit:contain}
-@media(max-width:640px){
-  /* NAV */
-  nav{padding:0 .7rem 0 0;height:48px}
-  .logo{padding-left:.7rem;height:48px}
-  .logo-img{height:32px}
-  .nl{font-size:.72rem;padding:.25rem .45rem}
-  .nc{padding:.3rem .6rem;font-size:.7rem;margin-left:.15rem;white-space:nowrap}
-
-  /* HERO */
-  .hero{padding:22px 1rem 20px;gap:.8rem;min-height:auto}
-  .hero-badge{font-size:.56rem;margin-bottom:.85rem;padding:.18rem .55rem .18rem .38rem;letter-spacing:.05em}
-  .badge-dot{width:5px;height:5px}
-  .hero-h1{font-size:clamp(1.45rem,7.2vw,1.9rem);line-height:1.07;margin-bottom:.7rem;letter-spacing:-.02em}
-  .hero-sub{font-size:.8rem;line-height:1.62;margin-bottom:1.1rem;max-width:100%}
-  .btn{padding:.55rem 1rem;font-size:.78rem;border-radius:8px}
-  .hero-cta{gap:.45rem;margin-bottom:1.2rem;flex-wrap:nowrap}
-  .hero-trust{gap:.8rem;flex-wrap:wrap}
-  .trust-i{font-size:.65rem;gap:.3rem}
-
-  /* TICKER */
-  .ticker-item{font-size:.56rem;padding:0 .9rem}
-
-  /* SECTIONS */
-  .section{padding:40px 1rem}
-  .sec-label{font-size:.58rem}
-  .sec-h{font-size:clamp(1.3rem,5.8vw,1.65rem);line-height:1.12}
-  .sec-sub{font-size:.8rem;line-height:1.65}
-
-  /* FEATURES GRID */
-  .feat-grid{grid-template-columns:1fr;margin-top:2rem}
-  .feat{padding:1.3rem 1rem}
-  .feat h3{font-size:.85rem}
-  .feat p{font-size:.75rem}
-  .feat-icon-box{width:36px;height:36px}
-
-  /* STATS */
-  .stats-inner{padding:0;grid-template-columns:repeat(2,1fr)}
-  .stat{padding:1.3rem .5rem}
-  .stat-val{font-size:1.65rem}
-  .stat-lbl{font-size:.52rem}
-
-  /* ARCHITECTURE */
-  .arch-row{flex-direction:column;align-items:center;gap:.4rem}
-  .arch-arr{transform:rotate(90deg);padding:.1rem 0;font-size:.8rem}
-  .arch-node{min-width:150px;padding:.9rem .8rem}
-  .an-icon{font-size:1.3rem;margin-bottom:.3rem}
-  .an-title{font-size:.72rem}
-  .an-sub{font-size:.58rem}
-  .cloud-box{padding:.7rem 1rem;gap:1.1rem;margin-top:1rem}
-  .ci-icon{font-size:.85rem}
-  .ci-name{font-size:.66rem}
-  .ci-sub{font-size:.55rem}
-
-  /* CTA */
-  .cta-sec{padding:0 1rem 40px}
-  .cta-box{padding:2.2rem 1rem}
-  .cta-h{font-size:1.3rem;margin-bottom:.5rem}
-  .cta-p{font-size:.8rem;margin-bottom:1.2rem}
-  .cta-btns{flex-direction:column;align-items:stretch;gap:.5rem}
-  .cta-btns .btn{text-align:center;justify-content:center}
-  .cta-note{font-size:.52rem}
-
-  /* FOOTER */
-  footer{padding:1.1rem 1rem;flex-direction:column;align-items:flex-start;gap:.5rem}
-  .footer-links{gap:.7rem;flex-wrap:wrap}
-  .footer-links a{font-size:.68rem}
-
-  /* INLINE GRID FIX */
-  [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important;gap:.75rem!important}
-}
 .nav-r{display:flex;align-items:center;gap:.15rem}
 .nl{padding:.42rem .85rem;color:var(--text2);font-size:.88rem;font-weight:500;text-decoration:none;border-radius:7px;transition:color .18s,background .18s}
 .nl:hover{color:var(--text);background:rgba(255,255,255,.05)}
@@ -461,6 +391,69 @@ footer{
 .r2.vis{opacity:1;transform:none}
 .r3{opacity:0;transform:translateY(20px);transition:opacity .65s ease .2s,transform .65s ease .2s}
 .r3.vis{opacity:1;transform:none}
+
+@media(max-width:640px){
+  nav{padding:0 .7rem 0 0;height:48px}
+  .logo{padding-left:.7rem;height:48px}
+  .logo-img{height:32px}
+  .nl{font-size:.72rem;padding:.25rem .45rem}
+  .nc{padding:.3rem .6rem;font-size:.7rem;margin-left:.15rem;white-space:nowrap}
+  .hero{padding:22px 1rem 20px;gap:.8rem;min-height:auto}
+  .hero-badge{font-size:.56rem;margin-bottom:.85rem;padding:.18rem .55rem .18rem .38rem;letter-spacing:.05em}
+  .badge-dot{width:5px;height:5px}
+  .hero-h1{font-size:clamp(1.45rem,7.2vw,1.9rem);line-height:1.07;margin-bottom:.7rem;letter-spacing:-.02em}
+  .hero-sub{font-size:.8rem;line-height:1.62;margin-bottom:1.1rem;max-width:100%}
+  .btn{padding:.55rem 1rem;font-size:.78rem;border-radius:8px}
+  .hero-cta{gap:.45rem;margin-bottom:1.2rem;flex-wrap:nowrap}
+  .hero-trust{gap:.8rem;flex-wrap:wrap}
+  .trust-i{font-size:.65rem;gap:.3rem}
+  .ticker-item{font-size:.56rem;padding:0 .9rem}
+  .section{padding:40px 1rem}
+  .sec-label{font-size:.58rem}
+  .sec-h{font-size:clamp(1.3rem,5.8vw,1.65rem);line-height:1.12}
+  .sec-sub{font-size:.8rem;line-height:1.65}
+  .feat-grid{grid-template-columns:1fr;margin-top:2rem}
+  .feat{padding:1.3rem 1rem}
+  .feat h3{font-size:.85rem}
+  .feat p{font-size:.75rem}
+  .feat-icon-box{width:36px;height:36px}
+  .stats-inner{padding:0;grid-template-columns:repeat(2,1fr)}
+  .stat{padding:1.3rem .5rem}
+  .stat-val{font-size:1.65rem}
+  .stat-lbl{font-size:.52rem}
+  .arch-row{flex-direction:column;align-items:center;gap:.4rem}
+  .arch-arr{transform:rotate(90deg);padding:.1rem 0;font-size:.8rem}
+  .arch-node{min-width:150px;padding:.9rem .8rem}
+  .an-icon{font-size:1.3rem;margin-bottom:.3rem}
+  .an-title{font-size:.72rem}
+  .an-sub{font-size:.58rem}
+  .cloud-box{padding:.7rem 1rem;gap:1.1rem;margin-top:1rem}
+  .ci-icon{font-size:.85rem}
+  .ci-name{font-size:.66rem}
+  .ci-sub{font-size:.55rem}
+  .cta-sec{padding:0 1rem 40px}
+  .cta-box{padding:2.2rem 1rem}
+  .cta-h{font-size:1.3rem;margin-bottom:.5rem}
+  .cta-p{font-size:.8rem;margin-bottom:1.2rem}
+  .cta-btns{flex-direction:column;align-items:stretch;gap:.5rem}
+  .cta-btns .btn{text-align:center;justify-content:center}
+  .cta-note{font-size:.52rem}
+  footer{padding:1.1rem 1rem;flex-direction:column;align-items:flex-start;gap:.5rem}
+  .footer-links{gap:.7rem;flex-wrap:wrap}
+  .footer-links a{font-size:.68rem}
+  [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important;gap:.75rem!important}
+  .wl-sec{padding:0 1rem 48px}
+  .wl-box{padding:2.5rem 1.1rem}
+  .wl-h{font-size:1.55rem}
+  .wl-p{font-size:.83rem;margin-bottom:1.6rem}
+  .wl-form{flex-direction:column;gap:.5rem}
+  .wl-btn{justify-content:center}
+  .wl-steps{gap:1.4rem;margin-top:1.8rem;padding-top:1.5rem}
+  .wl-step-icon{font-size:1.3rem}
+  .wl-step-t{font-size:.72rem}
+  .wl-step-s{font-size:.62rem}
+  .wl-note{font-size:.56rem}
+}
 </style>
 </head>
 <body>
