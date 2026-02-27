@@ -310,17 +310,65 @@ footer{border-top:1px solid var(--border);padding:1.55rem var(--r);display:flex;
     </div>
 
     <!-- Change email -->
-    <div class="card">
+    <div class="card" id="emailCard">
       <div class="clbl">CHANGE EMAIL</div>
       <div class="ctitle">✉️ Update Email Address</div>
       <div id="emailAlert"></div>
-      <p style="font-size:.8rem;color:var(--text2);margin-bottom:.95rem;line-height:1.65">A confirmation link will be sent to the new address. Your email won't change until you click the link.</p>
-      <div class="fg" style="max-width:400px">
-        <label class="fl" for="newEmail">New Email Address</label>
-        <input type="email" id="newEmail" class="fi" placeholder="new@example.com"/>
+
+      <!-- ── PENDING STATE BANNER ── -->
+      <div id="emailPendingBanner" style="display:none">
+        <div style="display:flex;align-items:flex-start;gap:.75rem;padding:1rem 1.1rem;border-radius:12px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.22);margin-bottom:1rem">
+          <span style="font-size:1.1rem;flex-shrink:0">⏳</span>
+          <div style="flex:1">
+            <p style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:.25rem">Email change pending confirmation</p>
+            <p style="font-size:.76rem;color:rgba(251,191,36,.7);line-height:1.55;margin:0">
+              A link was sent to <strong id="pendingEmailDisplay" style="color:#fcd34d">—</strong>.<br/>
+              Check your inbox and click the link to confirm. Expires in <strong id="pendingExpiry" style="color:#fcd34d">—</strong>.
+            </p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.65rem;padding:.75rem 1rem;border-radius:10px;background:var(--bg);border:1px solid var(--border);margin-bottom:.85rem">
+          <span style="font-size:.72rem;color:var(--text3);flex:1">📧 New address waiting:</span>
+          <span id="pendingEmailChip" style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--c1);font-weight:600">—</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn-d" id="cancelEmailBtn" onclick="cancelEmailChange()">✕ Cancel Email Change</button>
+          <button class="btn-g" id="resendEmailBtn" onclick="resendEmailChange()">↺ Resend Link</button>
+        </div>
       </div>
-      <div class="btn-row">
-        <button class="btn-p" id="saveEmailBtn" onclick="changeEmail()">Send Confirmation</button>
+
+      <!-- ── CHANGE FORM ── -->
+      <div id="emailForm">
+        <p style="font-size:.8rem;color:var(--text2);margin-bottom:1rem;line-height:1.65">Enter and confirm your new address, then verify with your current password. A confirmation link will be sent — your email won't change until you click it.</p>
+        <div class="two-col">
+          <div class="fg">
+            <label class="fl" for="newEmail">New Email Address</label>
+            <div class="fi-wrap">
+              <input type="email" id="newEmail" class="fi" placeholder="new@example.com" oninput="checkEmailMatch()"/>
+              <span id="em1Icon" style="position:absolute;right:.82rem;top:50%;transform:translateY(-50%);font-size:.82rem"></span>
+            </div>
+          </div>
+          <div class="fg">
+            <label class="fl" for="newEmail2">Confirm New Email</label>
+            <div class="fi-wrap">
+              <input type="email" id="newEmail2" class="fi" placeholder="Repeat new address" oninput="checkEmailMatch()"/>
+              <span id="em2Icon" style="position:absolute;right:.82rem;top:50%;transform:translateY(-50%);font-size:.82rem"></span>
+            </div>
+          </div>
+        </div>
+        <div id="emailMatchHint" style="font-size:.7rem;margin-top:-.5rem;margin-bottom:.85rem;min-height:.9rem"></div>
+        <div class="fg" style="max-width:400px">
+          <label class="fl" for="emailPwd">🔑 Confirm Current Password</label>
+          <div class="fi-wrap">
+            <input type="password" id="emailPwd" class="fi" placeholder="Your current password" onkeydown="if(event.key==='Enter')changeEmail()"/>
+            <button class="eye" type="button" onclick="togglePw('emailPwd')" tabindex="-1">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle stroke="currentColor" stroke-width="2" cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-p" id="saveEmailBtn" onclick="changeEmail()">Send Confirmation</button>
+        </div>
       </div>
     </div>
 
@@ -503,6 +551,7 @@ sb.auth.onAuthStateChange(async(e,s)=>{
   // linku savā JAUNAJĀ e-pasta kastītē.
   // Supabase automātiski nomaina session.user.email.
   if(e==='EMAIL_CHANGE'&&s?.user){
+    clearEmailPending()
     await loadAccount(s.user)
     overlay.classList.add('hidden')
     showTab('profile',document.getElementById('tbProfile'))
@@ -565,6 +614,7 @@ async function loadAccount(u){
   badge.style.display=''
 
   await loadHardware(u.id)
+  renderEmailState()
 }
 
 async function loadHardware(uid){
@@ -601,25 +651,108 @@ window.saveProfile=async()=>{
   showAlert('profileAlert','✅ Display name updated!','success')
 }
 
+// ─── Email pending state (localStorage) ────────────────────
+const EP_KEY='prestige_email_pending_v1'
+function getEmailPending(){
+  try{
+    const v=localStorage.getItem(EP_KEY);if(!v)return null
+    const p=JSON.parse(v)
+    if(Date.now()-p.sentAt>86400000){localStorage.removeItem(EP_KEY);return null}
+    return p
+  }catch{return null}
+}
+function setEmailPending(email){
+  localStorage.setItem(EP_KEY,JSON.stringify({newEmail:email,sentAt:Date.now()}))
+}
+function clearEmailPending(){
+  localStorage.removeItem(EP_KEY)
+}
+function renderEmailState(){
+  const p=getEmailPending()
+  const form=document.getElementById('emailForm')
+  const banner=document.getElementById('emailPendingBanner')
+  if(!form||!banner)return
+  if(p){
+    form.style.display='none'
+    banner.style.display=''
+    document.getElementById('pendingEmailDisplay').textContent=p.newEmail
+    document.getElementById('pendingEmailChip').textContent=p.newEmail
+    const rem=Math.max(0,86400000-(Date.now()-p.sentAt))
+    const hrs=Math.floor(rem/3600000)
+    const mins=Math.floor((rem%3600000)/60000)
+    document.getElementById('pendingExpiry').textContent=hrs+'h '+mins+'m'
+  }else{
+    form.style.display=''
+    banner.style.display='none'
+  }
+}
+window.checkEmailMatch=function(){
+  const e1=document.getElementById('newEmail').value.trim()
+  const e2=document.getElementById('newEmail2').value.trim()
+  const re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const hint=document.getElementById('emailMatchHint')
+  const i1=document.getElementById('em1Icon')
+  const i2=document.getElementById('em2Icon')
+  if(!e1&&!e2){hint.textContent='';i1.textContent='';i2.textContent='';return}
+  const v1=re.test(e1)
+  i1.textContent=e1?(v1?'✅':'❌'):''
+  if(e2){
+    if(!v1){hint.style.color='#fca5a5';hint.textContent='⚠ Enter a valid email first.';i2.textContent='';return}
+    if(e1===e2){hint.style.color='var(--green)';hint.textContent='✓ Addresses match.';i2.textContent='✅'}
+    else{hint.style.color='#fca5a5';hint.textContent='✗ Addresses do not match.';i2.textContent='❌'}
+  }else{hint.textContent='';i2.textContent=''}
+}
 window.changeEmail=async()=>{
-  const e=document.getElementById('newEmail').value.trim()
-  if(!e||!e.includes('@')){showAlert('emailAlert','Enter a valid email address.','error');return}
+  const e1=document.getElementById('newEmail').value.trim()
+  const e2=document.getElementById('newEmail2').value.trim()
+  const pwd=document.getElementById('emailPwd').value
   const cur=document.getElementById('pEmail').value.trim()
-  if(e===cur){showAlert('emailAlert','This is already your current email address.','error');return}
+  const re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if(!re.test(e1)){showAlert('emailAlert','Enter a valid email address.','error');return}
+  if(e1!==e2){showAlert('emailAlert','Email addresses do not match.','error');return}
+  if(e1===cur){showAlert('emailAlert','This is already your current email address.','error');return}
+  if(!pwd){showAlert('emailAlert','Please confirm your current password.','error');return}
+  setLoad('saveEmailBtn',true,'Verifying password…')
+  const{error:siErr}=await sb.auth.signInWithPassword({email:cur,password:pwd})
+  if(siErr){
+    setLoad('saveEmailBtn',false,'Send Confirmation')
+    showAlert('emailAlert','❌ Incorrect password. Please try again.','error')
+    return
+  }
   setLoad('saveEmailBtn',true,'Sending…')
-  // emailRedirectTo: Supabase ievieto šo URL apstiprinājuma e-pastā.
-  // Kad lietotājs klikšķina linku, tiek novirzīts šeit ar
-  // #access_token=...&type=email_change → onAuthStateChange apstrādā.
   const{error}=await sb.auth.updateUser(
-    {email:e},
-    {emailRedirectTo: location.origin+'/account'}
+    {email:e1},
+    {emailRedirectTo:location.origin+'/account'}
   )
   setLoad('saveEmailBtn',false,'Send Confirmation')
   if(error){showAlert('emailAlert',error.message,'error');return}
+  setEmailPending(e1)
   document.getElementById('newEmail').value=''
-  showAlert('emailAlert',
-    '✅ Confirmation link sent to <strong>'+e+'</strong>. Click it to confirm the change.',
-    'success')
+  document.getElementById('newEmail2').value=''
+  document.getElementById('emailPwd').value=''
+  document.getElementById('emailMatchHint').textContent=''
+  document.getElementById('em1Icon').textContent=''
+  document.getElementById('em2Icon').textContent=''
+  renderEmailState()
+  showAlert('emailAlert','✅ Confirmation link sent to <strong>'+e1+'</strong>. Check your inbox!','success')
+}
+window.cancelEmailChange=()=>{
+  clearEmailPending()
+  renderEmailState()
+  showAlert('emailAlert','Email change cancelled. You can start again.','info')
+}
+window.resendEmailChange=async()=>{
+  const p=getEmailPending();if(!p)return
+  setLoad('resendEmailBtn',true,'Sending…')
+  const{error}=await sb.auth.updateUser(
+    {email:p.newEmail},
+    {emailRedirectTo:location.origin+'/account'}
+  )
+  setLoad('resendEmailBtn',false,'↺ Resend Link')
+  if(error){showAlert('emailAlert',error.message,'error');return}
+  setEmailPending(p.newEmail)
+  renderEmailState()
+  showAlert('emailAlert','✅ Link resent to <strong>'+p.newEmail+'</strong>.','success')
 }
 
 window.changePwd=async()=>{
