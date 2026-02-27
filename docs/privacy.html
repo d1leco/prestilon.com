@@ -297,9 +297,12 @@ footer{
       <li><a href="#s7">7. Data Retention</a></li>
       <li><a href="#s8">8. Security</a></li>
       <li><a href="#s9">9. Cookies</a></li>
-      <li><a href="#s10">10. Children</a></li>
-      <li><a href="#s11">11. Changes</a></li>
-      <li><a href="#s12">12. Contact</a></li>
+      <li><a href="#s10">10. AI & Automated Decisions</a></li>
+      <li><a href="#s11">11. Payment Processing</a></li>
+      <li><a href="#s12">12. Sub-processors</a></li>
+      <li><a href="#s13">13. Children</a></li>
+      <li><a href="#s14">14. Changes</a></li>
+      <li><a href="#s15">15. Contact</a></li>
     </ul>
   </aside>
 
@@ -378,6 +381,17 @@ footer{
           </ul>
         </div>
 
+        <div class="highlight" style="margin-top:.8rem;background:rgba(239,68,68,.04);border-color:rgba(239,68,68,.18)">
+          <div class="hl-label" style="color:#fca5a5">Crash Reports (Diagnostic Data)</div>
+          <div class="hl-text">
+            If the PRESTILON backend encounters a critical error, a <strong>minimal crash report</strong>
+            may be generated locally. These reports contain only: error type, software version,
+            and your <strong>HWID</strong>. They are <strong>never automatically transmitted</strong> — upload
+            is always explicit and optional. If you choose to send a report, the HWID
+            constitutes personal data and is processed under this policy.
+          </div>
+        </div>
+
         <p style="margin-top:1rem">
           <strong>We do not collect</strong> printer telemetry data on our servers.
           All print job metrics, sensor readings, and AI diagnostics are processed
@@ -444,6 +458,7 @@ footer{
         <p style="margin-top:.8rem">
           Each of these providers is contractually bound to process your data
           only as instructed by us and in compliance with applicable data protection laws.
+          For a full list of sub-processors, see <a href="#s12" style="color:var(--c1)">Section 12</a>.
         </p>
       </div>
     </section>
@@ -554,26 +569,137 @@ footer{
       </div>
       <div class="sec-body">
         <p>
-          PRESTILON uses <strong>only essential cookies</strong> required for authentication
-          and session management. We do not use tracking, advertising, or analytics cookies.
+          We use <strong>only strictly necessary (functional) cookies</strong> required
+          to operate the platform. We do <strong>not</strong> use any third-party
+          tracking cookies, advertising cookies, or analytics cookies of any kind.
+          No cookie consent banner is required because we only use cookies that are
+          technically essential to provide the service you requested.
         </p>
         <div class="highlight">
-          <div class="hl-label">Cookies we use</div>
+          <div class="hl-label">Cookies &amp; Storage we use</div>
           <ul class="data-list">
-            <li><strong>Session token</strong> — Keeps you signed in (expires on sign-out)</li>
-            <li><strong>Refresh token</strong> — Maintains your session securely (stored in localStorage)</li>
+            <li><strong>Session token</strong> — Authenticates your session with Supabase. Expires on sign-out or after 1 hour of inactivity.</li>
+            <li><strong>Refresh token</strong> — Silently renews your session so you stay signed in. Stored in <code style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--c1)">localStorage</code>, not a cookie. Cleared on sign-out.</li>
           </ul>
         </div>
         <p style="margin-top:.8rem">
-          You can clear these at any time by signing out or clearing your browser storage.
+          You can remove all session data at any time by signing out, or by clearing
+          your browser's localStorage and cookies for <strong>prestilon.com</strong>.
         </p>
       </div>
     </section>
 
-    <!-- 10 -->
-    <section class="sec" id="s10" style="animation-delay:.25s">
+    <!-- 10 — NEW: AI & Automated Decisions (GDPR Art. 22) -->
+    <section class="sec" id="s10" style="animation-delay:.245s">
       <div class="sec-head">
         <div class="sec-num">10</div>
+        <div class="sec-title">AI & Automated Decision-Making</div>
+      </div>
+      <div class="sec-body">
+        <p>
+          PRESTILON's AI engine operates <strong>entirely on your local machine</strong>.
+          Under GDPR Article 22, you have the right to know whether automated
+          decision-making is applied to you. We are transparent about this:
+        </p>
+        <div class="highlight">
+          <div class="hl-label">How our AI works</div>
+          <div class="hl-text">
+            Anomaly detection, failure prediction, and print diagnostics are processed
+            <strong>locally</strong> using on-device inference. No print data, sensor
+            readings, or AI results are sent to PRESTILON servers.
+          </div>
+        </div>
+        <div class="highlight amber" style="margin-top:.75rem">
+          <div class="hl-label">Automated Actions (GDPR Art. 22 disclosure)</div>
+          <div class="hl-text">
+            The PRESTILON backend may <strong>automatically pause a print job</strong> when
+            the AI detects a high-confidence failure condition (e.g. layer delamination,
+            extruder clog). This action is:
+            <ul class="data-list" style="margin-top:.5rem">
+              <li>Configured and enabled <strong>by you</strong> in the backend settings</li>
+              <li>Fully reversible — you can resume or override at any time</li>
+              <li>Based on <strong>local sensor data only</strong> — not on your personal data</li>
+            </ul>
+            We do <strong>not</strong> perform automated profiling of users, nor do we make
+            decisions with legal or similarly significant effects based on personal data.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 — NEW: Payment Processing -->
+    <section class="sec" id="s11" style="animation-delay:.26s">
+      <div class="sec-head">
+        <div class="sec-num">11</div>
+        <div class="sec-title">Payment Processing</div>
+      </div>
+      <div class="sec-body">
+        <p>
+          All subscription payments are processed by our third-party payment provider.
+          PRESTILON <strong>does not store, see, or have access to</strong> your full
+          card number, CVV, or banking credentials at any point.
+        </p>
+        <div class="highlight">
+          <div class="hl-label">Data handled by payment processor</div>
+          <ul class="data-list">
+            <li>Cardholder name and billing address</li>
+            <li>Last 4 digits of card number (for your reference only)</li>
+            <li>Card expiry date</li>
+            <li>Payment amount, currency, and transaction timestamp</li>
+          </ul>
+        </div>
+        <p style="margin-top:.8rem">
+          Our payment provider is PCI-DSS Level 1 certified. The data they collect
+          is governed by their own privacy policy. We receive only a payment
+          confirmation token and subscription status — nothing more.
+        </p>
+        <p>
+          Invoices sent to your email will contain your billing name, address,
+          and subscription details. These are stored for <strong>7 years</strong>
+          as required by financial regulations.
+        </p>
+      </div>
+    </section>
+
+    <!-- 12 — NEW: Sub-processors -->
+    <section class="sec" id="s12" style="animation-delay:.275s">
+      <div class="sec-head">
+        <div class="sec-num">12</div>
+        <div class="sec-title">Sub-processors</div>
+      </div>
+      <div class="sec-body">
+        <p>
+          The following third-party sub-processors may handle personal data on our behalf.
+          Each has entered into a Data Processing Agreement (DPA) with us and is
+          bound to GDPR-compliant data handling standards.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:.55rem;margin:.8rem 0">
+          <div class="highlight" style="margin:0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem">
+              <div><div class="hl-label">Supabase, Inc.</div><div class="hl-text"><strong>Purpose:</strong> Authentication, account data, license management<br/><strong>Data:</strong> Email, display name, HWID, subscription status<br/><strong>Location:</strong> European Union</div></div>
+            </div>
+          </div>
+          <div class="highlight" style="margin:0">
+            <div><div class="hl-label">Resend</div><div class="hl-text"><strong>Purpose:</strong> Transactional email delivery<br/><strong>Data:</strong> Email address, email content (reset links, confirmations)<br/><strong>Location:</strong> United States (Standard Contractual Clauses apply)</div></div>
+          </div>
+          <div class="highlight" style="margin:0">
+            <div><div class="hl-label">Cloudflare, Inc.</div><div class="hl-text"><strong>Purpose:</strong> DNS, CDN, DDoS protection<br/><strong>Data:</strong> IP address (in transit only, not logged by us)<br/><strong>Location:</strong> Global (EU nodes used where possible)</div></div>
+          </div>
+          <div class="highlight" style="margin:0">
+            <div><div class="hl-label">Payment Processor (TBD)</div><div class="hl-text"><strong>Purpose:</strong> Subscription billing and payment processing<br/><strong>Data:</strong> Billing name, address, payment token<br/><strong>Location:</strong> To be confirmed on payment integration</div></div>
+          </div>
+        </div>
+        <p style="margin-top:.5rem;font-size:.8rem;color:var(--text3)">
+          We will update this list within 30 days of adding any new sub-processor
+          and notify active users by email of any significant changes.
+        </p>
+      </div>
+    </section>
+
+    <!-- 13 -->
+    <section class="sec" id="s13" style="animation-delay:.29s">
+      <div class="sec-head">
+        <div class="sec-num">13</div>
         <div class="sec-title">Children's Privacy</div>
       </div>
       <div class="sec-body">
@@ -586,10 +712,10 @@ footer{
       </div>
     </section>
 
-    <!-- 11 -->
-    <section class="sec" id="s11" style="animation-delay:.27s">
+    <!-- 14 -->
+    <section class="sec" id="s14" style="animation-delay:.305s">
       <div class="sec-head">
-        <div class="sec-num">11</div>
+        <div class="sec-num">14</div>
         <div class="sec-title">Changes to This Policy</div>
       </div>
       <div class="sec-body">
@@ -605,23 +731,33 @@ footer{
       </div>
     </section>
 
-    <!-- 12 -->
-    <section class="sec" id="s12" style="animation-delay:.29s">
+    <!-- 15 -->
+    <section class="sec" id="s15" style="animation-delay:.32s">
       <div class="sec-head">
-        <div class="sec-num">12</div>
+        <div class="sec-num">15</div>
         <div class="sec-title">Contact & Data Requests</div>
       </div>
       <div class="sec-body">
         <p>
-          For any privacy-related questions, data requests, or concerns,
-          please reach out to us directly:
+          For any privacy-related questions, data subject requests (access, erasure,
+          portability), or concerns, please contact our Data Privacy contact directly.
+          We will respond within <strong>30 days</strong> as required by GDPR.
         </p>
         <div class="contact-card">
           <div class="cc-icon">
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline stroke="currentColor" stroke-width="2" stroke-linecap="round" points="22,6 12,13 2,6"/></svg>
           </div>
           <div class="cc-info">
-            <div class="cc-label">Privacy Inquiries</div>
+            <div class="cc-label">Data Privacy — Direct Email</div>
+            <div class="cc-value"><a href="mailto:privacy@prestilon.com">privacy@prestilon.com</a></div>
+          </div>
+        </div>
+        <div class="contact-card" style="margin-top:.65rem">
+          <div class="cc-icon">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          </div>
+          <div class="cc-info">
+            <div class="cc-label">General Support</div>
             <div class="cc-value"><a href="/support">prestilon.com/support</a></div>
           </div>
         </div>
