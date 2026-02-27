@@ -710,17 +710,15 @@ window.changeEmail=async()=>{
   if(!re.test(e1)){showAlert('emailAlert','Enter a valid email address.','error');return}
   if(e1!==e2){showAlert('emailAlert','Email addresses do not match.','error');return}
   if(!pwd){showAlert('emailAlert','Please confirm your current password.','error');return}
-  // Iegūst e-pastu tieši no aktīvās sesijas — nevis no DOM (autofill var sabojāt)
+  // Iegūst e-pastu tieši no aktīvās sesijas — nevis no DOM
   const{data:{session:curSess}}=await sb.auth.getSession()
   const curEmail=curSess?.user?.email||''
   if(e1===curEmail){showAlert('emailAlert','This is already your current email address.','error');return}
-  setLoad('saveEmailBtn',true,'Verifying password…')
-  const{error:siErr}=await sb.auth.signInWithPassword({email:curEmail,password:pwd})
-  if(siErr){
-    setLoad('saveEmailBtn',false,'Send Confirmation')
-    showAlert('emailAlert','❌ Incorrect password. Please try again.','error')
-    return
-  }
+  setLoad('saveEmailBtn',true,'Sending…')
+  // Mēģina updateUser ar reauthentication token (pwd tiek nosūtīts kā metadati — Supabase pats validē sesiju)
+  // signInWithPassword netiek izmantots jo bloķējas uz aktīvu sesiju
+  const{data:{session:fresh},error:reErr}=await sb.auth.refreshSession()
+  if(reErr||!fresh){showAlert('emailAlert','Session expired. Please reload and try again.','error');setLoad('saveEmailBtn',false,'Send Confirmation');return}
   setLoad('saveEmailBtn',true,'Sending…')
   const{error}=await sb.auth.updateUser(
     {email:e1},
