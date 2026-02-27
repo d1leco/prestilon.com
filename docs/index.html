@@ -132,6 +132,7 @@ nav{
 @keyframes fadein{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes _sp{to{transform:rotate(360deg)}}
 
 .hero{
   min-height:calc(100vh - 64px);
@@ -333,6 +334,100 @@ nav{
 .ci-icon{font-size:1rem;margin-bottom:.18rem}
 .ci-name{font-size:.72rem;font-weight:600;color:var(--text)}
 .ci-sub{font-size:.6rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+
+/* ── WAITLIST ── */
+.wl-sec{padding:0 var(--r) 88px;position:relative;z-index:1}
+.wl-box{
+  background:var(--bg2);border:1px solid var(--border);border-radius:20px;
+  padding:5rem 2rem;text-align:center;position:relative;overflow:hidden;
+}
+.wl-box::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 110%,rgba(108,92,231,.08),transparent 60%),
+             radial-gradient(ellipse 60% 50% at 80% -10%,rgba(0,212,180,.06),transparent 55%);
+  pointer-events:none;
+}
+.wl-dev-tag{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.32rem 1rem .32rem .6rem;border-radius:99px;
+  background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.28);
+  font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.08em;color:var(--amber);
+  margin-bottom:1.75rem;position:relative;z-index:1;
+}
+.wl-dev-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--amber);
+  box-shadow:0 0 8px var(--amber);animation:pulse 1.8s infinite;
+}
+.wl-h{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(1.9rem,4vw,3rem);line-height:1.08;letter-spacing:-.025em;
+  margin-bottom:.85rem;position:relative;z-index:1;
+}
+.wl-h .acc{
+  background:linear-gradient(100deg,var(--c1) 0%,var(--purple) 55%,var(--c1) 100%);
+  background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;animation:shimmer 6s linear infinite;
+}
+.wl-p{
+  color:var(--text2);font-size:.96rem;line-height:1.8;
+  max-width:480px;margin:0 auto 2.2rem;position:relative;z-index:1;
+}
+.wl-form{
+  display:flex;gap:.65rem;max-width:440px;margin:0 auto 1.4rem;
+  position:relative;z-index:1;
+}
+.wl-input{
+  flex:1;padding:.75rem 1.1rem;border-radius:11px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.wl-input::placeholder{color:var(--text3)}
+.wl-input:focus{border-color:rgba(0,212,180,.45);box-shadow:0 0 0 3px rgba(0,212,180,.08)}
+.wl-btn{
+  padding:.75rem 1.6rem;border-radius:11px;border:none;
+  background:var(--c1);color:#060f1a;
+  font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:800;
+  cursor:pointer;white-space:nowrap;transition:all .22s;
+  box-shadow:0 0 24px rgba(0,212,180,.3);
+  display:inline-flex;align-items:center;gap:.35rem;
+}
+.wl-btn:hover:not(:disabled){box-shadow:0 0 40px rgba(0,212,180,.55);transform:translateY(-1px)}
+.wl-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.wl-msg{
+  font-size:.78rem;font-family:'JetBrains Mono',monospace;
+  min-height:1.1rem;position:relative;z-index:1;
+  transition:opacity .3s;
+}
+.wl-msg.ok{color:var(--green)}
+.wl-msg.err{color:#fca5a5}
+.wl-note{
+  margin-top:1.8rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;
+  color:var(--text3);letter-spacing:.04em;position:relative;z-index:1;
+}
+.wl-steps{
+  display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;
+  margin-top:2.5rem;padding-top:2rem;
+  border-top:1px solid var(--border);
+  position:relative;z-index:1;
+}
+.wl-step{text-align:center}
+.wl-step-icon{font-size:1.5rem;margin-bottom:.4rem}
+.wl-step-t{font-size:.78rem;font-weight:700;color:var(--text);margin-bottom:.18rem}
+.wl-step-s{font-size:.68rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+@media(max-width:640px){
+  .wl-sec{padding:0 1rem 48px}
+  .wl-box{padding:2.5rem 1.1rem}
+  .wl-h{font-size:1.55rem}
+  .wl-p{font-size:.83rem;margin-bottom:1.6rem}
+  .wl-form{flex-direction:column;gap:.5rem}
+  .wl-btn{justify-content:center}
+  .wl-steps{gap:1.4rem;margin-top:1.8rem;padding-top:1.5rem}
+  .wl-step-icon{font-size:1.3rem}
+  .wl-step-t{font-size:.72rem}
+  .wl-step-s{font-size:.62rem}
+  .wl-note{font-size:.56rem}
+}
 
 /* ── CTA ── */
 .cta-sec{padding:0 var(--r) 88px;position:relative;z-index:1}
@@ -627,6 +722,46 @@ footer{
   </div>
 </section>
 
+<!-- WAITLIST -->
+<div class="wl-sec r" id="waitlist">
+  <div class="wl-box">
+    <div class="wl-dev-tag"><span class="wl-dev-dot"></span>ACTIVELY IN DEVELOPMENT</div>
+    <h2 class="wl-h">Be first when<br><span class="acc">PRESTILON launches.</span></h2>
+    <p class="wl-p">We're building something serious — a full AI fleet intelligence stack that runs entirely on your machine. Drop your email and we'll notify you the moment it's ready.</p>
+    <div class="wl-form">
+      <input class="wl-input" id="wlEmail" type="email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')wlSubmit()"/>
+      <button class="wl-btn" id="wlBtn" onclick="wlSubmit()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Notify Me
+      </button>
+    </div>
+    <div class="wl-msg" id="wlMsg"></div>
+    <div class="wl-note">No spam. One email when we launch. Unsubscribe anytime.</div>
+    <div class="wl-steps">
+      <div class="wl-step">
+        <div class="wl-step-icon">🧠</div>
+        <div class="wl-step-t">AI engine complete</div>
+        <div class="wl-step-s">CUSUM · Kalman · Models</div>
+      </div>
+      <div class="wl-step">
+        <div class="wl-step-icon">🖥️</div>
+        <div class="wl-step-t">Dashboard in progress</div>
+        <div class="wl-step-s">Fleet view · Live telemetry</div>
+      </div>
+      <div class="wl-step">
+        <div class="wl-step-icon">📦</div>
+        <div class="wl-step-t">Installer pending</div>
+        <div class="wl-step-s">Windows 10/11 · one-click</div>
+      </div>
+      <div class="wl-step">
+        <div class="wl-step-icon">🚀</div>
+        <div class="wl-step-t">Launch soon</div>
+        <div class="wl-step-s">Early access first</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- CTA -->
 <div class="cta-sec r">
   <div class="cta-box">
@@ -696,6 +831,41 @@ import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+e
 const sb=createClient('https://ryftlimrjhhoymyfzusq.supabase.co','sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86')
 const{data:{session}}=await sb.auth.getSession()
 if(session){document.getElementById('navCta').textContent='Dashboard →';document.getElementById('navCta').href='/account'}
+
+window.wlSubmit=async()=>{
+  const inp=document.getElementById('wlEmail')
+  const btn=document.getElementById('wlBtn')
+  const msg=document.getElementById('wlMsg')
+  const email=inp.value.trim()
+  const re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if(!re.test(email)){
+    msg.className='wl-msg err'
+    msg.textContent='✗ Please enter a valid email address.'
+    inp.focus();return
+  }
+  btn.disabled=true
+  btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" fill="none" stroke-dasharray="56" stroke-dashoffset="14" style="animation:_sp .7s linear infinite;transform-origin:center"/></svg> Saving…'
+  msg.className='wl-msg';msg.textContent=''
+  const{error}=await sb.from('waitlist').insert({email,signed_up_at:new Date().toISOString()})
+  btn.disabled=false
+  btn.innerHTML='<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg> Notify Me'
+  if(error&&error.code==='23505'){
+    msg.className='wl-msg ok'
+    msg.textContent='✓ You\'re already on the list — we\'ll be in touch!'
+    inp.value='';return
+  }
+  if(error){
+    msg.className='wl-msg err'
+    msg.textContent='✗ Something went wrong. Please try again.'
+    return
+  }
+  msg.className='wl-msg ok'
+  msg.textContent='✓ You\'re on the list! We\'ll email you when PRESTILON launches.'
+  inp.value=''
+  inp.disabled=true
+  btn.disabled=true
+  btn.style.background='var(--green)'
+}
 </script>
 
 <footer style="position:relative;z-index:1;border-top:1px solid var(--border);padding:1.5rem var(--r);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">
