@@ -301,6 +301,11 @@ nav{
             </button>
           </div>
         </div>
+        <!-- Remember me -->
+        <div style="display:flex;align-items:center;gap:.5rem;margin-top:.35rem">
+          <input type="checkbox" id="rememberMe" checked style="width:15px;height:15px;accent-color:var(--c1);cursor:pointer;flex-shrink:0"/>
+          <label for="rememberMe" style="font-size:.75rem;color:var(--text2);cursor:pointer;user-select:none">Remember me</label>
+        </div>
         <button class="fsub" id="loginBtn" onclick="doLogin()">Sign In</button>
         <div class="divid"><span>don't have an account?</span></div>
         <div style="text-align:center"><a href="#" class="alink" onclick="sw('register');return false">Create a free account →</a></div>
@@ -501,18 +506,20 @@ const sb=createClient('https://ryftlimrjhhoymyfzusq.supabase.co','sb_publishable
 window._sb=sb
 const{data:{session}}=await sb.auth.getSession()
 if(session)window.location.href='/account'
-// Klausās reāllāikā — ja lietotājs apstiprina e-pastu citā tabā,
-// šī lapa automatīski novirza uz /account.
-sb.auth.onAuthStateChange((e,s)=>{
-  if(e==='SIGNED_IN'&&s?.user)window.location.href='/account'
-})
 window.doLogin=async()=>{
   const e=document.getElementById('lEmail').value.trim(),p=document.getElementById('lPass').value
+  const remember=document.getElementById('rememberMe')?.checked!==false
   if(!e||!p){showAlert('Please fill in all fields.','error');return}
   setLoading('loginBtn',true,'Signing in…')
   const{error}=await sb.auth.signInWithPassword({email:e,password:p})
   setLoading('loginBtn',false,'Sign In')
   if(error){showAlert(error.message,'error');return}
+  // If "Remember me" is unchecked, clear session on tab close
+  if(!remember){
+    window.addEventListener('beforeunload',()=>{
+      sb.auth.signOut()
+    })
+  }
   window.location.href='/account'
 }
 window.doRegister=async()=>{
@@ -599,7 +606,7 @@ window.doForgot=async()=>{
   const e=document.getElementById('fEmail').value.trim()
   if(!e){showAlert('Please enter your email.','error');return}
   setLoading('forgotBtn',true,'Sending…')
-  const{error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin+'/account'})
+  const{error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin+'/reset-password'})
   setLoading('forgotBtn',false,'Send Reset Link')
   if(error){showAlert(error.message,'error');return}
   showAlert('✅ Reset link sent — check your inbox.','success')
