@@ -250,25 +250,20 @@ import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+e
 const sb=createClient(
   'https://ryftlimrjhhoymyfzusq.supabase.co',
   'sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86',
-  { auth:{ detectSessionInUrl:false, persistSession:true, flowType:'implicit' } }
+  { auth:{ detectSessionInUrl:false, persistSession:true, flowType:'pkce' } }
 )
 
 let handled=false
 function handleSuccess(){ if(handled)return; handled=true; show('stateSuccess'); startCountdown() }
 function handleError(){ if(handled)return; handled=true; show('stateError') }
 
-// Supabase /auth/v1/verify redirect atdod #access_token= hash
-const _h=new URLSearchParams(window.location.hash.replace('#',''))
-const _access_token=_h.get('access_token')
-const _refresh_token=_h.get('refresh_token')
-const _type=_h.get('type')
+// ?code= query param — Gmail un visi email klienti to NEKAD negriez
+// (hash #access_token= tiek nogriezts Gmail mobile)
+const _code=new URLSearchParams(window.location.search).get('code')
 
-if(_type==='recovery'){
-  window.location.href='/reset-password'+window.location.hash
-}
-
-if(_access_token){
-  const{data,error}=await sb.auth.setSession({access_token:_access_token,refresh_token:_refresh_token||''})
+if(_code){
+  // Supabase serveris pārbauda code un atdod sesiju — strādā no jebkuras ierīces
+  const{data,error}=await sb.auth.exchangeCodeForSession(_code)
   if(!error && data?.session?.user){ handleSuccess() }
   else { handleError() }
 } else {
