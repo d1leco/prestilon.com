@@ -418,7 +418,7 @@ nav{
           Data stays private
         </div>
       </div>
-      <div class="form-footer">By signing in you agree to our <a href="/terms">Terms</a> &amp; <a href="/privacy">Privacy Policy</a></div>
+      <div class="form-footer" id="formFooterTerms">By signing in you agree to our <a href="/terms">Terms</a> &amp; <a href="/privacy">Privacy Policy</a></div>
     </div>
   </div>
 </div>
@@ -454,6 +454,7 @@ function sw(t){
   document.getElementById('pnl'+t[0].toUpperCase()+t.slice(1))?.classList.add('on')
   document.getElementById('tab'+t[0].toUpperCase()+t.slice(1))?.classList.add('on')
   document.getElementById('tabBar').style.display=t==='forgot'?'none':''
+  const ft=document.getElementById('formFooterTerms');if(ft)ft.style.display=t==='register'?'none':''
   document.getElementById('alertBox').innerHTML=''
 }
 function showAlert(msg,type){
