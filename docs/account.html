@@ -639,4 +639,15 @@ window.changePwd=async()=>{
 }
 
 window.signOutAll=async()=>{
-  setLoad('signOutAllBtn',true,'S
+  setLoad('signOutAllBtn',true,'Signing out…')
+  await sb.auth.signOut({scope:'global'})
+  window.location.href='/'
+}
+
+window.doLogout=async()=>{
+  await sb.auth.signOut()
+  window.location.href='/'
+}
+</script>
+</body>
+</html>
