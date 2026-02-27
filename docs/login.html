@@ -562,7 +562,7 @@ window.doRegister=async()=>{
     password:p,
     options:{
       data:{full_name:n,username:u},
-      emailRedirectTo:location.origin+'/account'
+      emailRedirectTo:location.origin+'/email-confirmed'
     }
   })
   if(error){
@@ -598,7 +598,7 @@ window.doRegister=async()=>{
   document.getElementById('tabBar').style.display='none'
 }
 window.doResendConfirm=async(email)=>{
-  const{error}=await sb.auth.resend({type:'signup',email,options:{emailRedirectTo:location.origin+'/account'}})
+  const{error}=await sb.auth.resend({type:'signup',email,options:{emailRedirectTo:location.origin+'/email-confirmed'}})
   if(error){showAlert(error.message,'error');return}
   showAlert('✅ Confirmation email resent to <strong>'+email+'</strong>.','success')
 }
