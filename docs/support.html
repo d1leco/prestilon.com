@@ -44,24 +44,6 @@ nav{
 .logo{display:flex;align-items:center;text-decoration:none;transition:opacity .2s;padding-left:1rem;overflow:hidden;height:64px}
 .logo:hover{opacity:.85}
 .logo-img{height:44px;width:auto;mix-blend-mode:screen;display:block;object-fit:contain}
-@media(max-width:640px){
-  nav{padding:0 .7rem 0 0;height:48px}
-  .logo{padding-left:.7rem;height:48px}
-  .logo-img{height:32px}
-  .nl{font-size:.68rem;padding:.2rem .32rem}
-  .nc{padding:.3rem .6rem;font-size:.7rem;margin-left:.1rem;white-space:nowrap}
-  .hero{padding:36px 1rem 28px}
-  .hero-h1{font-size:clamp(1.5rem,7vw,2rem)}
-  .hero-sub{font-size:.8rem}
-  .content{padding:2rem 1rem 3rem}
-  .card{padding:1.3rem 1rem}
-  .ff{padding:.6rem .85rem;font-size:.84rem}
-  textarea.ff{min-height:85px}
-  .fsub{padding:.75rem;font-size:.88rem}
-  footer{padding:1.1rem 1rem;flex-direction:column;align-items:flex-start;gap:.5rem}
-  .fl-links{gap:.7rem;flex-wrap:wrap}
-  .fl-links a{font-size:.68rem}
-}
 .nav-r{display:flex;align-items:center;gap:.15rem}
 .nl{padding:.42rem .85rem;color:var(--text2);font-size:.88rem;font-weight:500;text-decoration:none;border-radius:7px;transition:color .18s,background .18s}
 .nl:hover{color:var(--text);background:rgba(255,255,255,.05)}
@@ -155,6 +137,25 @@ footer{border-top:1px solid var(--border);padding:2rem var(--r);display:flex;ali
 /* REVEAL */
 .rev{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
 .rev.vis{opacity:1;transform:none}
+
+@media(max-width:640px){
+  nav{padding:0 .7rem 0 0;height:48px}
+  .logo{padding-left:.7rem;height:48px}
+  .logo-img{height:32px}
+  .nl{font-size:.68rem;padding:.2rem .32rem}
+  .nc{padding:.3rem .6rem;font-size:.7rem;margin-left:.1rem;white-space:nowrap}
+  .hero{padding:36px 1rem 28px}
+  .hero-h1{font-size:clamp(1.5rem,7vw,2rem)}
+  .hero-sub{font-size:.8rem}
+  .content{padding:2rem 1rem 3rem}
+  .card{padding:1.3rem 1rem}
+  .ff{padding:.6rem .85rem;font-size:.84rem}
+  textarea.ff{min-height:85px}
+  .fsub{padding:.75rem;font-size:.88rem}
+  footer{padding:1.1rem 1rem;flex-direction:column;align-items:flex-start;gap:.5rem}
+  .fl-links{gap:.7rem;flex-wrap:wrap}
+  .fl-links a{font-size:.68rem}
+}
 </style>
 </head>
 <body>
