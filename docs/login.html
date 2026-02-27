@@ -13,7 +13,7 @@
 :root{
   --bg:#060f1a;--bg2:#0a1929;--bg3:#0e2035;
   --c1:#00d4b4;--c2:#00a896;--purple:#6c5ce7;
-  --text:#f0f6ff;--text2:#8eaabf;--text3:#3d5a70;
+  --text:#f0f6ff;--text2:#a8c0d4;--text3:#5a7a94;
   --border:rgba(255,255,255,.07);--border2:rgba(0,212,180,.25);
   --red:#ef4444;--green:#10d48a;--amber:#f59e0b;
 }
@@ -452,10 +452,11 @@ window.checkUsername=function(v){
   hint.style.color='var(--text3)';hint.textContent='Checking…'
   clearTimeout(_unTimer)
   _unTimer=setTimeout(async()=>{
-    const{data}=await _sb.from('profiles').select('id').ilike('Username',v).maybeSingle().catch(()=>({data:null}))
+    if(!window._sb){hint.textContent='';return}
+    const{data}=await window._sb.from('profiles').select('id').ilike('Username',v).maybeSingle().catch(()=>({data:null}))
     if(data){hint.style.color='#fca5a5';hint.textContent='✗ Username already taken.'}
     else{hint.style.color='var(--green)';hint.textContent='✓ Available!'}
-  },600)
+  },700)
 }
 window.checkEmailMatch=function(){
   const e1=document.getElementById('rEmail')?.value.trim()||""
@@ -475,10 +476,11 @@ window.checkEmailAvail=function(v){
   hint.style.color='var(--text3)';hint.textContent='Checking…'
   clearTimeout(_emTimer)
   _emTimer=setTimeout(async()=>{
-    const{data}=await _sb.from('profiles').select('id').ilike('email',v).maybeSingle().catch(()=>({data:null}))
+    if(!window._sb){hint.textContent='';return}
+    const{data}=await window._sb.from('profiles').select('id').ilike('email',v).maybeSingle().catch(()=>({data:null}))
     if(data){hint.style.color='#fca5a5';hint.textContent='✗ Email already registered.'}
     else{hint.style.color='var(--green)';hint.textContent='✓ Looks good.'}
-  },600)
+  },700)
 }
 function checkStr(v){
   const bars=[document.getElementById('pb1'),document.getElementById('pb2'),document.getElementById('pb3')]
