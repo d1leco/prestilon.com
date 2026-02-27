@@ -251,7 +251,7 @@ import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+e
 const sb=createClient(
   'https://ryftlimrjhhoymyfzusq.supabase.co',
   'sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86',
-  { auth:{ detectSessionInUrl:true, persistSession:true, flowType:'pkce' } }
+  { auth:{ detectSessionInUrl:true, persistSession:true, flowType:'implicit' } }
 )
 
 let handled=false
@@ -288,14 +288,6 @@ sb.auth.onAuthStateChange((event, session)=>{
     handleSuccess()
   }
 })
-
-// PKCE: manually exchange ?code= if detectSessionInUrl doesn't catch it
-if(_hasCode){
-  try{
-    const{data,error}=await sb.auth.exchangeCodeForSession(window.location.href)
-    if(!error && data?.session?.user){ handleSuccess() }
-  }catch(e){ /* will fallback below */ }
-}
 
 // Fallback: if no auth event in 6s
 const _fallbackTimer=setTimeout(async()=>{
