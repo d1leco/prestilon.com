@@ -278,7 +278,7 @@ nav{
           <label class="fl">Email address</label>
           <div class="fi-wrap">
             <span class="fi-ico"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="22,6 12,13 2,6"/></svg></span>
-            <input type="email" id="lEmail" class="fi has-ico" placeholder="you@example.com" autocomplete="email"/>
+            <input type="email" id="lEmail" class="fi has-ico" placeholder="you@example.com" autocomplete="off"/>
           </div>
         </div>
         <div class="fg">
@@ -290,7 +290,7 @@ nav{
           </label>
           <div class="fi-wrap">
             <span class="fi-ico"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><rect stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" x="3" y="11" width="18" height="11" rx="2"/><path stroke="currentColor" stroke-width="2" d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
-            <input type="password" id="lPass" class="fi has-ico" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+            <input type="password" id="lPass" class="fi has-ico" placeholder="••••••••" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"/>
             <button class="eye" type="button" onclick="togglePw('lPass',this)" tabindex="-1">
               <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle stroke="currentColor" stroke-width="2" cx="12" cy="12" r="3"/></svg>
             </button>
@@ -309,14 +309,14 @@ nav{
           <label class="fl">Full name</label>
           <div class="fi-wrap">
             <span class="fi-ico"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle stroke="currentColor" stroke-width="2" cx="12" cy="7" r="4"/></svg></span>
-            <input type="text" id="rName" class="fi has-ico" placeholder="Jane Doe" autocomplete="name"/>
+            <input type="text" id="rName" class="fi has-ico" placeholder="Jane Doe" autocomplete="off"/>
           </div>
         </div>
         <div class="fg">
           <label class="fl">Username</label>
           <div class="fi-wrap">
             <span class="fi-ico"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3c1.5 0 3 .5 3 2s-1.5 2-3 2-3-.5-3-2 1.5-2 3-2z"/></svg></span>
-            <input type="text" id="rUsername" class="fi has-ico" placeholder="cooluser123" autocomplete="username" oninput="checkUsername(this.value)"/>
+            <input type="text" id="rUsername" class="fi has-ico" placeholder="cooluser123" autocomplete="off" oninput="checkUsername(this.value)"/>
           </div>
           <div id="usernameHint" style="font-size:.68rem;margin-top:.3rem;min-height:.85rem"></div>
         </div>
@@ -324,14 +324,14 @@ nav{
           <label class="fl">Email address</label>
           <div class="fi-wrap">
             <span class="fi-ico"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="22,6 12,13 2,6"/></svg></span>
-            <input type="email" id="rEmail" class="fi has-ico" placeholder="you@example.com" autocomplete="email"/>
+            <input type="email" id="rEmail" class="fi has-ico" placeholder="you@example.com" autocomplete="off"/>
           </div>
         </div>
         <div class="fg">
           <label class="fl">Password</label>
           <div class="fi-wrap">
             <span class="fi-ico"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><rect stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" x="3" y="11" width="18" height="11" rx="2"/><path stroke="currentColor" stroke-width="2" d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
-            <input type="password" id="rPass" class="fi has-ico" placeholder="min. 8 characters" autocomplete="new-password" oninput="checkStr(this.value)"/>
+            <input type="password" id="rPass" class="fi has-ico" placeholder="min. 8 characters" autocomplete="off" oninput="checkStr(this.value)"/>
             <button class="eye" type="button" onclick="togglePw('rPass',this)" tabindex="-1">
               <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle stroke="currentColor" stroke-width="2" cx="12" cy="12" r="3"/></svg>
             </button>
@@ -342,7 +342,7 @@ nav{
           <label class="fl">Confirm password</label>
           <div class="fi-wrap">
             <span class="fi-ico"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><rect stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" x="3" y="11" width="18" height="11" rx="2"/><path stroke="currentColor" stroke-width="2" d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
-            <input type="password" id="rConf" class="fi has-ico" placeholder="••••••••" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()"/>
+            <input type="password" id="rConf" class="fi has-ico" placeholder="••••••••" autocomplete="off" onkeydown="if(event.key==='Enter')doRegister()"/>
           </div>
         </div>
         <button class="fsub" id="regBtn" onclick="doRegister()">Create Account</button>
