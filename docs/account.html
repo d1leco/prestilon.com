@@ -546,6 +546,17 @@ sb.auth.onAuthStateChange(async(e,s)=>{
 
   if(e==='SIGNED_OUT'){window.location.href='/';return}
 
+  // ── SIGNED_IN ─────────────────────────────────────────
+  // Tiek izsaukts kad lietotājs ierodas no apstiprinājuma
+  // linka (signup confirm, magic link) → atsvaidzina UI
+  // un notīra URL hash lai links nešķiet "atkārtoti derīgs".
+  if(e==='SIGNED_IN'&&s?.user){
+    await loadAccount(s.user)
+    overlay.classList.add('hidden')
+    history.replaceState(null,'',location.pathname)
+    return
+  }
+
   // ── EMAIL_CHANGE ──────────────────────────────────────
   // Tiek izsaukts kad lietotājs noklikšķina apstiprinājuma
   // linku savā JAUNAJĀ e-pasta kastītē.
