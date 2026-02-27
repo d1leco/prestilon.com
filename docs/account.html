@@ -296,11 +296,11 @@ footer{border-top:1px solid var(--border);padding:1.55rem var(--r);display:flex;
       <div id="profileAlert"></div>
       <div class="two-col">
         <div class="fg">
-          <label class="fl">Display Name</label>
+          <label class="fl" for="pName">Display Name</label>
           <input type="text" id="pName" class="fi" placeholder="Your name"/>
         </div>
         <div class="fg">
-          <label class="fl">Email (read-only)</label>
+          <label class="fl" for="pEmail">Email (read-only)</label>
           <input type="email" id="pEmail" class="fi" readonly/>
         </div>
       </div>
@@ -316,7 +316,7 @@ footer{border-top:1px solid var(--border);padding:1.55rem var(--r);display:flex;
       <div id="emailAlert"></div>
       <p style="font-size:.8rem;color:var(--text2);margin-bottom:.95rem;line-height:1.65">A confirmation link will be sent to the new address. Your email won't change until you click the link.</p>
       <div class="fg" style="max-width:400px">
-        <label class="fl">New Email Address</label>
+        <label class="fl" for="newEmail">New Email Address</label>
         <input type="email" id="newEmail" class="fi" placeholder="new@example.com"/>
       </div>
       <div class="btn-row">
@@ -331,7 +331,7 @@ footer{border-top:1px solid var(--border);padding:1.55rem var(--r);display:flex;
       <div id="pwAlert"></div>
       <div class="two-col">
         <div class="fg">
-          <label class="fl">New Password</label>
+          <label class="fl" for="np">New Password</label>
           <div class="fi-wrap">
             <input type="password" id="np" class="fi" placeholder="min. 8 characters" oninput="checkStr(this.value)"/>
             <button class="eye" type="button" onclick="togglePw('np')" tabindex="-1">
@@ -341,7 +341,7 @@ footer{border-top:1px solid var(--border);padding:1.55rem var(--r);display:flex;
           <div class="pw-bars"><div class="pw-bar" id="pb1"></div><div class="pw-bar" id="pb2"></div><div class="pw-bar" id="pb3"></div><div class="pw-lbl" id="pwl"></div></div>
         </div>
         <div class="fg">
-          <label class="fl">Confirm New Password</label>
+          <label class="fl" for="cp2">Confirm New Password</label>
           <div class="fi-wrap">
             <input type="password" id="cp2" class="fi" placeholder="••••••••" onkeydown="if(event.key==='Enter')changePwd()"/>
             <button class="eye" type="button" onclick="togglePw('cp2')" tabindex="-1">
@@ -484,9 +484,11 @@ const sb=createClient(
 const overlay=document.getElementById('loadingOverlay')
 
 /* ── Initial session check ── */
-const{data:{session}}=await sb.auth.getSession()
-if(!session){window.location.href='/login'}
-else{await loadAccount(session.user);overlay.classList.add('hidden')}
+let _initSession
+try{const r=await sb.auth.getSession();_initSession=r.data?.session}catch(e){console.error('getSession error',e)}
+if(!_initSession){window.location.href='/login'}
+else{try{await loadAccount(_initSession.user)}catch(e){console.error('loadAccount error',e)}
+overlay.classList.add('hidden')}
 
 /* ═══════════════════════════════════════════════════════
    AUTH STATE CHANGE
@@ -541,7 +543,7 @@ async function loadAccount(u){
   document.getElementById('detailId').textContent=(u.id||'').slice(0,18)+'…'
   document.getElementById('detailSince').textContent=fmtDate(u.created_at)
 
-  const{data:sub}=await sb.from('subscriptions').select('*').eq('user_id',u.id).single()
+  const{data:sub}=await sb.from('subscriptions').select('*').eq('user_id',u.id).maybeSingle().then(r=>r)
   const plans={starter:'Starter',professional:'Professional',enterprise:'Enterprise'}
   const planLabel=sub?(plans[sub.plan]||sub.plan)+' Plan':'No active plan'
   document.getElementById('subName').textContent=planLabel
