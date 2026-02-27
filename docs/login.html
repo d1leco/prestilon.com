@@ -481,11 +481,22 @@ window.doRegister=async()=>{
   if(p!==c){showAlert('⚠️ Passwords do not match.','error');return}
   // — Clear any previous error —
   document.getElementById('alertBox').innerHTML=''
-  // — Pārbauda vai username jau aizņemts —
-  setLoading('regBtn',true,'Checking username…')
-  const{data:existing,error:chkErr}=await sb.from('profiles').select('id').ilike('Username',u).maybeSingle()
-  if(chkErr&&chkErr.code!=='PGRST116'){setLoading('regBtn',false,'Create Account');showAlert('⚠️ Could not verify username. Try again.','error');return}
-  if(existing){setLoading('regBtn',false,'Create Account');showAlert('⚠️ Username <strong>'+u+'</strong> is already taken. Please choose another.','error');return}
+  // — Pārbauda vai username un e-pasts jau aizņemts —
+  setLoading('regBtn',true,'Checking availability…')
+  const[{data:exUser},{data:exEmail}]=await Promise.all([
+    sb.from('profiles').select('id').ilike('Username',u).maybeSingle(),
+    sb.from('profiles').select('id').ilike('email',e).maybeSingle()
+  ])
+  if(exUser){
+    setLoading('regBtn',false,'Create Account')
+    showAlert('⚠️ Username <strong>'+u+'</strong> is already taken. Please choose another.','error')
+    return
+  }
+  if(exEmail){
+    setLoading('regBtn',false,'Create Account')
+    showAlert('⚠️ An account with this email already exists. <a href="#" onclick="sw(\'login\');return false" style="color:var(--c1)">Sign in instead →</a>','error')
+    return
+  }
   setLoading('regBtn',true,'Creating account…')
   const{data,error}=await sb.auth.signUp({
     email:e,
