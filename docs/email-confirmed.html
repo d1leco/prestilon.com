@@ -281,7 +281,7 @@ if(_hashType==='recovery'){
   window.location.href='/reset-password'+window.location.hash
 }
 
-// Listen for auth state changes (fires after Supabase exchanges code/token)
+// Listen for auth state changes
 sb.auth.onAuthStateChange((event, session)=>{
   if(handled)return
   if((event==='SIGNED_IN'||event==='USER_UPDATED') && session?.user){
@@ -289,15 +289,18 @@ sb.auth.onAuthStateChange((event, session)=>{
   }
 })
 
-// Fallback: if no auth event in 6s
+// CRITICAL FIX: detectSessionInUrl var apstrādāt token PIRMS listener ir pievienots
+// (īpaši uz mobile). Tūlīt pārbaudam sesiju!
+const{data:{session:_earlySession}}=await sb.auth.getSession()
+if(!handled && _earlySession?.user){ handleSuccess() }
+
+// Fallback: ja nekas nav noticis 4s laikā
 const _fallbackTimer=setTimeout(async()=>{
   if(handled)return
-  // Last chance — check if session exists
   const{data:{session}}=await sb.auth.getSession()
   if(session?.user){ handleSuccess(); return }
-  // No session, no token in URL = truly invalid/expired
   handleError()
-}, _hasCode||_hasToken ? 8000 : 1500)
+}, _hasToken ? 4000 : 1500)
 </script>
 </body>
 </html>
