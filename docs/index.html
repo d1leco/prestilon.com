@@ -41,41 +41,74 @@ nav{
 .logo:hover{opacity:.85}
 .logo-img{height:44px;width:auto;mix-blend-mode:screen;display:block;object-fit:contain}
 @media(max-width:640px){
-  nav{padding:0 .75rem 0 0;height:52px}
-  .logo{margin-left:8px}
-  .logo-img{height:36px}
-  .nl{font-size:.75rem;padding:.3rem .5rem}
-  .nc{padding:.35rem .65rem;font-size:.72rem;margin-left:.2rem;white-space:nowrap}
-}
-/* ── MOBILE LAYOUT FIXES ── */
-@media(max-width:640px){
-  .hero{padding:32px 1rem 28px;gap:1.5rem}
-  .hero-h1{font-size:clamp(1.9rem,9vw,2.8rem)}
-  .hero-sub{font-size:.88rem;margin-bottom:1.4rem}
-  .btn{padding:.65rem 1.2rem;font-size:.82rem}
-  .hero-cta{gap:.6rem;margin-bottom:1.8rem}
-  .trust-i{font-size:.7rem}
-  .section{padding:52px 1rem}
-  .sec-h{font-size:clamp(1.5rem,7vw,2rem)}
-  .sec-sub{font-size:.88rem}
-  .stats-inner{padding:0 1rem}
-  .stat{padding:1.6rem .8rem}
-  .stat-val{font-size:1.9rem}
-  .cta-sec{padding:0 1rem 52px}
-  .cta-box{padding:3rem 1.25rem}
-  .cta-h{font-size:1.5rem}
-  .cta-p{font-size:.88rem}
-  .cta-btns{flex-direction:column;align-items:stretch}
+  /* NAV */
+  nav{padding:0 .7rem 0 0;height:48px}
+  .logo{padding-left:.7rem;height:48px}
+  .logo-img{height:32px}
+  .nl{font-size:.72rem;padding:.25rem .45rem}
+  .nc{padding:.3rem .6rem;font-size:.7rem;margin-left:.15rem;white-space:nowrap}
+
+  /* HERO */
+  .hero{padding:22px 1rem 20px;gap:.8rem;min-height:auto}
+  .hero-badge{font-size:.56rem;margin-bottom:.85rem;padding:.18rem .55rem .18rem .38rem;letter-spacing:.05em}
+  .badge-dot{width:5px;height:5px}
+  .hero-h1{font-size:clamp(1.45rem,7.2vw,1.9rem);line-height:1.07;margin-bottom:.7rem;letter-spacing:-.02em}
+  .hero-sub{font-size:.8rem;line-height:1.62;margin-bottom:1.1rem;max-width:100%}
+  .btn{padding:.55rem 1rem;font-size:.78rem;border-radius:8px}
+  .hero-cta{gap:.45rem;margin-bottom:1.2rem;flex-wrap:nowrap}
+  .hero-trust{gap:.8rem;flex-wrap:wrap}
+  .trust-i{font-size:.65rem;gap:.3rem}
+
+  /* TICKER */
+  .ticker-item{font-size:.56rem;padding:0 .9rem}
+
+  /* SECTIONS */
+  .section{padding:40px 1rem}
+  .sec-label{font-size:.58rem}
+  .sec-h{font-size:clamp(1.3rem,5.8vw,1.65rem);line-height:1.12}
+  .sec-sub{font-size:.8rem;line-height:1.65}
+
+  /* FEATURES GRID */
+  .feat-grid{grid-template-columns:1fr;margin-top:2rem}
+  .feat{padding:1.3rem 1rem}
+  .feat h3{font-size:.85rem}
+  .feat p{font-size:.75rem}
+  .feat-icon-box{width:36px;height:36px}
+
+  /* STATS */
+  .stats-inner{padding:0;grid-template-columns:repeat(2,1fr)}
+  .stat{padding:1.3rem .5rem}
+  .stat-val{font-size:1.65rem}
+  .stat-lbl{font-size:.52rem}
+
+  /* ARCHITECTURE */
+  .arch-row{flex-direction:column;align-items:center;gap:.4rem}
+  .arch-arr{transform:rotate(90deg);padding:.1rem 0;font-size:.8rem}
+  .arch-node{min-width:150px;padding:.9rem .8rem}
+  .an-icon{font-size:1.3rem;margin-bottom:.3rem}
+  .an-title{font-size:.72rem}
+  .an-sub{font-size:.58rem}
+  .cloud-box{padding:.7rem 1rem;gap:1.1rem;margin-top:1rem}
+  .ci-icon{font-size:.85rem}
+  .ci-name{font-size:.66rem}
+  .ci-sub{font-size:.55rem}
+
+  /* CTA */
+  .cta-sec{padding:0 1rem 40px}
+  .cta-box{padding:2.2rem 1rem}
+  .cta-h{font-size:1.3rem;margin-bottom:.5rem}
+  .cta-p{font-size:.8rem;margin-bottom:1.2rem}
+  .cta-btns{flex-direction:column;align-items:stretch;gap:.5rem}
   .cta-btns .btn{text-align:center;justify-content:center}
-  footer{padding:1.5rem 1rem;flex-direction:column;align-items:flex-start;gap:.5rem}
-  /* Fix 2-col feature header grid */
-  [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important;gap:1rem!important}
-  /* Fix arch nodes overflow */
-  .arch-node{min-width:100px;padding:1rem .8rem}
-  .an-title{font-size:.7rem}
-  .an-sub{font-size:.55rem}
-  .cloud-box{padding:.8rem 1rem;gap:1.5rem}
-  .ticker-item{font-size:.6rem;padding:0 1.2rem}
+  .cta-note{font-size:.52rem}
+
+  /* FOOTER */
+  footer{padding:1.1rem 1rem;flex-direction:column;align-items:flex-start;gap:.5rem}
+  .footer-links{gap:.7rem;flex-wrap:wrap}
+  .footer-links a{font-size:.68rem}
+
+  /* INLINE GRID FIX */
+  [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important;gap:.75rem!important}
 }
 .nav-r{display:flex;align-items:center;gap:.15rem}
 .nl{padding:.42rem .85rem;color:var(--text2);font-size:.88rem;font-weight:500;text-decoration:none;border-radius:7px;transition:color .18s,background .18s}
@@ -607,11 +640,6 @@ footer{
     <div class="cta-note">WINDOWS 10/11 · NODE.JS 18+ · KLIPPER / MOONRAKER REQUIRED</div>
   </div>
 </div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="fc">© 2026 PRESTILON. All rights reserved.</div>
-</footer>
 
 <script>
 /* CANVAS */

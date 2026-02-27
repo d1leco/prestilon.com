@@ -43,6 +43,18 @@ nav{
 .logo{display:flex;align-items:center;text-decoration:none;transition:opacity .2s;padding-left:1rem;overflow:hidden;height:64px}
 .logo:hover{opacity:.85}
 .logo-img{height:44px;width:auto;mix-blend-mode:screen;display:block;object-fit:contain}
+@media(max-width:640px){
+  nav{padding:0 .7rem 0 0;height:48px}
+  .logo{padding-left:.7rem;height:48px}
+  .logo-img{height:32px}
+  .page{min-height:calc(100vh - 48px)}
+  .card{padding:1.75rem 1.25rem}
+  .title{font-size:1.25rem}
+  .subtitle{font-size:.8rem}
+  .btn{font-size:.82rem;padding:.55rem}
+  .feats{gap:.8rem}
+  .feat{font-size:.62rem}
+}
 
 .page{
   min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;
