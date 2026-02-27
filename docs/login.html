@@ -511,19 +511,8 @@ window.doRegister=async()=>{
     showAlert(error.message,'error')
     return
   }
-  // Insert profile row (trigger fallback)
-  if(data?.user){
-    try{
-      await sb.from('profiles').upsert({
-        id:data.user.id,
-        email:e,
-        full_name:n,
-        Username:u,
-        created_at:new Date().toISOString(),
-        updated_at:new Date().toISOString()
-      },{onConflict:'id'})
-    }catch(_){/* trigger will handle it */}
-  }
+  // Profilu izveido triggeris auth.users tabulā
+  // Klienta upsert nav iespējams bez sesijas (e-pasta apstiprinājums)
   setLoading('regBtn',false,'Create Account')
   // Email confirm OFF — redirect directly
   if(data?.session){
