@@ -359,6 +359,55 @@ nav{
   .wl-note{font-size:.56rem}
 }
 
+/* ── PRICING ── */
+.pricing-sec{padding:88px var(--r);position:relative;z-index:1}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3.5rem}
+@media(max-width:900px){.pricing-grid{grid-template-columns:1fr;max-width:440px;margin-left:auto;margin-right:auto}}
+.plan{
+  background:var(--bg2);border:1px solid var(--border);border-radius:18px;
+  padding:2rem 1.75rem;display:flex;flex-direction:column;gap:0;
+  position:relative;overflow:hidden;transition:border-color .25s,transform .25s;
+}
+.plan:hover{border-color:var(--border2);transform:translateY(-3px)}
+.plan.popular{border-color:rgba(0,212,180,.45);background:var(--bg3)}
+.plan.popular::before{
+  content:'MOST POPULAR';
+  position:absolute;top:0;right:0;
+  background:var(--c1);color:#060f1a;
+  font-family:'JetBrains Mono',monospace;font-size:.55rem;font-weight:700;letter-spacing:.1em;
+  padding:.28rem .7rem;border-radius:0 18px 0 10px;
+}
+.plan-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--text);margin-bottom:.3rem}
+.plan-price{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:2.4rem;color:var(--c1);line-height:1;margin:.6rem 0 .25rem;
+}
+.plan-price span{font-size:.95rem;color:var(--text2);font-weight:400;font-family:'DM Sans',sans-serif}
+.plan-sub{font-size:.75rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:1.4rem;min-height:2rem}
+.plan-divider{height:1px;background:var(--border);margin-bottom:1.4rem}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:.65rem;flex:1}
+.plan-features li{
+  font-size:.82rem;color:var(--text2);display:flex;align-items:flex-start;gap:.55rem;line-height:1.45;
+}
+.plan-features li::before{content:'✓';color:var(--c1);font-weight:700;flex-shrink:0;margin-top:.05rem}
+.plan-features li.highlight{color:var(--text);font-weight:600}
+.plan-badge{display:inline-block;padding:.2rem .55rem;border-radius:5px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#fbbf24;margin-bottom:.5rem}
+.plan-cta{
+  margin-top:1.75rem;padding:.75rem;border-radius:10px;
+  font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;
+  text-align:center;text-decoration:none;border:none;cursor:pointer;
+  transition:all .22s;display:block;
+}
+.plan-cta.primary{background:var(--c1);color:#060f1a;box-shadow:0 0 24px rgba(0,212,180,.25)}
+.plan-cta.primary:hover{box-shadow:0 0 40px rgba(0,212,180,.5);transform:translateY(-1px)}
+.plan-cta.secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)}
+.plan-cta.secondary:hover{background:rgba(255,255,255,.1);border-color:var(--border2)}
+@media(max-width:640px){
+  .pricing-sec{padding:40px 1rem}
+  .plan{padding:1.5rem 1.25rem}
+  .plan-price{font-size:2rem}
+}
+
 /* ── CTA ── */
 .cta-sec{padding:0 var(--r) 88px;position:relative;z-index:1}
 .cta-box{
@@ -757,6 +806,74 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.
     </div>
   </div>
 </div>
+
+<!-- PRICING -->
+<section class="pricing-sec r" id="pricing">
+  <div class="r">
+    <div class="sec-label">PRICING</div>
+    <h2 class="sec-h">Simple, transparent pricing.</h2>
+    <p class="sec-sub">Start small and scale as your fleet grows. No hidden fees — just the plan that fits your operation.</p>
+  </div>
+  <div class="pricing-grid">
+
+    <!-- BASIC -->
+    <div class="plan r">
+      <div class="plan-name">Basic</div>
+      <div class="plan-price">€4.99<span>/mo</span></div>
+      <div class="plan-sub">+ €3 per printer / month<br>Up to 50 printers</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li class="highlight">Full monitoring dashboard</li>
+        <li>Real-time printer status</li>
+        <li>Email notifications</li>
+        <li>AI anomaly detection</li>
+        <li>30-day print history</li>
+        <li>€3 per printer / month</li>
+      </ul>
+      <a class="plan-cta secondary" href="/login">Get Started →</a>
+    </div>
+
+    <!-- PRO -->
+    <div class="plan popular r2">
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">€139.99<span>/mo</span></div>
+      <div class="plan-sub">All 50 printers included<br>No extra fees</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li class="highlight">Everything in Basic</li>
+        <li class="highlight">All 50 printers included</li>
+        <li>Kalman / CUSUM analytics</li>
+        <li>WebSocket real-time data</li>
+        <li>AI cloud constants</li>
+        <li>90-day print history</li>
+        <li>Priority support</li>
+      </ul>
+      <a class="plan-cta primary" href="/login">Get Started →</a>
+    </div>
+
+    <!-- ANNUAL -->
+    <div class="plan r3">
+      <div class="plan-badge">Save ~32%</div>
+      <div class="plan-name">Annual</div>
+      <div class="plan-price">€1,149.99<span>/yr</span></div>
+      <div class="plan-sub">All 50 printers included<br>~€95.83 / month billed yearly</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li class="highlight">Everything in Pro</li>
+        <li class="highlight">All 50 printers included</li>
+        <li>Fixed price for 12 months</li>
+        <li>Enterprise AI constants</li>
+        <li>Unlimited print history</li>
+        <li>24/7 VIP support</li>
+        <li>SLA guarantee</li>
+      </ul>
+      <a class="plan-cta secondary" href="/login">Get Started →</a>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider r"></div>
 
 <!-- CTA -->
 <div class="cta-sec r">
