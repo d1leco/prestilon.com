@@ -95,10 +95,7 @@ nav{
   cursor:pointer;transition:border-color .2s,background .2s;
 }
 .post:hover{border-color:var(--border2);background:rgba(0,212,180,.02)}
-.post-vote{display:flex;flex-direction:column;align-items:center;gap:.2rem;flex-shrink:0;min-width:32px}
-.vote-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text3);font-size:.75rem;width:28px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1}
-.vote-btn:hover,.vote-btn.active{border-color:var(--c1);color:var(--c1);background:rgba(0,212,180,.08)}
-.vote-count{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text2);line-height:1}
+.post-vote{display:none}
 .post-body{flex:1;min-width:0}
 .post-tags{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.45rem}
 .tag{padding:.15rem .55rem;border-radius:99px;font-size:.62rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
@@ -276,8 +273,8 @@ footer{border-top:1px solid var(--border);padding:2rem var(--r);display:flex;ali
       </div>
     </div>
 
-    <!-- NEW POST PROMPT -->
-    <button class="new-post-btn rev" onclick="openModal()">
+    <!-- NEW POST PROMPT (only for logged-in users) -->
+    <button class="new-post-btn rev" id="newPostBtn" style="display:none" onclick="openModal()">
       <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>
       Share something with the community…
     </button>
@@ -454,11 +451,7 @@ function renderPosts(filter){
     const uv = userVotes[p.id] || 0
     return `
     <div class="post rev" id="post-${p.id}">
-      <div class="post-vote">
-        <button class="vote-btn ${uv===1?'active':''}" onclick="vote(${p.id},1)" title="Upvote">▲</button>
-        <div class="vote-count" id="v-${p.id}">${votes[p.id]}</div>
-        <button class="vote-btn ${uv===-1?'active':''}" onclick="vote(${p.id},-1)" title="Downvote">▼</button>
-      </div>`
+      <div class="post-vote"></div>`
       + `<div class="post-body">
         <div class="post-tags">${p.tags.map(t=>`<span class="tag tag-${t}">${t}</span>`).join('')}</div>
         <div class="post-title">${p.title}</div>
@@ -571,6 +564,8 @@ if(session){
   document.getElementById('navCta').textContent='Dashboard →'
   document.getElementById('navCta').href='/account'
   currentUser = session.user
+  const btn = document.getElementById('newPostBtn')
+  if(btn) btn.style.display='flex'
 }
 </script>
 </body>
