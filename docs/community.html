@@ -220,16 +220,7 @@ footer{border-top:1px solid var(--border);padding:2rem var(--r);display:flex;ali
   <div class="h-badge"><span class="h-dot"></span>COMMUNITY FORUM</div>
   <h1 class="hero-h1">Where <span class="acc">makers</span> connect</h1>
   <p class="hero-sub">Ask questions, share print configs, showcase your setups, and help each other get the most out of PRESTILON.</p>
-  <div class="hero-actions">
-    <button class="btn-primary" onclick="openModal()">
-      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>
-      New Post
-    </button>
-    <a class="btn-ghost" href="/support">
-      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/></svg>
-      Contact Support
-    </a>
-  </div>
+
 </div>
 
 <!-- STATS -->
@@ -452,19 +443,23 @@ const POSTS = [
 
 let currentFilter = null
 let votes = {}
+let userVotes = {} // tracks per-post: 1=upvoted, -1=downvoted, 0=none
+let currentUser = null // set after Supabase session check
 POSTS.forEach(p=>votes[p.id]=p.votes)
 
 function renderPosts(filter){
   const list = document.getElementById('postsList')
   let filtered = filter ? POSTS.filter(p=>p.tags.includes(filter)) : POSTS
-  list.innerHTML = filtered.map(p=>`
+  list.innerHTML = filtered.map(p=>{
+    const uv = userVotes[p.id] || 0
+    return `
     <div class="post rev" id="post-${p.id}">
       <div class="post-vote">
-        <button class="vote-btn ${votes[p.id]>p.votes?'active':''}" onclick="vote(${p.id},1)">▲</button>
+        <button class="vote-btn ${uv===1?'active':''}" onclick="vote(${p.id},1)" title="Upvote">▲</button>
         <div class="vote-count" id="v-${p.id}">${votes[p.id]}</div>
-        <button class="vote-btn" onclick="vote(${p.id},-1)">▼</button>
-      </div>
-      <div class="post-body">
+        <button class="vote-btn ${uv===-1?'active':''}" onclick="vote(${p.id},-1)" title="Downvote">▼</button>
+      </div>`
+      + `<div class="post-body">
         <div class="post-tags">${p.tags.map(t=>`<span class="tag tag-${t}">${t}</span>`).join('')}</div>
         <div class="post-title">${p.title}</div>
         <div class="post-meta">
@@ -477,16 +472,40 @@ function renderPosts(filter){
         <div class="pstat"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>${p.views}</div>
       </div>
     </div>
-  `).join('')
+  `
+  }).join('')
   setTimeout(()=>{
     document.querySelectorAll('.rev').forEach(el=>obs.observe(el))
   },50)
 }
 
 function vote(id, dir){
-  votes[id] = Math.max(0, votes[id] + dir)
+  if(!currentUser){
+    showToast('⚠️ Please sign in to vote')
+    setTimeout(()=>{window.location.href='/login'},1200)
+    return
+  }
+  const prev = userVotes[id] || 0
+  if(prev === dir){
+    // clicking same direction again = undo vote
+    votes[id] -= dir
+    userVotes[id] = 0
+  } else {
+    // switching vote or new vote
+    votes[id] -= prev  // remove old
+    votes[id] += dir   // add new
+    votes[id] = Math.max(0, votes[id])
+    userVotes[id] = dir
+  }
   const el = document.getElementById('v-'+id)
   if(el) el.textContent = votes[id]
+  // re-render vote buttons to reflect state
+  const post = document.getElementById('post-'+id)
+  if(post){
+    const btns = post.querySelectorAll('.vote-btn')
+    btns[0].classList.toggle('active', userVotes[id]===1)
+    btns[1].classList.toggle('active', userVotes[id]===-1)
+  }
 }
 
 function filterTag(tag, btn){
@@ -548,7 +567,11 @@ setTimeout(()=>{
 import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 const sb=createClient('https://ryftlimrjhhoymyfzusq.supabase.co','sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86')
 const{data:{session}}=await sb.auth.getSession()
-if(session){document.getElementById('navCta').textContent='Dashboard →';document.getElementById('navCta').href='/account'}
+if(session){
+  document.getElementById('navCta').textContent='Dashboard →'
+  document.getElementById('navCta').href='/account'
+  currentUser = session.user
+}
 </script>
 </body>
 </html>
