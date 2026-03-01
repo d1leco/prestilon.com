@@ -39,26 +39,26 @@ nav{position:sticky;top:0;z-index:999;display:flex;align-items:center;justify-co
 .nl.active{color:var(--c1)}
 .nc{margin-left:.4rem;padding:.38rem .95rem;border-radius:7px;font-weight:700;font-size:.8rem;background:var(--c1);color:#060f1a;text-decoration:none;box-shadow:0 0 18px rgba(0,212,180,.25);transition:all .2s;display:inline-flex;align-items:center;gap:.3rem}
 .nc:hover{box-shadow:0 0 30px rgba(0,212,180,.45);transform:translateY(-1px)}
-.hero{text-align:center;padding:36px var(--r) 28px;position:relative;z-index:1}
-.h-badge{display:inline-flex;align-items:center;gap:.45rem;padding:.28rem .85rem .28rem .5rem;border-radius:99px;border:1px solid var(--border2);background:rgba(0,212,180,.05);font-family:'JetBrains Mono',monospace;font-size:.67rem;letter-spacing:.08em;color:var(--c1);margin-bottom:1.5rem;animation:up .55s ease both}
+.hero{text-align:center;padding:20px var(--r) 14px;position:relative;z-index:1}
+.h-badge{display:inline-flex;align-items:center;gap:.45rem;padding:.28rem .85rem .28rem .5rem;border-radius:99px;border:1px solid var(--border2);background:rgba(0,212,180,.05);font-family:'JetBrains Mono',monospace;font-size:.67rem;letter-spacing:.08em;color:var(--c1);margin-bottom:.75rem;animation:up .55s ease both}
 .h-dot{width:6px;height:6px;border-radius:50%;background:var(--c1);box-shadow:0 0 7px var(--c1);animation:pulse 2s infinite}
-.hero-h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,3.5vw,2.6rem);line-height:1.08;letter-spacing:-.01em;margin-bottom:.7rem;animation:up .55s ease .07s both}
+.hero-h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.5rem,2.8vw,2rem);line-height:1.08;letter-spacing:-.01em;margin-bottom:.4rem;animation:up .55s ease .07s both}
 .hero-h1 .acc{background:linear-gradient(100deg,var(--c1),var(--purple),var(--c1));background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 6s linear infinite}
-.hero-sub{color:var(--text2);font-size:.84rem;line-height:1.65;max-width:520px;margin:0 auto;animation:up .55s ease .14s both}
-.stats{display:flex;justify-content:center;gap:2rem;padding:1.2rem var(--r) 0;position:relative;z-index:1;flex-wrap:wrap}
+.hero-sub{color:var(--text2);font-size:.78rem;line-height:1.55;max-width:480px;margin:0 auto;animation:up .55s ease .14s both}
+.stats{display:flex;justify-content:center;gap:1.5rem;padding:.75rem var(--r) 0;position:relative;z-index:1;flex-wrap:wrap}
 .stat{text-align:center}
-.stat-n{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--c1);line-height:1}
+.stat-n{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--c1);line-height:1}
 .stat-l{font-size:.64rem;color:var(--text3);letter-spacing:.04em;text-transform:uppercase;margin-top:.2rem;font-family:'JetBrains Mono',monospace}
-.wrap{max-width:1200px;margin:0 auto;padding:36px var(--r) 60px;position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gap:2rem;align-items:start}
-.sec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem}
-.cats{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:2rem}
-.cat-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.3rem;text-decoration:none;transition:border-color .2s,background .2s,transform .18s;display:block;cursor:pointer}
+.wrap{max-width:1200px;margin:0 auto;padding:18px var(--r) 60px;position:relative;z-index:1;display:grid;grid-template-columns:1fr 300px;gap:1.5rem;align-items:start}
+.sec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.6rem}
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:1.2rem}
+.cat-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.65rem .85rem;text-decoration:none;transition:border-color .2s,background .2s,transform .18s;display:flex;align-items:center;gap:.7rem;cursor:pointer}
 .cat-card:hover{border-color:var(--border2);background:rgba(0,212,180,.03);transform:translateY(-2px)}
 .cat-card.active-cat{border-color:var(--border2);background:rgba(0,212,180,.05)}
-.cat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:.8rem}
-.cat-name{font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:.2rem}
-.cat-desc{font-size:.75rem;color:var(--text2);line-height:1.5}
-.cat-count{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);margin-top:.5rem}
+.cat-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.cat-name{font-weight:700;font-size:.78rem;color:var(--text);margin-bottom:.05rem;line-height:1.2}
+.cat-desc{font-size:.67rem;color:var(--text3);line-height:1.3}
+.cat-count{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3);margin-top:.08rem}
 .posts{display:flex;flex-direction:column;gap:.6rem}
 .post{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;display:flex;gap:1rem;align-items:flex-start;cursor:pointer;transition:border-color .2s,background .2s}
 .post:hover{border-color:var(--border2);background:rgba(0,212,180,.02)}
@@ -176,39 +176,27 @@ footer{
     <div class="cats rev">
       <a class="cat-card" onclick="setCategory(null)" id="cat-all">
         <div class="cat-icon" style="background:rgba(0,212,180,.12)">🌐</div>
-        <div class="cat-name">All Posts</div>
-        <div class="cat-desc">Browse everything in the community</div>
-        <div class="cat-count" id="cnt-all">— posts</div>
+        <div><div class="cat-name">All Posts</div><div class="cat-desc">Browse everything</div><div class="cat-count" id="cnt-all">— posts</div></div>
       </a>
       <a class="cat-card" onclick="setCategory('general')" id="cat-general">
         <div class="cat-icon" style="background:rgba(0,212,180,.12)">💬</div>
-        <div class="cat-name">General Discussion</div>
-        <div class="cat-desc">Talk about anything PRESTILON related</div>
-        <div class="cat-count" id="cnt-general">— posts</div>
+        <div><div class="cat-name">General Discussion</div><div class="cat-desc">Anything PRESTILON related</div><div class="cat-count" id="cnt-general">— posts</div></div>
       </a>
       <a class="cat-card" onclick="setCategory('help')" id="cat-help">
         <div class="cat-icon" style="background:rgba(239,68,68,.12)">🆘</div>
-        <div class="cat-name">Help & Troubleshooting</div>
-        <div class="cat-desc">Get community help with issues</div>
-        <div class="cat-count" id="cnt-help">— posts</div>
+        <div><div class="cat-name">Help & Troubleshooting</div><div class="cat-desc">Community support</div><div class="cat-count" id="cnt-help">— posts</div></div>
       </a>
       <a class="cat-card" onclick="setCategory('tips')" id="cat-tips">
         <div class="cat-icon" style="background:rgba(16,212,138,.12)">🛠️</div>
-        <div class="cat-name">Tips & Configs</div>
-        <div class="cat-desc">Share settings, profiles, and workflows</div>
-        <div class="cat-count" id="cnt-tips">— posts</div>
+        <div><div class="cat-name">Tips & Configs</div><div class="cat-desc">Settings & workflows</div><div class="cat-count" id="cnt-tips">— posts</div></div>
       </a>
       <a class="cat-card" onclick="setCategory('showcase')" id="cat-showcase">
         <div class="cat-icon" style="background:rgba(236,72,153,.12)">✨</div>
-        <div class="cat-name">Showcase</div>
-        <div class="cat-desc">Show off your prints and setups</div>
-        <div class="cat-count" id="cnt-showcase">— posts</div>
+        <div><div class="cat-name">Showcase</div><div class="cat-desc">Show off your prints</div><div class="cat-count" id="cnt-showcase">— posts</div></div>
       </a>
       <a class="cat-card" onclick="setCategory('bug')" id="cat-bug">
         <div class="cat-icon" style="background:rgba(245,158,11,.12)">🐛</div>
-        <div class="cat-name">Bug Reports</div>
-        <div class="cat-desc">Report issues and track fixes</div>
-        <div class="cat-count" id="cnt-bug">— posts</div>
+        <div><div class="cat-name">Bug Reports</div><div class="cat-desc">Report & track fixes</div><div class="cat-count" id="cnt-bug">— posts</div></div>
       </a>
     </div>
 
