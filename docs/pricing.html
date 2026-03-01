@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="PRESTILON Pricing — Simple, transparent plans for every fleet size. Start free, scale as you grow."/>
+<link rel="icon" type="image/png" href="prestilon.logo.png">
+<title>Pricing — PRESTILON</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060f1a;--bg2:#0a1929;--bg3:#0e2035;
+  --c1:#00d4b4;--c2:#00a896;--purple:#6c5ce7;
+  --text:#f0f6ff;--text2:#8eaabf;--text3:#3d5a70;
+  --border:rgba(255,255,255,.07);--border2:rgba(0,212,180,.25);
+  --red:#ef4444;--green:#10d48a;--amber:#f59e0b;
+  --r:max(1.5rem,calc(50vw - 700px));
+}
+html{background:var(--bg);scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh;padding-bottom:44px}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 40% at 50% -5%,rgba(0,212,180,.07),transparent 55%),
+             radial-gradient(ellipse 50% 50% at 90% 90%,rgba(108,92,231,.04),transparent 55%)}
+canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35}
+
+@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes shimmer{to{background-position:200% center}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:999;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.5rem 0 0;height:52px;
+  background:rgba(6,15,26,.92);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+}
+.logo{display:flex;align-items:center;text-decoration:none;transition:opacity .2s;padding-left:1rem;overflow:hidden;height:52px}
+.logo:hover{opacity:.85}
+.logo-img{height:34px;width:auto;mix-blend-mode:screen;display:block;object-fit:contain}
+.nav-r{display:flex;align-items:center;gap:.15rem}
+.nl{padding:.3rem .65rem;color:var(--text2);font-size:.8rem;font-weight:500;text-decoration:none;border-radius:7px;transition:color .18s,background .18s}
+.nl:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.nl.active{color:var(--c1)}
+.nc{margin-left:.4rem;padding:.38rem .95rem;border-radius:7px;font-weight:700;font-size:.8rem;background:var(--c1);color:#060f1a;text-decoration:none;box-shadow:0 0 20px rgba(0,212,180,.28);transition:all .2s;display:inline-flex;align-items:center;gap:.3rem}
+.nc:hover{box-shadow:0 0 34px rgba(0,212,180,.5);transform:translateY(-1px)}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:44px var(--r) 36px;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;padding:.2rem .65rem .2rem .38rem;border-radius:99px;border:1px solid var(--border2);background:rgba(0,212,180,.05);font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.07em;color:var(--c1);margin-bottom:.85rem;animation:up .5s ease both}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--c1);box-shadow:0 0 8px var(--c1);animation:pulse 2s infinite}
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.7rem,3.2vw,2.5rem);line-height:1.08;letter-spacing:-.015em;margin-bottom:.55rem;animation:up .5s ease .07s both}
+.hero h1 .acc{background:linear-gradient(100deg,var(--c1) 0%,var(--purple) 50%,var(--c1) 100%);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 6s linear infinite}
+.hero p{color:var(--text2);font-size:.84rem;line-height:1.65;max-width:440px;margin:0 auto 1.5rem;animation:up .5s ease .14s both}
+.toggle-wrap{display:inline-flex;align-items:center;gap:.75rem;padding:.3rem .35rem;background:var(--bg2);border:1px solid var(--border);border-radius:99px;animation:up .5s ease .2s both;margin-bottom:.5rem}
+.toggle-opt{padding:.3rem .85rem;border-radius:99px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .22s;border:none;background:transparent;color:var(--text3)}
+.toggle-opt.on{background:var(--c1);color:#060f1a;box-shadow:0 0 14px rgba(0,212,180,.3)}
+.save-badge{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--green);background:rgba(16,212,138,.1);border:1px solid rgba(16,212,138,.25);padding:.15rem .5rem;border-radius:99px}
+
+/* ── PLANS ── */
+.plans-wrap{padding:0 var(--r) 40px;position:relative;z-index:1}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;max-width:1040px;margin:0 auto}
+@media(max-width:900px){.plans-grid{grid-template-columns:1fr;max-width:440px;margin-left:auto;margin-right:auto}}
+
+.plan{
+  background:var(--bg2);border:1px solid var(--border);border-radius:18px;
+  padding:1.5rem 1.35rem 1.35rem;display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+  transition:border-color .25s,transform .3s,box-shadow .3s;
+  animation:up .5s ease both;
+}
+.plan:nth-child(1){animation-delay:.08s}
+.plan:nth-child(2){animation-delay:.16s}
+.plan:nth-child(3){animation-delay:.24s}
+.plan:hover{border-color:rgba(255,255,255,.14);transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.plan.popular{border-color:rgba(0,212,180,.45);background:var(--bg3)}
+.plan.popular:hover{box-shadow:0 20px 60px rgba(0,212,180,.15)}
+.plan::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,180,.3),transparent);opacity:0;transition:opacity .3s}
+.plan:hover::before{opacity:1}
+.plan.popular::before{opacity:1;background:linear-gradient(90deg,transparent,rgba(0,212,180,.6),transparent)}
+
+.pop-label{position:absolute;top:0;right:0;background:linear-gradient(135deg,var(--c1),var(--c2));color:#060f1a;font-family:'JetBrains Mono',monospace;font-size:.56rem;font-weight:700;letter-spacing:.1em;padding:.28rem .85rem;border-radius:0 18px 0 10px}
+.plan-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:.85rem;flex-shrink:0}
+.plan-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--text);margin-bottom:.2rem}
+.plan-tagline{font-size:.72rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:.9rem;min-height:1rem}
+.plan-price{font-family:'Syne',sans-serif;font-weight:800;line-height:1;margin-bottom:.1rem}
+.plan-price .amount{font-size:2rem;color:var(--c1)}
+.plan-price .period{font-size:.9rem;color:var(--text2);font-weight:400;font-family:'DM Sans',sans-serif}
+.plan-price .yearly-note{display:block;font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:.18rem;min-height:.9rem}
+.plan-printer-rate{margin-top:.3rem;margin-bottom:.9rem;font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--text3)}
+.plan-printer-rate strong{color:var(--c1)}
+
+.plan-divider{height:1px;background:var(--border);margin:.9rem 0}
+
+.plan-feats{list-style:none;display:flex;flex-direction:column;gap:.48rem;flex:1}
+.plan-feats li{font-size:.76rem;color:var(--text2);display:flex;align-items:flex-start;gap:.5rem;line-height:1.42}
+.plan-feats li::before{content:'✓';color:var(--c1);font-weight:700;flex-shrink:0;margin-top:.06rem;font-size:.78rem}
+.plan-feats li.hl{color:var(--text);font-weight:600}
+.plan-feats li.na{color:var(--text3)}
+.plan-feats li.na::before{content:'—';color:var(--text3)}
+
+.plan-cta{
+  margin-top:1.25rem;padding:.72rem;border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-weight:700;font-size:.9rem;
+  text-align:center;text-decoration:none;border:none;cursor:pointer;
+  transition:all .22s;display:block;
+}
+.plan-cta.primary{background:var(--c1);color:#060f1a;box-shadow:0 0 24px rgba(0,212,180,.28)}
+.plan-cta.primary:hover{box-shadow:0 0 42px rgba(0,212,180,.55);transform:translateY(-1px)}
+.plan-cta.ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.12)}
+.plan-cta.ghost:hover{background:rgba(255,255,255,.1);border-color:var(--border2)}
+
+/* ── COMPARISON TABLE ── */
+.compare-wrap{padding:0 var(--r) 48px;position:relative;z-index:1}
+.compare-wrap h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.15rem,2vw,1.45rem);margin-bottom:.35rem}
+.compare-wrap .sub{font-size:.8rem;color:var(--text2);margin-bottom:1.4rem}
+
+.table-outer{overflow-x:auto;border-radius:14px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;background:var(--bg2)}
+thead th{padding:.9rem 1.1rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+thead th:not(:first-child){text-align:center}
+thead th.hl-col{color:var(--c1)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .18s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.022)}
+tbody td{padding:.82rem 1.1rem;font-size:.8rem;color:var(--text2)}
+tbody td:first-child{color:var(--text);font-weight:500}
+tbody td:not(:first-child){text-align:center}
+.tg-head td{background:var(--bg3);font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;padding:.55rem 1.1rem}
+.tick{color:var(--c1);font-size:.9rem}
+.cross{color:var(--text3);font-size:.85rem}
+.td-val{font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--c1)}
+.td-muted{color:var(--text3);font-size:.74rem;font-family:'JetBrains Mono',monospace}
+
+/* ── FAQ ── */
+.faq-wrap{padding:0 var(--r) 52px;position:relative;z-index:1;max-width:780px;margin:0 auto}
+.faq-wrap h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.15rem,2vw,1.45rem);margin-bottom:.35rem}
+.faq-wrap .sub{font-size:.8rem;color:var(--text2);margin-bottom:1.4rem}
+.faq-item{border-bottom:1px solid var(--border);overflow:hidden}
+.faq-item:first-of-type{border-top:1px solid var(--border)}
+.faq-q{width:100%;background:none;border:none;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 0;cursor:pointer;text-align:left;transition:color .18s}
+.faq-q:hover .faq-qt{color:var(--text)}
+.faq-qt{font-size:.88rem;font-weight:600;color:var(--text2);transition:color .18s}
+.faq-arr{color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem}
+.faq-item.open .faq-arr{transform:rotate(45deg)}
+.faq-item.open .faq-qt{color:var(--c1)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .3s ease}
+.faq-item.open .faq-a{max-height:300px;padding-bottom:1rem}
+.faq-a p{font-size:.82rem;color:var(--text2);line-height:1.75}
+.faq-a a{color:var(--c1);text-decoration:none;font-weight:600}
+.faq-a a:hover{text-decoration:underline}
+
+/* ── CTA BOTTOM ── */
+.cta-wrap{padding:0 var(--r) 56px;position:relative;z-index:1}
+.cta-box{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:2.5rem 2rem;text-align:center;position:relative;overflow:hidden}
+.cta-box::before{content:'';position:absolute;bottom:-100px;left:50%;transform:translateX(-50%);width:700px;height:300px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,212,180,.08),transparent 65%);pointer-events:none}
+.cta-box::after{content:'';position:absolute;top:-60px;right:-60px;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(108,92,231,.06),transparent 60%);pointer-events:none}
+.cta-box h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.15rem,2.2vw,1.6rem);margin-bottom:.5rem;position:relative;z-index:1}
+.cta-box p{color:var(--text2);font-size:.82rem;line-height:1.65;max-width:420px;margin:0 auto 1.4rem;position:relative;z-index:1}
+.cta-btns{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.btn{padding:.52rem 1.2rem;border-radius:9px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:.35rem;text-decoration:none;transition:all .22s}
+.btn-p{background:var(--c1);color:#060f1a;box-shadow:0 0 28px rgba(0,212,180,.32)}
+.btn-p:hover{box-shadow:0 0 46px rgba(0,212,180,.55);transform:translateY(-2px)}
+.btn-s{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.11)}
+.btn-s:hover{background:rgba(255,255,255,.1);border-color:var(--border2)}
+.cta-note{margin-top:1.1rem;font-size:.63rem;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.04em;position:relative;z-index:1}
+
+/* ── REVEAL ── */
+.r{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.r.vis{opacity:1;transform:none}
+.r2{opacity:0;transform:translateY(18px);transition:opacity .6s ease .1s,transform .6s ease .1s}
+.r2.vis{opacity:1;transform:none}
+.r3{opacity:0;transform:translateY(18px);transition:opacity .6s ease .2s,transform .6s ease .2s}
+.r3.vis{opacity:1;transform:none}
+
+/* ── SECTION LABEL ── */
+.sec-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.14em;color:var(--c1);text-transform:uppercase;margin-bottom:.55rem;display:flex;align-items:center;gap:.35rem}
+.sec-label::before{content:'//';opacity:.4}
+
+/* ── FOOTER ── */
+footer{position:fixed!important;bottom:0;left:0;right:0;z-index:998;background:rgba(6,15,26,.92);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding:.4rem var(--r);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
+.fc{font-size:.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.footer-links{display:flex;gap:1.2rem;flex-wrap:wrap}
+.footer-links a{font-size:.72rem;color:var(--text2);text-decoration:none;transition:color .18s}
+.footer-links a:hover{color:var(--text)}
+.footer-links a[href="/pricing"]{color:var(--c1)}
+
+@media(max-width:640px){
+  nav{padding:0 .6rem 0 0;height:44px}.logo{padding-left:.6rem;height:44px}.logo-img{height:28px}
+  .nl{font-size:.68rem;padding:.2rem .35rem}.nc{padding:.25rem .5rem;font-size:.65rem;margin-left:.1rem;white-space:nowrap}
+  .hero{padding:24px .85rem 22px}
+  .plans-wrap{padding:0 .85rem 32px}.compare-wrap{padding:0 .85rem 32px}.faq-wrap{padding:0 .85rem 36px}.cta-wrap{padding:0 .85rem 52px}
+  .plan{padding:1.1rem .95rem 1rem}
+  .plan-price .amount{font-size:1.65rem}
+  thead th,tbody td{padding:.65rem .65rem;font-size:.7rem}
+  footer{padding:.8rem .85rem;flex-direction:column;align-items:flex-start;gap:.35rem}
+  .footer-links{gap:.4rem .9rem}.footer-links a{font-size:.62rem}
+  .cta-btns{flex-direction:column;align-items:stretch}.btn{justify-content:center}
+}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="/"><img class="logo-img" src="/prestilon.logo.png" alt="Prestilon"></a>
+  <div class="nav-r">
+    <a class="nl" href="/">Home</a>
+    <a class="nl" href="/community">Community</a>
+    <a class="nl" href="/support">Support</a>
+    <a class="nc active" id="navCta" href="/login">Get Started →</a>
+  </div>
+</nav>
+<script>(()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('navCta');if(el){el.textContent='Dashboard →';el.href='/account'}}}}catch(e){}})();</script>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge"><span class="badge-dot"></span>PRICING</div>
+  <h1>Simple, <span class="acc">transparent</span> pricing.</h1>
+  <p>Start small and scale as your fleet grows. No hidden fees, no per-feature paywalls — just the plan that fits your operation.</p>
+  <div class="toggle-wrap">
+    <button class="toggle-opt on" id="tgMonthly" onclick="setBilling('monthly')">Monthly</button>
+    <button class="toggle-opt" id="tgAnnual" onclick="setBilling('annual')">Annual <span class="save-badge">Save 11%</span></button>
+  </div>
+</section>
+
+<!-- PLANS -->
+<div class="plans-wrap">
+  <div class="plans-grid">
+
+    <!-- BASIC -->
+    <div class="plan r">
+      <div class="plan-icon" style="background:rgba(96,165,250,.1)">🔹</div>
+      <div class="plan-name">Basic</div>
+      <div class="plan-tagline">For small shops & hobbyists</div>
+      <div class="plan-price">
+        <span class="amount" id="basicAmt">€4.99</span><span class="period">/mo</span>
+        <span class="yearly-note" id="basicNote">&nbsp;</span>
+      </div>
+      <div class="plan-printer-rate">+ <strong id="basicPrinter">€3</strong> per printer / month · up to 50</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-feats">
+        <li class="hl">Up to 50 printers</li>
+        <li>Full monitoring dashboard</li>
+        <li>Real-time printer status</li>
+        <li>WebSocket live telemetry</li>
+        <li>AI anomaly detection</li>
+        <li>Kalman / CUSUM analytics</li>
+        <li>Failure prediction (5 modes)</li>
+        <li>Print history</li>
+        <li>Email notifications</li>
+        <li>Priority support</li>
+      </ul>
+      <a class="plan-cta ghost" href="/login">Get Started →</a>
+    </div>
+
+    <!-- PRO -->
+    <div class="plan popular r2">
+      <div class="pop-label">MOST POPULAR</div>
+      <div class="plan-icon" style="background:rgba(0,212,180,.12)">⚡</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-tagline">For serious multi-printer fleets</div>
+      <div class="plan-price">
+        <span class="amount" id="proAmt">€139.99</span><span class="period">/mo</span>
+        <span class="yearly-note" id="proNote">&nbsp;</span>
+      </div>
+      <div class="plan-printer-rate"><strong>All 50 printers included</strong> — no extra fees</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-feats">
+        <li class="hl">All 50 printers included</li>
+        <li>Full monitoring dashboard</li>
+        <li>Real-time printer status</li>
+        <li>WebSocket live telemetry</li>
+        <li>AI anomaly detection</li>
+        <li>Kalman / CUSUM analytics</li>
+        <li>Failure prediction (5 modes)</li>
+        <li>Print history</li>
+        <li>Email notifications</li>
+        <li class="hl">Priority support</li>
+      </ul>
+      <a class="plan-cta primary" href="/login">Get Started →</a>
+    </div>
+
+    <!-- ANNUAL -->
+    <div class="plan r3">
+      <div class="plan-icon" style="background:rgba(251,191,36,.1)">🏆</div>
+      <div class="plan-name">Annual</div>
+      <div class="plan-tagline">Best value for full-year operations</div>
+      <div class="plan-price">
+        <span class="amount" id="annualAmt">€1,499.99</span><span class="period" id="annualPer">/yr</span>
+        <span class="yearly-note" id="annualNote">~€124.99 / month</span>
+      </div>
+      <div class="plan-printer-rate"><strong>All 50 printers included</strong> — billed once yearly</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-feats">
+        <li class="hl">All 50 printers included</li>
+        <li>Full monitoring dashboard</li>
+        <li>Real-time printer status</li>
+        <li>WebSocket live telemetry</li>
+        <li>AI anomaly detection</li>
+        <li>Kalman / CUSUM analytics</li>
+        <li>Failure prediction (5 modes)</li>
+        <li>Print history</li>
+        <li>Email notifications</li>
+        <li class="hl">Priority support</li>
+      </ul>
+      <a class="plan-cta ghost" href="/login">Get Started →</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- COMPARISON TABLE -->
+<div class="compare-wrap r">
+  <div class="sec-label">COMPARE</div>
+  <h2>Everything you need, side by side.</h2>
+  <p class="sub">A full breakdown of what's included in each plan.</p>
+  <div class="table-outer">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:42%">Feature</th>
+          <th>Basic</th>
+          <th class="hl-col">Pro</th>
+          <th>Annual</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="tg-head"><td colspan="4">Fleet</td></tr>
+        <tr><td>Max printers</td><td class="td-val">50</td><td class="td-val">50</td><td class="td-val">50</td></tr>
+        <tr><td>Per-printer fee</td><td class="td-val">€3 / printer</td><td class="td-muted">Included</td><td class="td-muted">Included</td></tr>
+        <tr><td>Multi-machine support</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+
+        <tr class="tg-head"><td colspan="4">Monitoring & Telemetry</td></tr>
+        <tr><td>Real-time dashboard</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+        <tr><td>WebSocket live telemetry</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+        <tr><td>Telemetry latency</td><td class="td-muted">&lt;50ms</td><td class="td-muted">&lt;50ms</td><td class="td-muted">&lt;50ms</td></tr>
+        <tr><td>Temperature & fan tracking</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+        <tr><td>Print progress monitoring</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+
+        <tr class="tg-head"><td colspan="4">AI Engine</td></tr>
+        <tr><td>Anomaly detection (CUSUM)</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+        <tr><td>Kalman filtering</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+        <tr><td>Health score (0–100)</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+        <tr><td>Failure prediction modes</td><td class="td-val">5</td><td class="td-val">5</td><td class="td-val">5</td></tr>
+        <tr><td>AI autonomy levels</td><td class="td-val">L0 · L1 · L2</td><td class="td-val">L0 · L1 · L2</td><td class="td-val">L0 · L1 · L2</td></tr>
+        <tr><td>Hardware diagnostics</td><td class="td-val">6 tests</td><td class="td-val">6 tests</td><td class="td-val">6 tests</td></tr>
+
+        <tr class="tg-head"><td colspan="4">History & Maintenance</td></tr>
+        <tr><td>Print history</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+        <tr><td>Maintenance predictions</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+        <tr><td>Bed mesh visualization</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+
+        <tr class="tg-head"><td colspan="4">Privacy & Infrastructure</td></tr>
+        <tr><td>100% local AI inference</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+        <tr><td>Printer data stays local</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+        <tr><td>Cloud auth only</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+
+        <tr class="tg-head"><td colspan="4">Support</td></tr>
+        <tr><td>Email support</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+        <tr><td>Priority support</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+        <tr><td>Community forum</td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-wrap r">
+  <div class="sec-label">FAQ</div>
+  <h2>Frequently asked questions.</h2>
+  <p class="sub">Still have questions? <a href="/support">Contact support →</a></p>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      <span class="faq-qt">What is the per-printer fee on Basic?</span>
+      <span class="faq-arr">+</span>
+    </button>
+    <div class="faq-a"><p>On the Basic plan you pay a base fee of €4.99/month, plus €3 per printer per month. So for 5 printers it would be €4.99 + (5 × €3) = €19.99/month. The Pro and Annual plans include all 50 printer slots at a flat rate — no extra per-printer charges.</p></div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      <span class="faq-qt">Can I switch between plans at any time?</span>
+      <span class="faq-arr">+</span>
+    </button>
+    <div class="faq-a"><p>Yes. You can upgrade, downgrade, or cancel at any time via the billing portal in your <a href="/account">account page</a>. Upgrades take effect immediately, downgrades at the end of the current billing cycle.</p></div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      <span class="faq-qt">Does PRESTILON send my printer data to the cloud?</span>
+      <span class="faq-arr">+</span>
+    </button>
+    <div class="faq-a"><p>No. The entire AI engine runs on your local machine (Windows 10/11). Printer telemetry — temperatures, positions, G-code — never leaves your local network. Only license validation and account management communicate with our cloud servers.</p></div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      <span class="faq-qt">What hardware and software do I need?</span>
+      <span class="faq-arr">+</span>
+    </button>
+    <div class="faq-a"><p>You need a Windows 10 or 11 (64-bit) machine with Node.js 18+. Your printers must run Klipper + Moonraker and be reachable on your local network. A one-click Windows installer is coming soon — you'll be notified by email when it's ready.</p></div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      <span class="faq-qt">Is there a free trial?</span>
+      <span class="faq-arr">+</span>
+    </button>
+    <div class="faq-a"><p>Yes — all new accounts start with a free trial period so you can explore the full feature set before committing to a paid plan. No credit card required to sign up.</p></div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      <span class="faq-qt">What is the refund policy?</span>
+      <span class="faq-arr">+</span>
+    </button>
+    <div class="faq-a"><p>We offer a 7-day money-back guarantee on all plans. If you're not satisfied, contact <a href="/support">support</a> within 7 days of your first charge and we'll issue a full refund. See our full <a href="/refund">Refund Policy</a> for details.</p></div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      <span class="faq-qt">What happens if I exceed the printer limit?</span>
+      <span class="faq-arr">+</span>
+    </button>
+    <div class="faq-a"><p>All plans currently support up to 50 printers. If your fleet exceeds this, <a href="/support">contact us</a> — we can discuss a custom arrangement.</p></div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-wrap r">
+  <div class="cta-box">
+    <div class="sec-label" style="justify-content:center">GET STARTED</div>
+    <h2>Start monitoring your fleet today.</h2>
+    <p>Create a free account and have your first printer monitored in under 5 minutes.</p>
+    <div class="cta-btns">
+      <a class="btn btn-p" href="/login">Create Free Account →</a>
+      <a class="btn btn-s" href="/support">Questions? Support →</a>
+    </div>
+    <div class="cta-note">WINDOWS 10/11 · NODE.JS 18+ · KLIPPER / MOONRAKER REQUIRED</div>
+  </div>
+</div>
+
+<script>
+/* Canvas particles */
+(()=>{
+  const c=document.getElementById('bg'),x=c.getContext('2d');let W,H,P=[]
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  function init(){P=[];for(let i=0;i<50;i++)P.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.16,vy:(Math.random()-.5)*.16})}
+  function draw(){
+    x.clearRect(0,0,W,H)
+    P.forEach((a,i)=>{
+      P.slice(i+1).forEach(b=>{const dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);if(d<125){x.beginPath();x.strokeStyle=`rgba(0,212,180,${.038*(1-d/125)})`;x.lineWidth=.5;x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()}})
+      x.beginPath();x.arc(a.x,a.y,1,0,Math.PI*2);x.fillStyle='rgba(0,212,180,.16)';x.fill()
+      a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>W)a.vx*=-1;if(a.y<0||a.y>H)a.vy*=-1
+    });requestAnimationFrame(draw)
+  }
+  window.addEventListener('resize',()=>{resize();init()});resize();init();draw()
+})()
+
+/* Scroll reveal */
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.05})
+document.querySelectorAll('.r,.r2,.r3').forEach(el=>obs.observe(el))
+
+/* Billing toggle */
+const prices={
+  monthly:{ basicAmt:'€4.99',   basicNote:'',                  basicPrinter:'€3',    proAmt:'€139.99', proNote:'',           annualAmt:'€1,499.99', annualPer:'/yr', annualNote:'~€124.99 / month' },
+  annual: { basicAmt:'€4.49',   basicNote:'billed annually',   basicPrinter:'€2.70', proAmt:'€124.99', proNote:'billed annually', annualAmt:'€1,499.99', annualPer:'/yr', annualNote:'~€124.99 / month' },
+}
+function setBilling(mode){
+  const p=prices[mode]
+  document.getElementById('basicAmt').textContent=p.basicAmt
+  document.getElementById('basicNote').textContent=p.basicNote
+  document.getElementById('basicPrinter').textContent=p.basicPrinter
+  document.getElementById('proAmt').textContent=p.proAmt
+  document.getElementById('proNote').textContent=p.proNote
+  document.getElementById('annualAmt').textContent=p.annualAmt
+  document.getElementById('annualPer').textContent=p.annualPer
+  document.getElementById('annualNote').textContent=p.annualNote
+  document.getElementById('tgMonthly').classList.toggle('on',mode==='monthly')
+  document.getElementById('tgAnnual').classList.toggle('on',mode==='annual')
+}
+
+/* FAQ */
+function toggleFaq(btn){
+  const item=btn.closest('.faq-item')
+  const wasOpen=item.classList.contains('open')
+  document.querySelectorAll('.faq-item.open').forEach(i=>i.classList.remove('open'))
+  if(!wasOpen) item.classList.add('open')
+}
+</script>
+
+<footer>
+  <div class="fc">© 2026 PRESTILON. All rights reserved.</div>
+  <div class="footer-links">
+    <a href="/pricing">Pricing</a>
+    <a href="/privacy">Privacy Policy</a>
+    <a href="/refund">Refund Policy</a>
+    <a href="/terms">Terms of Service</a>
+  </div>
+</footer>
+</body>
+</html>
