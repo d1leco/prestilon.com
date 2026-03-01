@@ -16,14 +16,14 @@
   --text:#f0f6ff;--text2:#8eaabf;--text3:#3d5a70;
   --border:rgba(255,255,255,.07);--border2:rgba(0,212,180,.25);
   --red:#ef4444;--green:#10d48a;--amber:#f59e0b;
-  --r:max(1.5rem,calc(50vw - 620px));
+  --r:max(1.5rem,calc(50vw - 660px));
 }
 html{background:var(--bg);min-height:100vh}
 body{font-family:'DM Sans',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh}
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(ellipse 70% 50% at 70% 0%,rgba(0,212,180,.07),transparent 55%),
              radial-gradient(ellipse 55% 40% at 0% 85%,rgba(108,92,231,.04),transparent 50%)}
-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.3}
+canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35}
 @keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes _sp{to{transform:rotate(360deg)}}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
