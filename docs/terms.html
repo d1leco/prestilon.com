@@ -169,9 +169,18 @@ footer{
     <a class="nl" href="/pricing">Pricing</a>
     <a class="nl" href="/support">Support</a>
     <a class="nc" id="navCta" href="/login">Dashboard →</a>
+    <button class="ham-btn" id="hamBtn" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
-<script>(()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('navCta');if(el){el.textContent='Dashboard →';el.href='/account'}}}}catch(e){}})();</script>
+<div class="mob-menu" id="mobMenu">
+  <a href="/">Home</a>
+  <a href="/docs">Docs</a>
+  <a href="/community">Community</a>
+  <a href="/pricing">Pricing</a>
+  <a href="/support">Support</a>
+  <a class="mob-cta-mob" id="mobCta" href="/login">Dashboard →</a>
+</div>
+<script>(()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('navCta');if(el){el.textContent='Dashboard →';el.href='/account';var mc=document.getElementById('mobCta');if(mc){mc.textContent='Dashboard →';mc.href='/account'}}}}}catch(e){}})();</script>
 
 <div class="hero">
   <div class="h-badge"><span class="h-dot"></span>LEGAL · TERMS</div>
