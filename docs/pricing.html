@@ -170,6 +170,10 @@ tbody td:not(:first-child){text-align:center}
 .btn-s:hover{background:rgba(255,255,255,.1);border-color:var(--border2)}
 .cta-note{margin-top:1.1rem;font-size:.63rem;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.04em;position:relative;z-index:1}
 
+/* ── PAGE BAR ── */
+.page-bar{position:relative;z-index:998;background:rgba(6,15,26,.95);border-bottom:1px solid rgba(0,212,180,.12);padding:.28rem max(1.5rem,calc(50vw - 700px));display:flex;align-items:center;gap:.5rem;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.12em;color:var(--text3);text-transform:uppercase}
+.pb-dot{width:5px;height:5px;border-radius:50%;background:var(--c1);box-shadow:0 0 6px var(--c1);flex-shrink:0;display:inline-block}
+.pb-sep{color:rgba(0,212,180,.35)}
 /* ── REVEAL ── */
 .r{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
 .r.vis{opacity:1;transform:none}
@@ -218,6 +222,7 @@ footer{position:fixed!important;bottom:0;left:0;right:0;z-index:998;background:r
   </div>
 </nav>
 <script>(()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('navCta');if(el){el.textContent='Dashboard →';el.href='/account'}}}}catch(e){}})();</script>
+<div class="page-bar"><span class="pb-sep">//</span>&nbsp;<span class="pb-dot"></span>&nbsp;PRICING</div>
 
 <!-- HERO -->
 <section class="hero">
