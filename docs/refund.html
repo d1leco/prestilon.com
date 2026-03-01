@@ -27,7 +27,7 @@ body::before{
     radial-gradient(ellipse 55% 50% at 15% 25%,rgba(0,212,180,.05),transparent 60%),
     radial-gradient(ellipse 50% 45% at 85% 75%,rgba(108,92,231,.04),transparent 55%);
 }
-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.25}
+canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35}
 
 @keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @keyframes shimmer{to{background-position:200% center}}
@@ -209,12 +209,19 @@ nav{
 .cc-value a:hover{text-decoration:underline}
 
 /* ── FOOTER ── */
-footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.5rem var(--r);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
-.fc{font-size:.75rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+body{padding-bottom:52px}
+footer{
+  position:fixed!important;bottom:0;left:0;right:0;z-index:998;
+  background:rgba(6,15,26,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);
+  padding:.55rem var(--r);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+}
+.fc{font-size:.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
 .footer-links{display:flex;gap:1.2rem;flex-wrap:wrap}
-.footer-links a{font-size:.75rem;color:var(--text);text-decoration:none;transition:color .18s}
-.footer-links a:hover{color:var(--text2)}
-.footer-links a[href="/community"]{color:var(--c1)}
+.footer-links a{font-size:.72rem;color:var(--text2);text-decoration:none;transition:color .18s}
+.footer-links a:hover{color:var(--text)}
+.footer-links a[href="/community"]{color:var(--green)}
 
 @media(max-width:640px){
   nav{padding:0 .7rem 0 0;height:48px}
@@ -677,17 +684,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.
 
   </main>
 </div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="fc">© 2026 PRESTILON. All rights reserved.</div>
-  <div class="footer-links">
-    <a href="/community">Community</a>
-    <a href="/privacy">Privacy Policy</a>
-    <a href="/refund">Refund Policy</a>
-    <a href="/terms">Terms of Service</a>
-  </div>
-</footer>
 
 <!-- CANVAS -->
 <script>
