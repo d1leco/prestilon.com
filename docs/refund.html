@@ -270,7 +270,7 @@ footer{
     <a class="nl" href="/community">Community</a>
     <a class="nl" href="/pricing">Pricing</a>
     <a class="nl" href="/support">Support</a>
-    <a class="nc" id="navCta" href="/login">Dashboard →</a>
+    <a class="nc" id="navCta" href="/login">Sign In →</a>
   
     <button class="ham" onclick="openMob()" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
@@ -768,7 +768,7 @@ if(session){document.getElementById('navCta').textContent='Dashboard →';docume
   <a href="/community" onclick="closeMob()">Community</a>
   <a href="/pricing" onclick="closeMob()">Pricing</a>
   <a href="/support" onclick="closeMob()">Support</a>
-  <a href="/login" id="mobCta" class="mob-cta" onclick="closeMob()">Dashboard →</a>
+  <a href="/login" id="mobCta" class="mob-cta" onclick="closeMob()">Sign In →</a>
 </div>
 <script>
 (()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('mobCta');if(el){el.textContent='Dashboard →';el.href='/account'}}}}catch(e){}})();

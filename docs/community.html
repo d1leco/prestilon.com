@@ -508,7 +508,7 @@ await Promise.all([loadPosts(),loadStats(),loadTopContributors()])
   <a href="/community" onclick="closeMob()">Community</a>
   <a href="/pricing" onclick="closeMob()">Pricing</a>
   <a href="/support" onclick="closeMob()">Support</a>
-  <a href="/login" id="mobCta" class="mob-cta" onclick="closeMob()">Dashboard →</a>
+  <a href="/login" id="mobCta" class="mob-cta" onclick="closeMob()">Sign In →</a>
 </div>
 <script>
 (()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('mobCta');if(el){el.textContent='Dashboard →';el.href='/account'}}}}catch(e){}})();
