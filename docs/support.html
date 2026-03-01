@@ -20,7 +20,7 @@
   --r:max(1.5rem,calc(50vw - 640px));
 }
 html{background:var(--bg);scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
+body{font-family:'DM Sans',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh}
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(ellipse 70% 40% at 50% -5%,rgba(0,212,180,.06),transparent 55%),
   radial-gradient(ellipse 50% 50% at 90% 90%,rgba(108,92,231,.04),transparent 55%)}
@@ -51,9 +51,16 @@ nav{
 .nc{margin-left:.5rem;padding:.5rem 1.25rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;background:var(--c1);color:#060f1a;text-decoration:none;box-shadow:0 0 18px rgba(0,212,180,.25);transition:all .2s;display:inline-flex;align-items:center;gap:.3rem}
 .nc:hover{box-shadow:0 0 30px rgba(0,212,180,.45);transform:translateY(-1px)}
 
+/* PAGE WRAP */
+.page-wrap{
+  min-height:calc(100vh - 64px - 52px);
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;z-index:1;
+}
+
 /* HERO */
 .hero{
-  text-align:center;padding:40px var(--r) 32px;
+  text-align:center;padding:48px var(--r) 32px;
   position:relative;z-index:1;
 }
 .h-badge{
@@ -74,10 +81,9 @@ nav{
 
 /* CONTENT GRID */
 .content{
-  padding:24px var(--r) 88px;
+  padding:0 var(--r) 48px;
   position:relative;z-index:1;
-  max-width:660px;margin:0 auto;
-  flex:1;
+  max-width:660px;margin:0 auto;width:100%;
 }
 
 /* CARDS */
@@ -179,6 +185,7 @@ footer{
   </div>
 </nav>
 
+<div class="page-wrap">
 <div class="hero">
   <div class="h-badge"><span class="h-dot"></span>HELP CENTER</div>
   <h1 class="hero-h1">How can we <span class="acc">help you?</span></h1>
@@ -214,6 +221,7 @@ footer{
   </div>
 
 
+</div>
 </div>
 
 <script>
