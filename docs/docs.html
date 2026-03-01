@@ -236,23 +236,23 @@ footer{position:fixed!important;bottom:0;left:0;right:0;z-index:998;background:r
   <aside class="sidebar" id="sidebar">
     <div class="side-section" id="sb-setup">
       <div class="side-label">Setup Guide</div>
-      <button class="side-link on" onclick="scrollTo('req')"><span class="si">📋</span> Requirements</button>
-      <button class="side-link" onclick="scrollTo('install')"><span class="si">⬇</span> Installation</button>
-      <button class="side-link" onclick="scrollTo('connect')"><span class="si">🔌</span> Connect Printers</button>
-      <button class="side-link" onclick="scrollTo('first-run')"><span class="si">▶</span> First Run</button>
-      <button class="side-link" onclick="scrollTo('faq')"><span class="si">💬</span> FAQ</button>
+      <button class="side-link on" onclick="scrollToSection('req',this)"><span class="si">📋</span> Requirements</button>
+      <button class="side-link" onclick="scrollToSection('install',this)"><span class="si">⬇</span> Installation</button>
+      <button class="side-link" onclick="scrollToSection('connect',this)"><span class="si">🔌</span> Connect Printers</button>
+      <button class="side-link" onclick="scrollToSection('first-run',this)"><span class="si">▶</span> First Run</button>
+      <button class="side-link" onclick="scrollToSection('faq',this)"><span class="si">💬</span> FAQ</button>
     </div>
     <div class="side-section" id="sb-features" style="display:none">
       <div class="side-label">Features</div>
-      <button class="side-link on" onclick="scrollTo('ai-engine')"><span class="si">🧠</span> AI Engine</button>
-      <button class="side-link" onclick="scrollTo('monitoring')"><span class="si">📡</span> Monitoring</button>
-      <button class="side-link" onclick="scrollTo('autonomy')"><span class="si">🤖</span> Autonomy Levels</button>
-      <button class="side-link" onclick="scrollTo('diagnostics')"><span class="si">🔬</span> Diagnostics</button>
+      <button class="side-link on" onclick="scrollToSection('ai-engine',this)"><span class="si">🧠</span> AI Engine</button>
+      <button class="side-link" onclick="scrollToSection('monitoring',this)"><span class="si">📡</span> Monitoring</button>
+      <button class="side-link" onclick="scrollToSection('autonomy',this)"><span class="si">🤖</span> Autonomy Levels</button>
+      <button class="side-link" onclick="scrollToSection('diagnostics',this)"><span class="si">🔬</span> Diagnostics</button>
     </div>
     <div class="side-section" id="sb-roadmap" style="display:none">
       <div class="side-label">Roadmap</div>
-      <button class="side-link on" onclick="scrollTo('phases')"><span class="si">📍</span> Phases</button>
-      <button class="side-link" onclick="scrollTo('vote')"><span class="si">🗳</span> Vote on Features</button>
+      <button class="side-link on" onclick="scrollToSection('phases',this)"><span class="si">📍</span> Phases</button>
+      <button class="side-link" onclick="scrollToSection('vote',this)"><span class="si">🗳</span> Vote on Features</button>
     </div>
   </aside>
 
@@ -759,11 +759,11 @@ window.showTab=function(tab, btn){
 }
 
 /* Scroll to section */
-window.scrollTo=function(id){
+window.scrollToSection=function(id, btn){
   const el=document.getElementById(id)
   if(el) el.scrollIntoView({behavior:'smooth', block:'start'})
   document.querySelectorAll('.side-link').forEach(l=>l.classList.remove('on'))
-  event.currentTarget.classList.add('on')
+  btn.classList.add('on')
 }
 
 /* Vote toggle */
