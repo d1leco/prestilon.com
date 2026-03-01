@@ -139,7 +139,7 @@ footer{
 .footer-links{display:flex;gap:1.2rem;flex-wrap:wrap}
 .footer-links a{font-size:.72rem;color:var(--text2);text-decoration:none;transition:color .18s}
 .footer-links a:hover{color:var(--text)}
-.footer-links a[href="/community"]{color:var(--green)}
+.footer-links a.active{color:var(--c1);font-weight:600}
 
 @media(max-width:640px){
   nav{padding:0 .6rem 0 0;height:44px}
@@ -572,7 +572,7 @@ if(session){document.getElementById('navCta').textContent='Dashboard →';docume
   <div class="footer-links">
     <a href="/privacy">Privacy Policy</a>
     <a href="/refund">Refund Policy</a>
-    <a href="/terms">Terms of Service</a>
+    <a href="/terms" class="active">Terms of Service</a>
   </div>
 </footer>
 </body>
