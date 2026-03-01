@@ -89,19 +89,30 @@ nav{position:sticky;top:0;z-index:999;display:flex;align-items:center;justify-co
 .sign-in-prompt a:hover{text-decoration:underline}
 
 /* COMMENT ITEM */
-.comment{padding:1rem 0;border-bottom:1px solid var(--border)}
+.comment{padding:.75rem 0;border-bottom:1px solid var(--border)}
 .comment:last-child{border-bottom:none}
-.comment-header{display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem}
+.comment-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
 .comment-author{font-size:.8rem;font-weight:600;color:var(--text)}
-.comment-time{font-size:.7rem;color:var(--text3)}
-.comment-body{font-size:.85rem;color:var(--text2);line-height:1.7;white-space:pre-wrap;word-break:break-word;margin-bottom:.6rem}
-.comment-actions{display:flex;align-items:center;gap:.8rem}
-.ca-btn{background:none;border:none;color:var(--text3);font-size:.72rem;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:.25rem;padding:.2rem .4rem;border-radius:5px;transition:color .15s,background .15s}
-.ca-btn:hover{color:var(--c1);background:rgba(0,212,180,.06)}
+.comment-time{font-size:.68rem;color:var(--text3)}
+.comment-body{font-size:.85rem;color:var(--text2);line-height:1.7;white-space:pre-wrap;word-break:break-word;margin-bottom:.45rem}
+.comment-actions{display:flex;align-items:center;gap:.15rem;flex-wrap:wrap}
+.ca-btn{background:none;border:none;color:var(--text3);font-size:.72rem;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:.25rem;padding:.25rem .5rem;border-radius:5px;transition:color .15s,background .15s;white-space:nowrap}
+.ca-btn:hover{color:var(--text);background:rgba(255,255,255,.06)}
 .ca-btn.liked{color:var(--c1)}
 .ca-btn.disliked{color:#fca5a5}
-.reply-thread{padding-left:1.5rem;border-left:2px solid var(--border);margin-top:.8rem}
-.reply-thread .comment{padding:.8rem 0}
+.ca-btn.saved{color:var(--amber)}
+.vote-group{display:flex;align-items:center;gap:0;background:rgba(255,255,255,.04);border-radius:99px;overflow:hidden;border:1px solid var(--border)}
+.vote-group .ca-btn{padding:.22rem .6rem;border-radius:0}
+.vote-sep{width:1px;height:16px;background:var(--border)}
+.ca-dots{position:relative}
+.dots-menu{position:absolute;top:100%;left:0;z-index:100;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.3rem;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,.4);display:none}
+.dots-menu.open{display:block}
+.dots-item{display:flex;align-items:center;gap:.6rem;padding:.45rem .75rem;border-radius:7px;font-size:.78rem;color:var(--text2);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.dots-item:hover{background:rgba(255,255,255,.06);color:var(--text)}
+.dots-item.danger{color:#fca5a5}
+.dots-item.danger:hover{background:rgba(239,68,68,.08)}
+.reply-thread{padding-left:1.2rem;border-left:2px solid var(--border);margin-top:.6rem}
+.reply-thread .comment{padding:.6rem 0}
 
 /* EMPTY / LOADING */
 .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text3);font-size:.85rem}
@@ -258,49 +269,139 @@ function renderCommentBox(parentId=null, onCancel=null){
 
 function renderComment(c, depth=0){
   const ci=charCode(c.author_username)
-  const canReact=!!currentUser
   const myUp=c._myReaction==='up', myDown=c._myReaction==='down'
+  const isSaved=c._saved||false
+  const isFollowed=c._followed||false
+  const score=(c.upvotes||0)-(c.downvotes||0)
   return `
   <div class="comment" id="cmt${c.id}">
     <div class="comment-header">
-      <div class="av" style="width:26px;height:26px;font-size:.68rem;background:${avatarColor(ci)};color:${avatarText(ci)}">${(c.author_username||'?')[0].toUpperCase()}</div>
+      <div class="av" style="width:24px;height:24px;font-size:.65rem;background:${avatarColor(ci)};color:${avatarText(ci)}">${(c.author_username||'?')[0].toUpperCase()}</div>
       <span class="comment-author">${escHtml(c.author_username||'unknown')}</span>
-      <span class="comment-time">${timeAgo(c.created_at)}</span>
-      ${c.author_role!=='member'?`<span style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--c1)">${c.author_role}</span>`:''}
+      ${c.author_role!=='member'?`<span style="font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:.1rem .4rem;background:rgba(0,212,180,.1);border-radius:4px;color:var(--c1)">${c.author_role}</span>`:''}
+      <span class="comment-time">· ${timeAgo(c.created_at)}</span>
     </div>
     <div class="comment-body">${escHtml(c.body)}</div>
     <div class="comment-actions">
-      <button class="ca-btn ${myUp?'liked':''}" onclick="reactComment(${c.id},'up',this)">
-        <svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>
-        <span id="cu${c.id}">${c.upvotes||0}</span>
+      <div class="vote-group">
+        <button class="ca-btn ${myUp?'liked':''}" onclick="reactComment(${c.id},'up')" title="Upvote">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+        <span style="font-size:.72rem;color:${score>0?'var(--c1)':score<0?'#fca5a5':'var(--text3)'};padding:0 .25rem;font-family:'JetBrains Mono',monospace" id="cs${c.id}">${score}</span>
+        <div class="vote-sep"></div>
+        <button class="ca-btn ${myDown?'disliked':''}" onclick="reactComment(${c.id},'down')" title="Downvote">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12l7 7 7-7"/></svg>
+        </button>
+      </div>
+      ${depth<2&&currentUser?`<button class="ca-btn" onclick="showReplyBox(${c.id})">
+        <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Reply
+      </button>`:''}
+      <button class="ca-btn" onclick="shareComment(${c.id})">
+        <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+        Share
       </button>
-      <button class="ca-btn ${myDown?'disliked':''}" onclick="reactComment(${c.id},'down',this)">
-        <svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/></svg>
-        <span id="cd${c.id}">${c.downvotes||0}</span>
-      </button>
-      ${depth<2&&currentUser?`<button class="ca-btn" onclick="showReplyBox(${c.id})">↩ Reply</button>`:''}
-      ${currentUser&&currentUser.id===c.author_id?`<button class="ca-btn" style="color:var(--red);margin-left:auto" onclick="deleteComment(${c.id})">Delete</button>`:''}
+      ${currentUser?`<div class="ca-dots" id="dots${c.id}">
+        <button class="ca-btn" onclick="toggleDotsMenu(${c.id},event)">
+          <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+        </button>
+        <div class="dots-menu" id="dotsMenu${c.id}">
+          <div class="dots-item" onclick="followComment(${c.id})">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            ${isFollowed?'Unfollow comment':'Follow comment'}
+          </div>
+          <div class="dots-item" onclick="saveItem('comment',${c.id})">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+            ${isSaved?'Unsave':'Save'}
+          </div>
+          <div class="dots-item danger" onclick="reportItem('comment',${c.id})">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>
+            Report
+          </div>
+          ${currentUser&&currentUser.id===c.author_id?`<div class="dots-item danger" onclick="deleteComment(${c.id})">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><polyline stroke="currentColor" stroke-width="2" stroke-linecap="round" points="3 6 5 6 21 6"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+            Delete
+          </div>`:''}
+        </div>
+      </div>`:''}
     </div>
     <div id="replybox${c.id}"></div>
     ${c._replies&&c._replies.length?`<div class="reply-thread">${c._replies.map(r=>renderComment(r,depth+1)).join('')}</div>`:''}
   </div>`
 }
 
-async function reactComment(id, dir, btn){
+async function reactComment(id, dir){
   if(!currentUser){showToast('⚠️ Sign in to react');setTimeout(()=>{window.location.href='/login'},1200);return}
-  const upBtn=document.querySelector(`#cmt${id} .ca-btn.liked, #cmt${id} .comment-actions .ca-btn:first-child`)
-  // determine current state from btn classes
-  const isUp=dir==='up', isDown=dir==='down'
-  const wasLiked=btn.classList.contains('liked'), wasDisliked=btn.classList.contains('disliked')
-  if((isUp&&wasLiked)||(isDown&&wasDisliked)){
+  const scoreEl=document.getElementById('cs'+id)
+  const upBtn=document.querySelector(`#cmt${id} .vote-group .ca-btn:first-child`)
+  const downBtn=document.querySelector(`#cmt${id} .vote-group .ca-btn:last-child`)
+  const wasUp=upBtn&&upBtn.classList.contains('liked')
+  const wasDown=downBtn&&downBtn.classList.contains('disliked')
+  if((dir==='up'&&wasUp)||(dir==='down'&&wasDown)){
     await sb.from('reactions').delete().eq('user_id',currentUser.id).eq('target_type','comment').eq('target_id',id)
   } else {
     await sb.from('reactions').upsert({user_id:currentUser.id,target_type:'comment',target_id:id,reaction:dir},{onConflict:'user_id,target_type,target_id'})
   }
   const{data:c}=await sb.from('comments').select('upvotes,downvotes').eq('id',id).single()
-  if(c){document.getElementById('cu'+id).textContent=c.upvotes||0;document.getElementById('cd'+id).textContent=c.downvotes||0}
-  // reload to reflect button states
+  if(c&&scoreEl){
+    const s=(c.upvotes||0)-(c.downvotes||0)
+    scoreEl.textContent=s
+    scoreEl.style.color=s>0?'var(--c1)':s<0?'#fca5a5':'var(--text3)'
+  }
+  if(upBtn) upBtn.classList.toggle('liked',dir==='up'&&!wasUp)
+  if(downBtn) downBtn.classList.toggle('disliked',dir==='down'&&!wasDown)
+}
+
+function toggleDotsMenu(id, e){
+  e.stopPropagation()
+  document.querySelectorAll('.dots-menu.open').forEach(m=>{
+    if(m.id!=='dotsMenu'+id) m.classList.remove('open')
+  })
+  document.getElementById('dotsMenu'+id)?.classList.toggle('open')
+}
+document.addEventListener('click',()=>document.querySelectorAll('.dots-menu.open').forEach(m=>m.classList.remove('open')))
+
+function shareComment(id){
+  const url=window.location.origin+window.location.pathname+'?id='+postId+'#cmt'+id
+  navigator.clipboard.writeText(url).then(()=>showToast('🔗 Link copied!'))
+}
+
+async function followComment(id){
+  if(!currentUser){showToast('⚠️ Sign in first');return}
+  const{data:existing}=await sb.from('followed_comments').select('id').eq('user_id',currentUser.id).eq('comment_id',id).single()
+  if(existing){
+    await sb.from('followed_comments').delete().eq('user_id',currentUser.id).eq('comment_id',id)
+    showToast('🔕 Unfollowed comment')
+  } else {
+    await sb.from('followed_comments').insert({user_id:currentUser.id,comment_id:id})
+    showToast('🔔 Following comment')
+  }
+  document.getElementById('dotsMenu'+id)?.classList.remove('open')
   loadComments()
+}
+
+async function saveItem(type, id){
+  if(!currentUser){showToast('⚠️ Sign in first');return}
+  const{data:existing}=await sb.from('saved_items').select('id').eq('user_id',currentUser.id).eq('target_type',type).eq('target_id',id).single()
+  if(existing){
+    await sb.from('saved_items').delete().eq('user_id',currentUser.id).eq('target_type',type).eq('target_id',id)
+    showToast('🗑 Removed from saved')
+  } else {
+    await sb.from('saved_items').insert({user_id:currentUser.id,target_type:type,target_id:id})
+    showToast('🔖 Saved!')
+  }
+  document.getElementById('dotsMenu'+id)?.classList.remove('open')
+  loadComments()
+}
+
+async function reportItem(type, id){
+  if(!currentUser){showToast('⚠️ Sign in first');return}
+  const reason=prompt('Why are you reporting this? (optional)')
+  if(reason===null)return
+  const{error}=await sb.from('reports').insert({reporter_id:currentUser.id,target_type:type,target_id:id,reason:reason||null})
+  if(error&&error.code==='23505'){showToast('⚠️ Already reported');return}
+  showToast('🚩 Reported — thank you')
+  document.getElementById('dotsMenu'+id)?.classList.remove('open')
 }
 
 function showReplyBox(parentId){
@@ -342,20 +443,25 @@ async function loadComments(){
     .select('*').eq('post_id',postId).order('created_at',{ascending:true})
   if(!comments){area.querySelector('#commentsList').innerHTML='<div class="empty-state">Failed to load comments.</div>';return}
 
-  // fetch my reactions to comments
-  let myReactions={}
+  // fetch my reactions, saves, follows for comments
+  let myReactions={}, mySaves={}, myFollows={}
   if(currentUser){
     const ids=comments.map(c=>c.id)
     if(ids.length){
-      const{data:reacts}=await sb.from('reactions').select('target_id,reaction')
-        .eq('user_id',currentUser.id).eq('target_type','comment').in('target_id',ids)
+      const[{data:reacts},{data:saves},{data:follows}]=await Promise.all([
+        sb.from('reactions').select('target_id,reaction').eq('user_id',currentUser.id).eq('target_type','comment').in('target_id',ids),
+        sb.from('saved_items').select('target_id').eq('user_id',currentUser.id).eq('target_type','comment').in('target_id',ids),
+        sb.from('followed_comments').select('comment_id').eq('user_id',currentUser.id).in('comment_id',ids)
+      ])
       if(reacts) reacts.forEach(r=>myReactions[r.target_id]=r.reaction)
+      if(saves) saves.forEach(s=>mySaves[s.target_id]=true)
+      if(follows) follows.forEach(f=>myFollows[f.comment_id]=true)
     }
   }
 
   // build tree
   const map={}, roots=[]
-  comments.forEach(c=>{c._replies=[];c._myReaction=myReactions[c.id]||null;map[c.id]=c})
+  comments.forEach(c=>{c._replies=[];c._myReaction=myReactions[c.id]||null;c._saved=mySaves[c.id]||false;c._followed=myFollows[c.id]||false;map[c.id]=c})
   comments.forEach(c=>{
     if(c.parent_id&&map[c.parent_id]) map[c.parent_id]._replies.push(c)
     else if(!c.parent_id) roots.push(c)
