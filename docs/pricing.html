@@ -206,6 +206,24 @@ footer{position:fixed!important;bottom:0;left:0;right:0;z-index:998;background:r
   .footer-links{gap:.4rem .9rem}.footer-links a{font-size:.62rem}
   .cta-btns{flex-direction:column;align-items:stretch}.btn{justify-content:center}
 }
+
+/* ── MOBILE NAV ── */
+.ham{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;background:none;border:none;cursor:pointer;padding:4px;border-radius:7px;transition:background .18s;flex-shrink:0}
+.ham:hover{background:rgba(255,255,255,.07)}
+.ham span{display:block;width:20px;height:2px;background:var(--text2);border-radius:2px;transition:all .25s;transform-origin:center}
+.mob-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:rgba(6,15,26,.97);backdrop-filter:blur(24px);flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
+.mob-menu.open{display:flex}
+.mob-menu a{font-family:'Syne',sans-serif;font-weight:700;font-size:1.4rem;color:var(--text2);text-decoration:none;transition:color .18s}
+.mob-menu a:hover{color:var(--c1)}
+.mob-menu a.mob-cta{color:#060f1a;background:var(--c1);padding:.6rem 2rem;border-radius:10px;box-shadow:0 0 24px rgba(0,212,180,.3)}
+.mob-close{position:absolute;top:1.1rem;right:1.1rem;background:none;border:none;color:var(--text2);font-size:1.5rem;cursor:pointer;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .18s}
+.mob-close:hover{background:rgba(255,255,255,.07)}
+@media(max-width:640px){
+  .ham{display:flex}
+  .nav-r .nl{display:none}
+  .nav-r .nc{display:none}
+  .nav-r{gap:0}
+}
 </style>
 </head>
 <body>
@@ -221,18 +239,11 @@ footer{position:fixed!important;bottom:0;left:0;right:0;z-index:998;background:r
     <a class="nl active" href="/pricing">Pricing</a>
     <a class="nl" href="/support">Support</a>
     <a class="nc" id="navCta" href="/login">Dashboard →</a>
-    <button class="ham-btn" id="hamBtn" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
+  
+    <button class="ham" onclick="openMob()" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
-<div class="mob-menu" id="mobMenu">
-  <a href="/">Home</a>
-  <a href="/docs">Docs</a>
-  <a href="/community">Community</a>
-  <a href="/pricing" class="active">Pricing</a>
-  <a href="/support">Support</a>
-  <a class="mob-cta-mob" id="mobCta" href="/login">Dashboard →</a>
-</div>
-<script>(()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('navCta');if(el){el.textContent='Dashboard →';el.href='/account';var mc=document.getElementById('mobCta');if(mc){mc.textContent='Dashboard →';mc.href='/account'}}}}}catch(e){}})();</script>
+<script>(()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('navCta');if(el){el.textContent='Dashboard →';el.href='/account'}}}}catch(e){}})();</script>
 
 
 <!-- HERO -->
@@ -518,24 +529,20 @@ function toggleFaq(btn){
     <a href="/terms">Terms of Service</a>
   </div>
 </footer>
-<style>
-.ham-btn{display:none;flex-direction:column;justify-content:center;gap:5px;width:34px;height:34px;background:none;border:none;cursor:pointer;padding:5px;border-radius:7px;transition:background .18s;flex-shrink:0;margin-left:.3rem}
-.ham-btn:hover{background:rgba(255,255,255,.07)}
-.ham-btn span{display:block;height:2px;width:20px;background:#8eaabf;border-radius:2px;transition:all .25s}
-.ham-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.ham-btn.open span:nth-child(2){opacity:0}
-.ham-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-.mob-menu{display:none;position:absolute;top:44px;left:0;right:0;background:rgba(6,15,26,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(0,212,180,.25);padding:.65rem 1rem .85rem;flex-direction:column;gap:.15rem;z-index:998}
-.mob-menu.open{display:flex}
-.mob-menu a{padding:.55rem .75rem;color:#8eaabf;font-size:.88rem;font-weight:500;text-decoration:none;border-radius:8px;transition:color .18s,background .18s}
-.mob-menu a:hover{color:#f0f6ff;background:rgba(255,255,255,.05)}
-.mob-menu a.active{color:#00d4b4}
-.mob-cta-mob{margin-top:.45rem!important;padding:.62rem .75rem!important;border-radius:9px!important;background:#00d4b4!important;color:#060f1a!important;font-weight:700!important;text-align:center!important}
-@media(max-width:660px){.nav-r .nl{display:none}.ham-btn{display:flex}}
-</style>
+<div class="mob-menu" id="mobMenu">
+  <button class="mob-close" onclick="closeMob()">✕</button>
+  <a href="/" onclick="closeMob()">Home</a>
+  <a href="/docs" onclick="closeMob()">Docs</a>
+  <a href="/community" onclick="closeMob()">Community</a>
+  <a href="/pricing" onclick="closeMob()">Pricing</a>
+  <a href="/support" onclick="closeMob()">Support</a>
+  <a href="/login" id="mobCta" class="mob-cta" onclick="closeMob()">Dashboard →</a>
+</div>
 <script>
-function toggleMenu(){document.getElementById('hamBtn').classList.toggle('open');document.getElementById('mobMenu').classList.toggle('open')}
-document.addEventListener('click',function(e){var m=document.getElementById('mobMenu'),b=document.getElementById('hamBtn');if(m&&b&&!m.contains(e.target)&&!b.contains(e.target)){m.classList.remove('open');b.classList.remove('open')}})
+(()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('mobCta');if(el){el.textContent='Dashboard →';el.href='/account'}}}}catch(e){}})();
+function openMob(){document.getElementById('mobMenu').classList.add('open');document.body.style.overflow='hidden'}
+function closeMob(){document.getElementById('mobMenu').classList.remove('open');document.body.style.overflow=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMob()})
 </script>
 </body>
 </html>

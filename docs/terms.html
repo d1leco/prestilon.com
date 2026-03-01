@@ -155,6 +155,24 @@ footer{
   .footer-links{gap:.4rem .9rem;flex-wrap:wrap}
   .footer-links a{font-size:.62rem}
 }
+
+/* ── MOBILE NAV ── */
+.ham{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;background:none;border:none;cursor:pointer;padding:4px;border-radius:7px;transition:background .18s;flex-shrink:0}
+.ham:hover{background:rgba(255,255,255,.07)}
+.ham span{display:block;width:20px;height:2px;background:var(--text2);border-radius:2px;transition:all .25s;transform-origin:center}
+.mob-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:rgba(6,15,26,.97);backdrop-filter:blur(24px);flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
+.mob-menu.open{display:flex}
+.mob-menu a{font-family:'Syne',sans-serif;font-weight:700;font-size:1.4rem;color:var(--text2);text-decoration:none;transition:color .18s}
+.mob-menu a:hover{color:var(--c1)}
+.mob-menu a.mob-cta{color:#060f1a;background:var(--c1);padding:.6rem 2rem;border-radius:10px;box-shadow:0 0 24px rgba(0,212,180,.3)}
+.mob-close{position:absolute;top:1.1rem;right:1.1rem;background:none;border:none;color:var(--text2);font-size:1.5rem;cursor:pointer;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .18s}
+.mob-close:hover{background:rgba(255,255,255,.07)}
+@media(max-width:640px){
+  .ham{display:flex}
+  .nav-r .nl{display:none}
+  .nav-r .nc{display:none}
+  .nav-r{gap:0}
+}
 </style>
 </head>
 <body>
@@ -169,18 +187,11 @@ footer{
     <a class="nl" href="/pricing">Pricing</a>
     <a class="nl" href="/support">Support</a>
     <a class="nc" id="navCta" href="/login">Dashboard →</a>
-    <button class="ham-btn" id="hamBtn" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
+  
+    <button class="ham" onclick="openMob()" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
-<div class="mob-menu" id="mobMenu">
-  <a href="/">Home</a>
-  <a href="/docs">Docs</a>
-  <a href="/community">Community</a>
-  <a href="/pricing">Pricing</a>
-  <a href="/support">Support</a>
-  <a class="mob-cta-mob" id="mobCta" href="/login">Dashboard →</a>
-</div>
-<script>(()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('navCta');if(el){el.textContent='Dashboard →';el.href='/account';var mc=document.getElementById('mobCta');if(mc){mc.textContent='Dashboard →';mc.href='/account'}}}}}catch(e){}})();</script>
+<script>(()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('navCta');if(el){el.textContent='Dashboard →';el.href='/account'}}}}catch(e){}})();</script>
 
 <div class="hero">
   <div class="h-badge"><span class="h-dot"></span>LEGAL · TERMS</div>
@@ -521,7 +532,7 @@ footer{
           </div>
           <div>
             <div class="cc-label">Legal Inquiries</div>
-            <div class="cc-value"><a href="mailto:legal@prestilon.com">legal@prestilon.com</a></div>
+            <div class="cc-value"><a href="/cdn-cgi/l/email-protection#3d51585a5c517d4d4f584e4954515253135e5250"><span class="__cf_email__" data-cfemail="d4b8b1b3b5b894a4a6b1a7a0bdb8bbbafab7bbb9">[email&#160;protected]</span></a></div>
           </div>
         </div>
         <div class="contact-card" style="margin-top:.65rem">
@@ -539,7 +550,7 @@ footer{
   </main>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 (()=>{
   const c=document.getElementById('bg'),x=c.getContext('2d');let W,H,P=[]
   function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
@@ -578,13 +589,21 @@ const{data:{session}}=await sb.auth.getSession()
 if(session){document.getElementById('navCta').textContent='Dashboard →';document.getElementById('navCta').href='/account'}
 </script>
 
+<div class="mob-menu" id="mobMenu">
+  <button class="mob-close" onclick="closeMob()">✕</button>
+  <a href="/" onclick="closeMob()">Home</a>
+  <a href="/docs" onclick="closeMob()">Docs</a>
+  <a href="/community" onclick="closeMob()">Community</a>
+  <a href="/pricing" onclick="closeMob()">Pricing</a>
+  <a href="/support" onclick="closeMob()">Support</a>
+  <a href="/login" id="mobCta" class="mob-cta" onclick="closeMob()">Dashboard →</a>
+</div>
+<script>
+(()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('mobCta');if(el){el.textContent='Dashboard →';el.href='/account'}}}}catch(e){}})();
+function openMob(){document.getElementById('mobMenu').classList.add('open');document.body.style.overflow='hidden'}
+function closeMob(){document.getElementById('mobMenu').classList.remove('open');document.body.style.overflow=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMob()})
+</script>
+
 <footer>
-  <div class="fc">© 2026 PRESTILON. All rights reserved.</div>
-  <div class="footer-links">
-    <a href="/privacy">Privacy Policy</a>
-    <a href="/refund">Refund Policy</a>
-    <a href="/terms" class="active">Terms of Service</a>
-  </div>
-</footer>
-</body>
-</html>
+  <div class="fc">© 202
