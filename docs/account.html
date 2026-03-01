@@ -266,7 +266,6 @@ footer{
     <button class="tab-btn on" id="tbSub"      onclick="showTab('sub',this)">💳 Subscription</button>
     <button class="tab-btn"    id="tbHardware" onclick="showTab('hardware',this)">🖥️ Hardware <span class="tab-nb" id="hwBadge" style="display:none">0</span></button>
     <button class="tab-btn"    id="tbProfile"  onclick="showTab('profile',this)">👤 Profile &amp; Security</button>
-    <button class="tab-btn"    id="tbDownload" onclick="showTab('download',this)">⬇ Download</button>
   </div>
 </div>
 
@@ -335,6 +334,40 @@ footer{
       <p style="font-size:.8rem;color:var(--text2);line-height:1.7">Your license is tied to specific machines based on your plan limit. The backend registers automatically on first run. To remove a binding, contact support.</p>
       <div class="tip">💡 <strong style="color:var(--c1)">Tip:</strong> The most recently bound machine appears first in the list.</div>
     </div>
+
+
+  <!-- ══ DOWNLOAD (moved) ══ -->
+<div class="card">
+      <div class="clbl">DOWNLOAD</div>
+      <div class="ctitle">⬇ PRESTILON Backend</div>
+      <div class="albox ai" style="margin-bottom:1.1rem">🚀 Windows installer coming soon. You'll be notified by email when it's ready.</div>
+      <div class="code-block"><span class="cm"># System Requirements</span>
+Windows 10 / 11 (64-bit)
+Node.js 18 or higher
+Klipper + Moonraker on each printer
+Local network access to printer IP
+
+<span class="cm"># After install, open dashboard at:</span>
+<span class="vl">http://localhost:3002</span>
+
+<span class="cm"># Architecture</span>
+Backend   → localhost:3002  (Node.js + SQLite)
+Telemetry → local DuckDB   (high-speed time-series)
+Auth      → Supabase cloud  (license only)
+AI        → local inference (zero cloud latency)</div>
+      <div class="act-row">
+        <a href="/cdn-cgi/l/email-protection#5a292f2a2a35282e1a2a283f292e3336353474393537" class="btn-link">📧 Notify Me at Launch</a>
+        <a href="/support" class="btn-link">❓ Support &amp; FAQ</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="clbl">YOUR LICENSE</div>
+      <div class="ctitle">🔑 License Details</div>
+      <div class="lic-row"><span style="color:var(--text2)">Plan</span><span id="dlPlan" style="font-family:'JetBrains Mono',monospace;color:var(--c1);font-size:.76rem">—</span></div>
+      <div class="lic-row"><span style="color:var(--text2)">Printer Limit</span><span id="dlLimit" style="font-family:'JetBrains Mono',monospace;color:var(--c1);font-size:.76rem">—</span></div>
+      <div class="lic-row"><span style="color:var(--text2)">Valid Until</span><span id="dlValid" style="font-family:'JetBrains Mono',monospace;color:var(--text2);font-size:.76rem">—</span></div>
+    </div>
+
   </div>
 
   <!-- ══ PROFILE & SECURITY ══ -->
@@ -465,43 +498,6 @@ footer{
     </div>
 
   </div>
-
-  <!-- ══ DOWNLOAD ══ -->
-  <div class="pnl" id="pnlDownload">
-    <div class="card">
-      <div class="clbl">DOWNLOAD</div>
-      <div class="ctitle">⬇ PRESTILON Backend</div>
-      <div class="albox ai" style="margin-bottom:1.1rem">🚀 Windows installer coming soon. You'll be notified by email when it's ready.</div>
-      <div class="code-block"><span class="cm"># System Requirements</span>
-Windows 10 / 11 (64-bit)
-Node.js 18 or higher
-Klipper + Moonraker on each printer
-Local network access to printer IP
-
-<span class="cm"># After install, open dashboard at:</span>
-<span class="vl">http://localhost:3002</span>
-
-<span class="cm"># Architecture</span>
-Backend   → localhost:3002  (Node.js + SQLite)
-Telemetry → local DuckDB   (high-speed time-series)
-Auth      → Supabase cloud  (license only)
-AI        → local inference (zero cloud latency)</div>
-      <div class="act-row">
-        <a href="/cdn-cgi/l/email-protection#5a292f2a2a35282e1a2a283f292e3336353474393537" class="btn-link">📧 Notify Me at Launch</a>
-        <a href="/support" class="btn-link">❓ Support &amp; FAQ</a>
-      </div>
-    </div>
-    <div class="card">
-      <div class="clbl">YOUR LICENSE</div>
-      <div class="ctitle">🔑 License Details</div>
-      <div class="lic-row"><span style="color:var(--text2)">Plan</span><span id="dlPlan" style="font-family:'JetBrains Mono',monospace;color:var(--c1);font-size:.76rem">—</span></div>
-      <div class="lic-row"><span style="color:var(--text2)">Printer Limit</span><span id="dlLimit" style="font-family:'JetBrains Mono',monospace;color:var(--c1);font-size:.76rem">—</span></div>
-      <div class="lic-row"><span style="color:var(--text2)">Valid Until</span><span id="dlValid" style="font-family:'JetBrains Mono',monospace;color:var(--text2);font-size:.76rem">—</span></div>
-    </div>
-  </div>
-
-</div>
-
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 (()=>{
   const c=document.getElementById('bg'),x=c.getContext('2d');let W,H,P=[]
