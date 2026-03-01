@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="PRESTILON Docs — Setup guide, feature overview, and public roadmap."/>
+<link rel="icon" type="image/png" href="prestilon.logo.png">
+<title>Docs & Roadmap — PRESTILON</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060f1a;--bg2:#0a1929;--bg3:#0e2035;
+  --c1:#00d4b4;--c2:#00a896;--purple:#6c5ce7;
+  --text:#f0f6ff;--text2:#8eaabf;--text3:#3d5a70;
+  --border:rgba(255,255,255,.07);--border2:rgba(0,212,180,.25);
+  --red:#ef4444;--green:#10d48a;--amber:#f59e0b;
+  --r:max(1.5rem,calc(50vw - 720px));
+}
+html{background:var(--bg);scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh;padding-bottom:44px}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 40% at 50% -5%,rgba(0,212,180,.06),transparent 55%),
+             radial-gradient(ellipse 50% 50% at 90% 90%,rgba(108,92,231,.04),transparent 55%)}
+canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35}
+
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes shimmer{to{background-position:200% center}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+@keyframes draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:999;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem 0 0;height:52px;background:rgba(6,15,26,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;text-decoration:none;transition:opacity .2s;padding-left:1rem;overflow:hidden;height:52px}
+.logo:hover{opacity:.85}
+.logo-img{height:34px;width:auto;mix-blend-mode:screen;display:block;object-fit:contain}
+.nav-r{display:flex;align-items:center;gap:.15rem}
+.nl{padding:.3rem .65rem;color:var(--text2);font-size:.8rem;font-weight:500;text-decoration:none;border-radius:7px;transition:color .18s,background .18s}
+.nl:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.nl.active{color:var(--c1)}
+.nc{margin-left:.4rem;padding:.38rem .95rem;border-radius:7px;font-weight:700;font-size:.8rem;background:var(--c1);color:#060f1a;text-decoration:none;box-shadow:0 0 18px rgba(0,212,180,.25);transition:all .2s;display:inline-flex;align-items:center;gap:.3rem}
+.nc:hover{box-shadow:0 0 30px rgba(0,212,180,.45);transform:translateY(-1px)}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:40px var(--r) 32px;position:relative;z-index:1}
+.h-badge{display:inline-flex;align-items:center;gap:.45rem;padding:.28rem .85rem .28rem .5rem;border-radius:99px;border:1px solid var(--border2);background:rgba(0,212,180,.05);font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.08em;color:var(--c1);margin-bottom:.9rem;animation:up .5s ease both}
+.h-dot{width:6px;height:6px;border-radius:50%;background:var(--c1);box-shadow:0 0 8px var(--c1);animation:pulse 2s infinite}
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.7rem,3vw,2.4rem);line-height:1.08;letter-spacing:-.01em;margin-bottom:.55rem;animation:up .5s ease .07s both}
+.hero h1 .acc{background:linear-gradient(100deg,var(--c1),var(--purple),var(--c1));background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 6s linear infinite}
+.hero p{color:var(--text2);font-size:.82rem;line-height:1.65;max-width:500px;margin:0 auto 1.4rem;animation:up .5s ease .14s both}
+
+/* ── TAB NAV ── */
+.tab-nav{display:flex;gap:.3rem;justify-content:center;padding:.3rem;background:var(--bg2);border:1px solid var(--border);border-radius:12px;width:fit-content;margin:0 auto;animation:up .5s ease .2s both}
+.tab-btn{padding:.42rem 1.1rem;border-radius:9px;border:none;background:transparent;color:var(--text3);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tab-btn:hover{color:var(--text2)}
+.tab-btn.on{background:var(--c1);color:#060f1a;box-shadow:0 0 14px rgba(0,212,180,.3)}
+
+/* ── LAYOUT ── */
+.page-wrap{display:grid;grid-template-columns:220px 1fr;gap:2rem;padding:32px var(--r) 60px;position:relative;z-index:1;max-width:1160px;margin:0 auto;align-items:start}
+@media(max-width:860px){.page-wrap{grid-template-columns:1fr}}
+
+/* ── SIDEBAR ── */
+.sidebar{position:sticky;top:72px}
+@media(max-width:860px){.sidebar{display:none}}
+.side-section{margin-bottom:1.5rem}
+.side-label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;margin-bottom:.5rem;padding:0 .6rem}
+.side-link{display:flex;align-items:center;gap:.5rem;padding:.38rem .6rem;border-radius:7px;font-size:.78rem;color:var(--text2);text-decoration:none;transition:all .18s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.side-link:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.side-link.on{color:var(--c1);background:rgba(0,212,180,.07)}
+.side-link .si{font-size:.75rem;flex-shrink:0;opacity:.7}
+
+/* ── CONTENT PANEL ── */
+.panel{display:none}
+.panel.on{display:flex;flex-direction:column;gap:2.2rem;animation:fadein .35s ease}
+
+/* ── SEC LABEL ── */
+.sec-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.14em;color:var(--c1);text-transform:uppercase;margin-bottom:.4rem;display:flex;align-items:center;gap:.35rem}
+.sec-label::before{content:'//';opacity:.4}
+
+/* ── CARD ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.6rem}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:.85rem;display:flex;align-items:center;gap:.5rem}
+.card p{font-size:.82rem;color:var(--text2);line-height:1.75;margin-bottom:.75rem}
+.card p:last-child{margin-bottom:0}
+.card a{color:var(--c1);text-decoration:none;font-weight:600}
+.card a:hover{text-decoration:underline}
+
+/* ── STEPS ── */
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:flex;gap:1.1rem;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;left:17px;top:38px;bottom:-12px;width:1px;background:linear-gradient(to bottom,rgba(0,212,180,.25),transparent)}
+.step-num{width:34px;height:34px;border-radius:50%;background:rgba(0,212,180,.1);border:1px solid rgba(0,212,180,.3);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.78rem;color:var(--c1);flex-shrink:0;margin-top:.1rem}
+.step-body{flex:1;padding-bottom:1.6rem}
+.step-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;color:var(--text);margin-bottom:.35rem}
+.step-desc{font-size:.8rem;color:var(--text2);line-height:1.72}
+.step-tag{display:inline-flex;align-items:center;gap:.3rem;margin-top:.6rem;padding:.2rem .6rem;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:600}
+.tag-soon{background:rgba(245,158,11,.08);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+.tag-done{background:rgba(0,212,180,.08);color:var(--c1);border:1px solid rgba(0,212,180,.2)}
+.tag-wip{background:rgba(108,92,231,.08);color:#a78bfa;border:1px solid rgba(108,92,231,.2)}
+
+/* ── REQ GRID ── */
+.req-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.5rem}
+@media(max-width:540px){.req-grid{grid-template-columns:1fr}}
+.req-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;display:flex;align-items:flex-start;gap:.7rem}
+.req-icon{font-size:1.1rem;flex-shrink:0;margin-top:.05rem}
+.req-name{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:.12rem}
+.req-sub{font-size:.68rem;color:var(--text3);font-family:'JetBrains Mono',monospace;line-height:1.4}
+.req-status{margin-top:.28rem;font-size:.62rem;font-family:'JetBrains Mono',monospace}
+.rs-ok{color:var(--green)}.rs-req{color:var(--c1)}
+
+/* ── CODE BLOCK ── */
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:1rem 1.15rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text2);line-height:1.85;overflow-x:auto;position:relative;margin-top:.6rem}
+.code-block .cm{color:var(--text3)}
+.code-block .kw{color:var(--c1)}
+.code-block .vl{color:#a78bfa}
+.code-copy{position:absolute;top:.65rem;right:.65rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;padding:.2rem .55rem;font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--text3);cursor:pointer;transition:all .18s}
+.code-copy:hover{color:var(--text);border-color:var(--border2)}
+
+/* ── INFO BOX ── */
+.info-box{padding:.85rem 1rem;border-radius:10px;display:flex;align-items:flex-start;gap:.6rem;font-size:.78rem;line-height:1.65;margin-top:.6rem}
+.ib-tip{background:rgba(0,212,180,.05);border:1px solid rgba(0,212,180,.2);color:var(--text2)}
+.ib-warn{background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.2);color:rgba(253,230,138,.85)}
+.ib-soon{background:rgba(108,92,231,.05);border:1px solid rgba(108,92,231,.2);color:rgba(196,181,253,.85)}
+.ib-icon{flex-shrink:0;font-size:.9rem}
+
+/* ── FEATURE LIST ── */
+.feat-list{display:flex;flex-direction:column;gap:.55rem;margin-top:.5rem}
+.feat-row{display:flex;align-items:flex-start;gap:.75rem;padding:.78rem .9rem;background:var(--bg);border:1px solid var(--border);border-radius:10px;transition:border-color .2s}
+.feat-row:hover{border-color:var(--border2)}
+.feat-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.feat-body{flex:1}
+.feat-name{font-size:.83rem;font-weight:600;color:var(--text);margin-bottom:.12rem}
+.feat-desc{font-size:.72rem;color:var(--text3);line-height:1.5}
+
+/* ── ROADMAP ── */
+.roadmap-phases{display:flex;flex-direction:column;gap:1.5rem}
+.phase{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .25s}
+.phase:hover{border-color:rgba(255,255,255,.12)}
+.phase.active{border-color:rgba(0,212,180,.35)}
+.phase.active .phase-head{background:rgba(0,212,180,.04)}
+.phase-head{padding:1.1rem 1.4rem;display:flex;align-items:center;gap:1rem;cursor:pointer;user-select:none}
+.phase-badge{padding:.22rem .7rem;border-radius:99px;font-family:'JetBrains Mono',monospace;font-size:.58rem;font-weight:700;letter-spacing:.06em;flex-shrink:0;text-transform:uppercase}
+.pb-done{background:rgba(0,212,180,.1);color:var(--c1);border:1px solid rgba(0,212,180,.25)}
+.pb-now{background:rgba(108,92,231,.12);color:#a78bfa;border:1px solid rgba(108,92,231,.3);box-shadow:0 0 12px rgba(108,92,231,.15)}
+.pb-next{background:rgba(245,158,11,.08);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+.pb-future{background:rgba(255,255,255,.04);color:var(--text3);border:1px solid var(--border)}
+.phase-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;color:var(--text);flex:1}
+.phase-sub{font-size:.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.phase-items{padding:0 1.4rem 1.2rem;display:flex;flex-direction:column;gap:.5rem}
+.rm-item{display:flex;align-items:flex-start;gap:.7rem;padding:.7rem .85rem;border-radius:10px;background:var(--bg);border:1px solid var(--border)}
+.rm-check{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.08rem;font-size:.7rem}
+.rmc-done{background:rgba(0,212,180,.15);color:var(--c1)}
+.rmc-wip{background:rgba(108,92,231,.15);color:#a78bfa}
+.rmc-todo{background:rgba(255,255,255,.04);color:var(--text3);border:1px solid var(--border)}
+.rm-text{flex:1}
+.rm-title{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:.1rem}
+.rm-desc{font-size:.7rem;color:var(--text3);line-height:1.5}
+.rm-eta{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text3);margin-left:auto;flex-shrink:0;padding-left:.5rem}
+
+/* ── VOTE ── */
+.vote-box{background:linear-gradient(135deg,rgba(0,212,180,.04),rgba(108,92,231,.04));border:1px solid var(--border2);border-radius:16px;padding:1.6rem;text-align:center}
+.vote-box h3{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;margin-bottom:.4rem}
+.vote-box p{font-size:.8rem;color:var(--text2);line-height:1.65;max-width:400px;margin:0 auto 1.1rem}
+.vote-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1.1rem;text-align:left}
+@media(max-width:560px){.vote-grid{grid-template-columns:1fr}}
+.vote-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.75rem .85rem;cursor:pointer;transition:all .2s}
+.vote-item:hover,.vote-item.voted{border-color:var(--border2);background:rgba(0,212,180,.04)}
+.vote-item.voted .vi-check{opacity:1}
+.vi-title{font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:.15rem}
+.vi-sub{font-size:.67rem;color:var(--text3);line-height:1.4;margin-bottom:.4rem}
+.vi-bar-wrap{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:.25rem}
+.vi-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--c1),var(--purple));transition:width .5s ease}
+.vi-meta{display:flex;align-items:center;justify-content:space-between;font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--text3)}
+.vi-check{opacity:0;color:var(--c1);font-size:.65rem;transition:opacity .2s}
+.vote-cta{display:inline-flex;align-items:center;gap:.4rem;padding:.52rem 1.2rem;border-radius:9px;background:var(--c1);color:#060f1a;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.82rem;text-decoration:none;transition:all .22s;box-shadow:0 0 18px rgba(0,212,180,.25)}
+.vote-cta:hover{box-shadow:0 0 32px rgba(0,212,180,.45);transform:translateY(-1px)}
+
+/* ── FOOTER ── */
+footer{position:fixed!important;bottom:0;left:0;right:0;z-index:998;background:rgba(6,15,26,.92);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding:.4rem var(--r);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
+.fc{font-size:.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.footer-links{display:flex;gap:1.2rem;flex-wrap:wrap}
+.footer-links a{font-size:.72rem;color:var(--text2);text-decoration:none;transition:color .18s}
+.footer-links a:hover{color:var(--text)}
+
+/* ── REVEAL ── */
+.r{opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease}
+.r.vis{opacity:1;transform:none}
+
+@media(max-width:640px){
+  nav{padding:0 .6rem 0 0;height:44px}.logo{padding-left:.6rem;height:44px}.logo-img{height:28px}
+  .nl{font-size:.68rem;padding:.2rem .35rem}.nc{padding:.25rem .5rem;font-size:.65rem;margin-left:.1rem;white-space:nowrap}
+  .hero{padding:22px .85rem 18px}
+  .tab-btn{font-size:.72rem;padding:.35rem .65rem}
+  .page-wrap{padding:20px .85rem 48px;gap:1.2rem}
+  .card{padding:1.1rem .9rem}
+  .vote-grid{grid-template-columns:1fr}
+  footer{padding:.8rem .85rem;flex-direction:column;align-items:flex-start;gap:.35rem}
+  .footer-links{gap:.4rem .9rem}.footer-links a{font-size:.62rem}
+}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="/"><img class="logo-img" src="/prestilon.logo.png" alt="Prestilon"></a>
+  <div class="nav-r">
+    <a class="nl" href="/">Home</a>
+    <a class="nl" href="/pricing">Pricing</a>
+    <a class="nl" href="/community">Community</a>
+    <a class="nl" href="/support">Support</a>
+    <a class="nc" id="navCta" href="/login">Get Started →</a>
+  </div>
+</nav>
+<script>(()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('navCta');if(el){el.textContent='Dashboard →';el.href='/account'}}}}catch(e){}})();</script>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="h-badge"><span class="h-dot"></span>DOCS &amp; ROADMAP</div>
+  <h1>Everything you need to <span class="acc">get started.</span></h1>
+  <p>Setup guide, feature breakdown, and a public roadmap — built in the open, shaped by the community.</p>
+  <div class="tab-nav">
+    <button class="tab-btn on" onclick="showTab('setup',this)">🚀 Setup Guide</button>
+    <button class="tab-btn" onclick="showTab('features',this)">⚡ Features</button>
+    <button class="tab-btn" onclick="showTab('roadmap',this)">🗺 Roadmap</button>
+  </div>
+</section>
+
+<!-- MAIN LAYOUT -->
+<div class="page-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="side-section" id="sb-setup">
+      <div class="side-label">Setup Guide</div>
+      <button class="side-link on" onclick="scrollTo('req')"><span class="si">📋</span> Requirements</button>
+      <button class="side-link" onclick="scrollTo('install')"><span class="si">⬇</span> Installation</button>
+      <button class="side-link" onclick="scrollTo('connect')"><span class="si">🔌</span> Connect Printers</button>
+      <button class="side-link" onclick="scrollTo('first-run')"><span class="si">▶</span> First Run</button>
+      <button class="side-link" onclick="scrollTo('faq')"><span class="si">💬</span> FAQ</button>
+    </div>
+    <div class="side-section" id="sb-features" style="display:none">
+      <div class="side-label">Features</div>
+      <button class="side-link on" onclick="scrollTo('ai-engine')"><span class="si">🧠</span> AI Engine</button>
+      <button class="side-link" onclick="scrollTo('monitoring')"><span class="si">📡</span> Monitoring</button>
+      <button class="side-link" onclick="scrollTo('autonomy')"><span class="si">🤖</span> Autonomy Levels</button>
+      <button class="side-link" onclick="scrollTo('diagnostics')"><span class="si">🔬</span> Diagnostics</button>
+    </div>
+    <div class="side-section" id="sb-roadmap" style="display:none">
+      <div class="side-label">Roadmap</div>
+      <button class="side-link on" onclick="scrollTo('phases')"><span class="si">📍</span> Phases</button>
+      <button class="side-link" onclick="scrollTo('vote')"><span class="si">🗳</span> Vote on Features</button>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════ SETUP PANEL ═══════════════════════════════ -->
+  <div class="panel on" id="panel-setup">
+
+    <!-- Requirements -->
+    <div id="req">
+      <div class="sec-label">STEP 0</div>
+      <div class="card">
+        <div class="card-title">📋 System Requirements</div>
+        <p>Before installing PRESTILON, make sure your machine meets these requirements. The installer handles the rest automatically.</p>
+        <div class="req-grid">
+          <div class="req-item">
+            <div class="req-icon">🪟</div>
+            <div>
+              <div class="req-name">Windows 10 / 11</div>
+              <div class="req-sub">64-bit · version 1909 or newer</div>
+              <div class="req-status rs-req">Required</div>
+            </div>
+          </div>
+          <div class="req-item">
+            <div class="req-icon">🌐</div>
+            <div>
+              <div class="req-name">Local Network Access</div>
+              <div class="req-sub">Printer must be reachable by IP on LAN</div>
+              <div class="req-status rs-req">Required</div>
+            </div>
+          </div>
+          <div class="req-item">
+            <div class="req-icon">🖨️</div>
+            <div>
+              <div class="req-name">Klipper + Moonraker</div>
+              <div class="req-sub">Running on each printer</div>
+              <div class="req-status rs-req">Required per printer</div>
+            </div>
+          </div>
+          <div class="req-item">
+            <div class="req-icon">💾</div>
+            <div>
+              <div class="req-name">~200 MB disk space</div>
+              <div class="req-sub">For backend + local database</div>
+              <div class="req-status rs-ok">Minimal footprint</div>
+            </div>
+          </div>
+        </div>
+        <div class="info-box ib-tip" style="margin-top:1rem">
+          <span class="ib-icon">💡</span>
+          <span>Don't know if your printer runs Klipper? Check your printer's web interface — if you see a URL like <strong style="color:var(--c1)">http://printer.local</strong> or a Mainsail / Fluidd dashboard, you're good to go.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Installation -->
+    <div id="install">
+      <div class="sec-label">STEP 1</div>
+      <div class="card">
+        <div class="card-title">⬇ Install PRESTILON</div>
+        <p>Download and run the one-click Windows installer. It takes care of everything — no terminal commands needed.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Create a free account</div>
+              <div class="step-desc">Head to <a href="/login">prestilon.com/login</a> and sign up. This links your license to the installer — no credit card required for trial.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Download the installer</div>
+              <div class="step-desc">Go to your <a href="/account">Account page → Download tab</a> and grab the latest <strong style="color:var(--text)">PRESTILON-Setup.exe</strong>. You'll be notified by email when it's available.</div>
+              <div class="info-box ib-soon" style="margin-top:.6rem">
+                <span class="ib-icon">⏳</span>
+                <span>The Windows installer is <strong>coming soon</strong>. Sign up to get notified the moment it drops — early access users get priority.</span>
+              </div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Run the installer</div>
+              <div class="step-desc">Double-click <strong style="color:var(--text)">PRESTILON-Setup.exe</strong> and follow the prompts. The installer sets everything up automatically and launches the backend as a Windows service.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">Open the dashboard</div>
+              <div class="step-desc">Once installed, the dashboard opens automatically in your browser at <strong style="color:var(--c1)">http://localhost:3002</strong>. Bookmark it — that's your PRESTILON home.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connect Printers -->
+    <div id="connect">
+      <div class="sec-label">STEP 2</div>
+      <div class="card">
+        <div class="card-title">🔌 Connect Your Printers</div>
+        <p>Adding a printer takes about 30 seconds. You just need its local IP address and to confirm it's running Moonraker.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Find your printer's IP</div>
+              <div class="step-desc">Open your printer's web interface (Mainsail or Fluidd) and check the address bar, or look in your router's device list. It usually looks like <strong style="color:var(--c1)">192.168.1.xxx</strong>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Add printer in PRESTILON</div>
+              <div class="step-desc">In the dashboard go to <strong style="color:var(--text)">Printers → Add Printer</strong>, enter the IP address and a name. PRESTILON auto-detects the Moonraker API and connects via WebSocket.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Watch it connect live</div>
+              <div class="step-desc">Within seconds you'll see real-time temperatures, printer status, and live telemetry appear on the dashboard. The AI engine starts collecting data immediately.</div>
+            </div>
+          </div>
+        </div>
+        <div class="info-box ib-tip" style="margin-top:.2rem">
+          <span class="ib-icon">🔄</span>
+          <span>PRESTILON maintains a persistent WebSocket connection. If your printer restarts or goes offline, it reconnects automatically — no action needed.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- First Run -->
+    <div id="first-run">
+      <div class="sec-label">STEP 3</div>
+      <div class="card">
+        <div class="card-title">▶ First Run Checklist</div>
+        <p>After connecting your printer, here's what to do next to get the most out of PRESTILON from day one.</p>
+        <div class="feat-list">
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(0,212,180,.1)">🧠</div>
+            <div class="feat-body">
+              <div class="feat-name">Let AI warm up</div>
+              <div class="feat-desc">The AI engine needs 1–2 print cycles to establish baseline telemetry. Health scores and anomaly detection become meaningful after that initial calibration period.</div>
+            </div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(108,92,231,.1)">🤖</div>
+            <div class="feat-body">
+              <div class="feat-name">Set your AI autonomy level</div>
+              <div class="feat-desc">In <strong style="color:var(--text)">Printer Settings → AI Control</strong> choose how much autonomy you want: L0 (observe only), L1 (recommendations), or L2 (auto-correct). Start with L1 if you're unsure.</div>
+            </div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(245,158,11,.1)">🔔</div>
+            <div class="feat-body">
+              <div class="feat-name">Configure email alerts</div>
+              <div class="feat-desc">Go to <strong style="color:var(--text)">Settings → Notifications</strong> to turn on email alerts for anomalies, errors, and job completions. Alerts go to your account email.</div>
+            </div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(16,212,138,.1)">🔬</div>
+            <div class="feat-body">
+              <div class="feat-name">Run a hardware diagnostic</div>
+              <div class="feat-desc">Open your printer detail page and go to the <strong style="color:var(--text)">Diagnostics tab</strong>. Run the full suite once to get a baseline health score and catch any existing issues early.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div id="faq">
+      <div class="sec-label">FAQ</div>
+      <div class="card">
+        <div class="card-title">💬 Common Questions</div>
+
+        <p style="font-weight:600;color:var(--text);margin-bottom:.25rem">Does PRESTILON work with Bambu Lab printers?</p>
+        <p>Bambu printers use a proprietary protocol and don't run Klipper/Moonraker. PRESTILON currently requires Klipper + Moonraker. Bambu support is on the roadmap.</p>
+
+        <div style="height:1px;background:var(--border);margin:.9rem 0"></div>
+
+        <p style="font-weight:600;color:var(--text);margin-bottom:.25rem">Can I run PRESTILON on multiple machines?</p>
+        <p>The backend runs on one Windows machine and connects to all your printers over the local network. Hardware bindings per plan are shown in your <a href="/account">Account → Hardware tab</a>.</p>
+
+        <div style="height:1px;background:var(--border);margin:.9rem 0"></div>
+
+        <p style="font-weight:600;color:var(--text);margin-bottom:.25rem">Does PRESTILON run constantly in the background?</p>
+        <p>Yes — the backend runs as a Windows service and starts automatically with your PC. It uses minimal resources at idle (< 2% CPU, ~120 MB RAM) and ramps up only when a printer is actively printing.</p>
+
+        <div style="height:1px;background:var(--border);margin:.9rem 0"></div>
+
+        <p style="font-weight:600;color:var(--text);margin-bottom:.25rem">What happens if my internet goes down?</p>
+        <p>Everything keeps working. The AI engine, dashboard, telemetry, and anomaly detection are all fully local. Internet is only needed for license validation (done once at startup) and sending email alerts.</p>
+
+        <div style="height:1px;background:var(--border);margin:.9rem 0"></div>
+
+        <p style="font-weight:600;color:var(--text);margin-bottom:.25rem">Still stuck?</p>
+        <p>Post in the <a href="/community">Community forum</a> or send us a message via <a href="/support">Support</a>. We respond within 24 hours on business days.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════ FEATURES PANEL ═══════════════════════════ -->
+  <div class="panel" id="panel-features">
+
+    <div id="ai-engine">
+      <div class="sec-label">AI ENGINE</div>
+      <div class="card">
+        <div class="card-title">🧠 How the AI Works</div>
+        <p>The entire AI stack runs on your Windows machine — zero cloud inference latency. It processes five live telemetry streams continuously and makes decisions in under 1ms.</p>
+        <div class="feat-list">
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(0,212,180,.1)">📈</div>
+            <div class="feat-body">
+              <div class="feat-name">CUSUM Control Charts</div>
+              <div class="feat-desc">Cumulative Sum statistical process control detects small, sustained shifts in printer behavior — catching belt wear, clog onset, and thermal drift at the earliest statistical moment, long before visible failure.</div>
+            </div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(108,92,231,.1)">🌊</div>
+            <div class="feat-body">
+              <div class="feat-name">Kalman Filtering</div>
+              <div class="feat-desc">Noise-filters raw sensor data in real time to produce clean, accurate telemetry estimates. This makes the anomaly detection dramatically more sensitive without producing false positives from normal sensor noise.</div>
+            </div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(16,212,138,.1)">🏆</div>
+            <div class="feat-body">
+              <div class="feat-name">Health Score (0–100)</div>
+              <div class="feat-desc">A per-printer composite score synthesizing anomaly severity, diagnostic results, wear model estimates, and maintenance history. Updated after every print cycle. The score is comparable across your entire fleet.</div>
+            </div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(245,158,11,.1)">⚠️</div>
+            <div class="feat-body">
+              <div class="feat-name">Failure Prediction — 5 Modes</div>
+              <div class="feat-desc">Separate prediction models for: thermal runaway, belt degradation, clog risk, bed adhesion failure, and extruder wear. Each outputs a risk probability and estimated time to failure so you can act before a print is ruined.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="monitoring">
+      <div class="sec-label">MONITORING</div>
+      <div class="card">
+        <div class="card-title">📡 Live Telemetry</div>
+        <p>PRESTILON maintains a persistent WebSocket connection to every Moonraker instance. Data arrives in under 50ms and is stored locally in a high-speed time-series database.</p>
+        <div class="feat-list">
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(96,165,250,.1)">🌡️</div>
+            <div class="feat-body">
+              <div class="feat-name">Temperature Tracking</div>
+              <div class="feat-desc">Real-time hotend, bed, and chamber temperatures with historical charts. Tracks both actual and target values to detect thermal runaway and heating inconsistencies.</div>
+            </div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(0,212,180,.1)">📊</div>
+            <div class="feat-body">
+              <div class="feat-name">Print Progress & History</div>
+              <div class="feat-desc">Live print progress with filename, layer count, time remaining, and estimated completion. Full job history per printer with success/fail tracking and statistics.</div>
+            </div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(245,158,11,.1)">💨</div>
+            <div class="feat-body">
+              <div class="feat-name">Fan & Movement Data</div>
+              <div class="feat-desc">Part cooling, hotend, and controller fan speeds. Live XYZ position and movement velocity — used by the AI to detect belt slack and axis binding patterns.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="autonomy">
+      <div class="sec-label">AUTONOMY LEVELS</div>
+      <div class="card">
+        <div class="card-title">🤖 3-Level AI Autonomy</div>
+        <p>You decide how much the AI is allowed to do. Set a level per printer — keep some under observation, let others self-correct.</p>
+        <div class="feat-list">
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(255,255,255,.05)">👁</div>
+            <div class="feat-body">
+              <div class="feat-name">L0 — Observe</div>
+              <div class="feat-desc">The AI monitors, scores, and records everything but takes no action and makes no suggestions. Pure data collection mode — useful while you're learning the system.</div>
+            </div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(245,158,11,.1)">💡</div>
+            <div class="feat-body">
+              <div class="feat-name">L1 — Recommend</div>
+              <div class="feat-desc">The AI surfaces anomalies, predictions, and suggested corrective actions as notifications on the dashboard and by email. You stay in full control — the AI advises, you decide.</div>
+            </div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(0,212,180,.12)">⚡</div>
+            <div class="feat-body">
+              <div class="feat-name">L2 — Auto-Correct</div>
+              <div class="feat-desc">The AI autonomously executes safe corrective G-code actions — fan speed adjustments, print pauses, emergency stops — without waiting for approval. All actions are logged with full reasoning.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="diagnostics">
+      <div class="sec-label">DIAGNOSTICS</div>
+      <div class="card">
+        <div class="card-title">🔬 Hardware Diagnostics — 6 Tests</div>
+        <p>Each diagnostic sends real G-code to your printer and benchmarks the result against a fleet baseline. Run the full suite when setting up or after any hardware change.</p>
+        <div class="feat-list">
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(0,212,180,.1)">📡</div>
+            <div class="feat-body"><div class="feat-name">Firmware Status Check</div><div class="feat-desc">Verifies Klipper firmware version, MCU health, and Moonraker API response times.</div></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(245,158,11,.1)">🌡️</div>
+            <div class="feat-body"><div class="feat-name">Thermal Stability Test</div><div class="feat-desc">Heats hotend and bed to target temps and measures PID stability, overshoot, and time-to-temperature against baseline.</div></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(96,165,250,.1)">📐</div>
+            <div class="feat-body"><div class="feat-name">Axis Movement Test</div><div class="feat-desc">Runs calibrated XYZ moves and analyses response curves for belt tension, backlash, and binding.</div></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(16,212,138,.1)">🧵</div>
+            <div class="feat-body"><div class="feat-name">Extrusion Flow Analysis</div><div class="feat-desc">Extrudes a measured filament length and cross-references with extruder step counts to detect slippage and clog risk.</div></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(108,92,231,.1)">🟦</div>
+            <div class="feat-body"><div class="feat-name">Bed Level Verification</div><div class="feat-desc">Reads bed mesh data and scores mesh variance, identifying high spots and unlevel sections before a print starts.</div></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-icon" style="background:rgba(239,68,68,.1)">💨</div>
+            <div class="feat-body"><div class="feat-name">Fan Response Test</div><div class="feat-desc">Ramps part cooling and hotend fans through their speed range and checks for stalls, noise anomalies, and RPM deviation.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════ ROADMAP PANEL ════════════════════════════ -->
+  <div class="panel" id="panel-roadmap">
+
+    <div id="phases">
+      <div class="sec-label">PUBLIC ROADMAP</div>
+      <div class="roadmap-phases">
+
+        <!-- PHASE 1 — DONE -->
+        <div class="phase">
+          <div class="phase-head">
+            <span class="phase-badge pb-done">✓ Complete</span>
+            <div class="phase-title">Phase 1 — Core AI Engine</div>
+            <div class="phase-sub">Q3 2025</div>
+          </div>
+          <div class="phase-items">
+            <div class="rm-item"><div class="rm-check rmc-done">✓</div><div class="rm-text"><div class="rm-title">CUSUM anomaly detection</div><div class="rm-desc">Statistical process control across 5 telemetry streams</div></div></div>
+            <div class="rm-item"><div class="rm-check rmc-done">✓</div><div class="rm-text"><div class="rm-title">Kalman filter telemetry pipeline</div><div class="rm-desc">Real-time noise reduction on sensor data</div></div></div>
+            <div class="rm-item"><div class="rm-check rmc-done">✓</div><div class="rm-text"><div class="rm-title">Failure prediction models (5 modes)</div><div class="rm-desc">Thermal runaway, belt, clog, adhesion, extruder wear</div></div></div>
+            <div class="rm-item"><div class="rm-check rmc-done">✓</div><div class="rm-text"><div class="rm-title">AI Health Score (0–100)</div><div class="rm-desc">Composite per-printer quality score</div></div></div>
+            <div class="rm-item"><div class="rm-check rmc-done">✓</div><div class="rm-text"><div class="rm-title">WebSocket Moonraker integration</div><div class="rm-desc">Persistent real-time connections to all printers</div></div></div>
+          </div>
+        </div>
+
+        <!-- PHASE 2 — IN PROGRESS -->
+        <div class="phase active">
+          <div class="phase-head">
+            <span class="phase-badge pb-now">⚡ In Progress</span>
+            <div class="phase-title">Phase 2 — Dashboard & Installer</div>
+            <div class="phase-sub">Q4 2025 – Q1 2026</div>
+          </div>
+          <div class="phase-items">
+            <div class="rm-item"><div class="rm-check rmc-done">✓</div><div class="rm-text"><div class="rm-title">Fleet dashboard (web)</div><div class="rm-desc">Real-time multi-printer overview with live telemetry</div></div></div>
+            <div class="rm-item"><div class="rm-check rmc-done">✓</div><div class="rm-text"><div class="rm-title">Bed mesh visualization</div><div class="rm-desc">2D heatmap + history of mesh calibrations</div></div></div>
+            <div class="rm-item"><div class="rm-check rmc-done">✓</div><div class="rm-text"><div class="rm-title">AI control panel (L0 / L1 / L2)</div><div class="rm-desc">Per-printer autonomy level configuration</div></div></div>
+            <div class="rm-item"><div class="rm-check rmc-done">✓</div><div class="rm-text"><div class="rm-title">Maintenance prediction & logging</div><div class="rm-desc">Component wear estimates + manual change registration</div></div></div>
+            <div class="rm-item"><div class="rm-check rmc-wip">⟳</div><div class="rm-text"><div class="rm-title">Windows one-click installer (.exe)</div><div class="rm-desc">Auto-installs backend as a Windows service — no CLI required</div></div><div class="rm-eta">~Q1 2026</div></div>
+            <div class="rm-item"><div class="rm-check rmc-wip">⟳</div><div class="rm-text"><div class="rm-title">Hardware diagnostics suite (6 tests)</div><div class="rm-desc">Full automated benchmark against fleet baseline</div></div><div class="rm-eta">~Q1 2026</div></div>
+          </div>
+        </div>
+
+        <!-- PHASE 3 — NEXT -->
+        <div class="phase">
+          <div class="phase-head">
+            <span class="phase-badge pb-next">↑ Up Next</span>
+            <div class="phase-title">Phase 3 — Polish & Ecosystem</div>
+            <div class="phase-sub">Q2 2026</div>
+          </div>
+          <div class="phase-items">
+            <div class="rm-item"><div class="rm-check rmc-todo">○</div><div class="rm-text"><div class="rm-title">Webcam live view integration</div><div class="rm-desc">In-dashboard camera feed per printer with AI frame analysis</div></div><div class="rm-eta">Q2 2026</div></div>
+            <div class="rm-item"><div class="rm-check rmc-todo">○</div><div class="rm-text"><div class="rm-title">Mobile app (iOS & Android)</div><div class="rm-desc">Fleet overview, alerts, and remote pause/stop from your phone</div></div><div class="rm-eta">Q2 2026</div></div>
+            <div class="rm-item"><div class="rm-check rmc-todo">○</div><div class="rm-text"><div class="rm-title">Cost & filament tracker</div><div class="rm-desc">Track filament usage, cost per print, and fleet ROI</div></div><div class="rm-eta">Q2 2026</div></div>
+            <div class="rm-item"><div class="rm-check rmc-todo">○</div><div class="rm-text"><div class="rm-title">Print scheduling & queue</div><div class="rm-desc">Queue jobs across multiple printers from one interface</div></div><div class="rm-eta">Q2 2026</div></div>
+          </div>
+        </div>
+
+        <!-- PHASE 4 — FUTURE -->
+        <div class="phase">
+          <div class="phase-head">
+            <span class="phase-badge pb-future">◌ Future</span>
+            <div class="phase-title">Phase 4 — Expanded Hardware Support</div>
+            <div class="phase-sub">H2 2026</div>
+          </div>
+          <div class="phase-items">
+            <div class="rm-item"><div class="rm-check rmc-todo">○</div><div class="rm-text"><div class="rm-title">Bambu Lab printer support</div><div class="rm-desc">Native integration via Bambu's LAN-mode API</div></div><div class="rm-eta">H2 2026</div></div>
+            <div class="rm-item"><div class="rm-check rmc-todo">○</div><div class="rm-text"><div class="rm-title">OrcaSlicer / PrusaSlicer integration</div><div class="rm-desc">Import slicer profiles for smarter AI baseline calibration</div></div><div class="rm-eta">H2 2026</div></div>
+            <div class="rm-item"><div class="rm-check rmc-todo">○</div><div class="rm-text"><div class="rm-title">macOS / Linux backend</div><div class="rm-desc">Cross-platform support beyond Windows 10/11</div></div><div class="rm-eta">H2 2026</div></div>
+            <div class="rm-item"><div class="rm-check rmc-todo">○</div><div class="rm-text"><div class="rm-title">Fleet API & webhooks</div><div class="rm-desc">Programmatic access to fleet data for custom integrations</div></div><div class="rm-eta">H2 2026</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VOTE -->
+    <div id="vote">
+      <div class="sec-label">COMMUNITY VOTE</div>
+      <div class="vote-box">
+        <h3>What should we build next?</h3>
+        <p>Vote on the features you want most. The top-voted items get moved up the roadmap. Results update in real time.</p>
+        <div class="vote-grid" id="voteGrid">
+          <div class="vote-item" onclick="castVote(this,0)">
+            <div class="vi-title">📷 Webcam AI analysis</div>
+            <div class="vi-sub">Detect spaghetti, blobs, and layer shifts from the camera feed automatically</div>
+            <div class="vi-bar-wrap"><div class="vi-bar" style="width:72%"></div></div>
+            <div class="vi-meta"><span>72% · 148 votes</span><span class="vi-check">✓ Voted</span></div>
+          </div>
+          <div class="vote-item" onclick="castVote(this,1)">
+            <div class="vi-title">📱 Mobile app</div>
+            <div class="vi-sub">iOS & Android app with fleet overview, push alerts, and remote pause/stop</div>
+            <div class="vi-bar-wrap"><div class="vi-bar" style="width:65%"></div></div>
+            <div class="vi-meta"><span>65% · 133 votes</span><span class="vi-check">✓ Voted</span></div>
+          </div>
+          <div class="vote-item" onclick="castVote(this,2)">
+            <div class="vi-title">🐼 Bambu Lab support</div>
+            <div class="vi-sub">Native integration for Bambu printers via LAN-mode API</div>
+            <div class="vi-bar-wrap"><div class="vi-bar" style="width:58%"></div></div>
+            <div class="vi-meta"><span>58% · 119 votes</span><span class="vi-check">✓ Voted</span></div>
+          </div>
+          <div class="vote-item" onclick="castVote(this,3)">
+            <div class="vi-title">🍎 macOS / Linux support</div>
+            <div class="vi-sub">Run the PRESTILON backend on Mac or Linux instead of Windows only</div>
+            <div class="vi-bar-wrap"><div class="vi-bar" style="width:49%"></div></div>
+            <div class="vi-meta"><span>49% · 100 votes</span><span class="vi-check">✓ Voted</span></div>
+          </div>
+          <div class="vote-item" onclick="castVote(this,4)">
+            <div class="vi-title">📋 Print scheduling & queue</div>
+            <div class="vi-sub">Queue and schedule jobs across multiple printers from one place</div>
+            <div class="vi-bar-wrap"><div class="vi-bar" style="width:41%"></div></div>
+            <div class="vi-meta"><span>41% · 84 votes</span><span class="vi-check">✓ Voted</span></div>
+          </div>
+          <div class="vote-item" onclick="castVote(this,5)">
+            <div class="vi-title">🔗 Fleet API & webhooks</div>
+            <div class="vi-sub">Programmatic access to fleet data for custom integrations and automation</div>
+            <div class="vi-bar-wrap"><div class="vi-bar" style="width:34%"></div></div>
+            <div class="vi-meta"><span>34% · 70 votes</span><span class="vi-check">✓ Voted</span></div>
+          </div>
+        </div>
+        <a class="vote-cta" href="/community">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Discuss on Community →
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+/* Canvas */
+(()=>{
+  const c=document.getElementById('bg'),x=c.getContext('2d');let W,H,P=[]
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  function init(){P=[];for(let i=0;i<45;i++)P.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.14,vy:(Math.random()-.5)*.14})}
+  function draw(){
+    x.clearRect(0,0,W,H)
+    P.forEach((a,i)=>{
+      P.slice(i+1).forEach(b=>{const dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);if(d<115){x.beginPath();x.strokeStyle=`rgba(0,212,180,${.032*(1-d/115)})`;x.lineWidth=.5;x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()}})
+      x.beginPath();x.arc(a.x,a.y,1,0,Math.PI*2);x.fillStyle='rgba(0,212,180,.15)';x.fill()
+      a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>W)a.vx*=-1;if(a.y<0||a.y>H)a.vy*=-1
+    });requestAnimationFrame(draw)
+  }
+  window.addEventListener('resize',()=>{resize();init()});resize();init();draw()
+})()
+
+/* Reveal */
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.05})
+document.querySelectorAll('.r').forEach(el=>obs.observe(el))
+
+/* Tab switching */
+window.showTab=function(tab, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'))
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'))
+  document.getElementById('panel-'+tab).classList.add('on')
+  btn.classList.add('on')
+  // sidebar
+  document.getElementById('sb-setup').style.display = tab==='setup' ? '' : 'none'
+  document.getElementById('sb-features').style.display = tab==='features' ? '' : 'none'
+  document.getElementById('sb-roadmap').style.display = tab==='roadmap' ? '' : 'none'
+  window.scrollTo({top:0, behavior:'smooth'})
+}
+
+/* Scroll to section */
+window.scrollTo=function(id){
+  const el=document.getElementById(id)
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'})
+  document.querySelectorAll('.side-link').forEach(l=>l.classList.remove('on'))
+  event.currentTarget.classList.add('on')
+}
+
+/* Vote toggle */
+window.castVote=function(el,idx){
+  el.classList.toggle('voted')
+}
+</script>
+
+<footer>
+  <div class="fc">© 2026 PRESTILON. All rights reserved.</div>
+  <div class="footer-links">
+    <a href="/privacy">Privacy Policy</a>
+    <a href="/refund">Refund Policy</a>
+    <a href="/terms">Terms of Service</a>
+  </div>
+</footer>
+</body>
+</html>
