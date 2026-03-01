@@ -368,7 +368,8 @@ function shareComment(id){
 
 async function followComment(id){
   if(!currentUser){showToast('⚠️ Sign in first');return}
-  const{data:existing}=await sb.from('followed_comments').select('id').eq('user_id',currentUser.id).eq('comment_id',id).single()
+  let existing=null
+  try{const{data:e}=await sb.from('followed_comments').select('id').eq('user_id',currentUser.id).eq('comment_id',id).single();existing=e}catch(e){showToast('⚠️ Run the SQL first!');return}
   if(existing){
     await sb.from('followed_comments').delete().eq('user_id',currentUser.id).eq('comment_id',id)
     showToast('🔕 Unfollowed comment')
@@ -448,14 +449,20 @@ async function loadComments(){
   if(currentUser){
     const ids=comments.map(c=>c.id)
     if(ids.length){
-      const[{data:reacts},{data:saves},{data:follows}]=await Promise.all([
-        sb.from('reactions').select('target_id,reaction').eq('user_id',currentUser.id).eq('target_type','comment').in('target_id',ids),
-        sb.from('saved_items').select('target_id').eq('user_id',currentUser.id).eq('target_type','comment').in('target_id',ids),
-        sb.from('followed_comments').select('comment_id').eq('user_id',currentUser.id).in('comment_id',ids)
-      ])
-      if(reacts) reacts.forEach(r=>myReactions[r.target_id]=r.reaction)
-      if(saves) saves.forEach(s=>mySaves[s.target_id]=true)
-      if(follows) follows.forEach(f=>myFollows[f.comment_id]=true)
+      try{
+        const[{data:reacts},{data:saves},{data:follows}]=await Promise.all([
+          sb.from('reactions').select('target_id,reaction').eq('user_id',currentUser.id).eq('target_type','comment').in('target_id',ids),
+          sb.from('saved_items').select('target_id').eq('user_id',currentUser.id).eq('target_type','comment').in('target_id',ids),
+          sb.from('followed_comments').select('comment_id').eq('user_id',currentUser.id).in('comment_id',ids)
+        ])
+        if(reacts) reacts.forEach(r=>myReactions[r.target_id]=r.reaction)
+        if(saves) saves.forEach(s=>mySaves[s.target_id]=true)
+        if(follows) follows.forEach(f=>myFollows[f.comment_id]=true)
+      }catch(e){
+        // tables may not exist yet, reactions only
+        const{data:reacts}=await sb.from('reactions').select('target_id,reaction').eq('user_id',currentUser.id).eq('target_type','comment').in('target_id',ids)
+        if(reacts) reacts.forEach(r=>myReactions[r.target_id]=r.reaction)
+      }
     }
   }
 
