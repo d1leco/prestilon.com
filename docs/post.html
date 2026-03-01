@@ -74,11 +74,12 @@ nav{position:sticky;top:0;z-index:999;display:flex;align-items:center;justify-co
 .comments-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text)}
 
 /* COMMENT BOX */
-.comment-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.7rem .9rem;margin-bottom:1rem}
-.comment-box textarea{width:100%;padding:.5rem .75rem;border-radius:8px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.84rem;resize:none;min-height:0;outline:none;transition:border-color .18s;line-height:1.5}
-.comment-box textarea:focus{border-color:rgba(0,212,180,.38)}
+.comment-box{background:transparent;border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;margin-bottom:1rem;overflow:hidden}
+.comment-box .cb-header{font-size:.72rem;color:var(--text3);margin-bottom:.4rem;font-family:'JetBrains Mono',monospace}
+.comment-box textarea{width:100%;padding:.3rem 0;background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;resize:none;min-height:0;outline:none;line-height:1.6}
 .comment-box textarea::placeholder{color:var(--text3)}
-.cb-footer{display:flex;align-items:center;justify-content:flex-end;margin-top:.45rem;gap:.5rem}
+.cb-footer{display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;gap:.5rem;border-top:1px solid var(--border);padding-top:.5rem}
+.cb-footer-hint{font-size:.72rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
 .cb-cancel{padding:.45rem .9rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;transition:all .15s}
 .cb-cancel:hover{border-color:var(--border2);color:var(--text)}
 .cb-submit{padding:.45rem 1.1rem;border-radius:8px;border:none;background:var(--c1);color:#060f1a;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:.35rem}
@@ -105,7 +106,7 @@ nav{position:sticky;top:0;z-index:999;display:flex;align-items:center;justify-co
 .vote-group .ca-btn{padding:.22rem .6rem;border-radius:0}
 .vote-sep{width:1px;height:16px;background:var(--border)}
 .ca-dots{position:relative}
-.dots-menu{position:absolute;top:100%;left:0;z-index:100;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.3rem;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,.4);display:none}
+.dots-menu{position:absolute;bottom:calc(100% + 6px);right:0;z-index:1000;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.3rem;min-width:160px;box-shadow:0 -4px 24px rgba(0,0,0,.5);display:none}
 .dots-menu.open{display:block}
 .dots-item{display:flex;align-items:center;gap:.6rem;padding:.45rem .75rem;border-radius:7px;font-size:.78rem;color:var(--text2);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
 .dots-item:hover{background:rgba(255,255,255,.06);color:var(--text)}
@@ -252,17 +253,22 @@ async function reactPost(dir){
   document.getElementById('btnDown').className='react-btn'+(myReaction==='down'?' disliked':'')
 }
 
-function renderCommentBox(parentId=null, onCancel=null){
+function renderCommentBox(parentId=null, onCancel=null, replyToName=null){
   const id='cb'+(parentId||'root')
+  const header=parentId&&replyToName?`<div class="cb-header">Reply to u/${escHtml(replyToName)}</div>`:''
+  const placeholder=parentId?'Aa':'Join the discussion…'
   return `
-  <div class="comment-box" id="${id}" style="${parentId?'margin-top:.6rem':''}">
-    <textarea placeholder="${parentId?'Write a reply…':'Join the discussion…'}" id="ta${id}" rows="2"></textarea>
+  <div class="comment-box" id="${id}" style="${parentId?'margin-top:.5rem':''}">
+    ${header}
+    <textarea placeholder="${placeholder}" id="ta${id}" rows="2"></textarea>
     <div class="cb-footer">
-      ${onCancel?`<button class="cb-cancel" onclick="${onCancel}">Cancel</button>`:''}
-      <button class="cb-submit" onclick="submitComment(${parentId?parentId:'null'},'${id}')">
-        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-        ${parentId?'Reply':'Post Comment'}
-      </button>
+      <div class="cb-footer-hint">${parentId?'':'Markdown supported'}</div>
+      <div style="display:flex;gap:.4rem">
+        ${onCancel?`<button class="cb-cancel" onclick="${onCancel}">Cancel</button>`:''}
+        <button class="cb-submit" onclick="submitComment(${parentId?parentId:'null'},'${id}')">
+          ${parentId?'Comment':'Post Comment'}
+        </button>
+      </div>
     </div>
   </div>`
 }
@@ -293,7 +299,7 @@ function renderComment(c, depth=0){
           <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12l7 7 7-7"/></svg>
         </button>
       </div>
-      ${depth<2&&currentUser?`<button class="ca-btn" onclick="showReplyBox(${c.id})">
+      ${depth<2&&currentUser?`<button class="ca-btn" onclick="showReplyBox(${c.id},'${escHtml(c.author_username||'')}')">
         <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         Reply
       </button>`:''}
@@ -405,10 +411,10 @@ async function reportItem(type, id){
   document.getElementById('dotsMenu'+id)?.classList.remove('open')
 }
 
-function showReplyBox(parentId){
+function showReplyBox(parentId, authorName=''){
   const box=document.getElementById('replybox'+parentId)
   if(box.innerHTML){box.innerHTML='';return}
-  box.innerHTML=renderCommentBox(parentId,`hideReplyBox(${parentId})`)
+  box.innerHTML=renderCommentBox(parentId,`hideReplyBox(${parentId})`,authorName)
   box.querySelector('textarea').focus()
 }
 function hideReplyBox(parentId){document.getElementById('replybox'+parentId).innerHTML=''}
