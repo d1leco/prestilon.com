@@ -422,12 +422,22 @@ nav{
 .cta-note{margin-top:1.2rem;font-size:.63rem;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.05em;position:relative;z-index:1}
 
 /* ── FOOTER ── */
+body{padding-bottom:52px}
+footer{
+  position:fixed!important;bottom:0;left:0;right:0;z-index:998;
+  border-top:1px solid var(--border);
+  padding:.75rem var(--r);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+  position:relative;z-index:1;
+}
+.fc{font-size:.7rem;color:var(--text3);margin-top:.2rem}
+/* ── FOOTER ── */
 footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.5rem var(--r);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
 .fc{font-size:.75rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
 .footer-links{display:flex;gap:1.2rem;flex-wrap:wrap}
 .footer-links a{font-size:.75rem;color:var(--text);text-decoration:none;transition:color .18s}
 .footer-links a:hover{color:var(--text2)}
-.footer-links a[href="/community"]{color:var(--c1)}
+.footer-links a[href="/support"]{color:var(--green)}
 
 /* ── REVEAL ── */
 .r{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease}
@@ -985,7 +995,7 @@ window.wlSubmit=async()=>{
 <footer>
   <div class="fc">© 2026 PRESTILON. All rights reserved.</div>
   <div class="footer-links">
-    <a href="/community">Community</a>
+    <a href="/community" style="color:var(--c1)">Community</a>
     <a href="/privacy">Privacy Policy</a>
     <a href="/refund">Refund Policy</a>
     <a href="/terms">Terms of Service</a>
