@@ -74,11 +74,11 @@ nav{position:sticky;top:0;z-index:999;display:flex;align-items:center;justify-co
 .comments-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text)}
 
 /* COMMENT BOX */
-.comment-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-bottom:1.5rem}
-.comment-box textarea{width:100%;padding:.7rem 1rem;border-radius:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem;resize:vertical;min-height:80px;outline:none;transition:border-color .18s;line-height:1.6}
+.comment-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.7rem .9rem;margin-bottom:1rem}
+.comment-box textarea{width:100%;padding:.5rem .75rem;border-radius:8px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.84rem;resize:none;min-height:0;outline:none;transition:border-color .18s;line-height:1.5}
 .comment-box textarea:focus{border-color:rgba(0,212,180,.38)}
 .comment-box textarea::placeholder{color:var(--text3)}
-.cb-footer{display:flex;align-items:center;justify-content:flex-end;margin-top:.7rem;gap:.6rem}
+.cb-footer{display:flex;align-items:center;justify-content:flex-end;margin-top:.45rem;gap:.5rem}
 .cb-cancel{padding:.45rem .9rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;transition:all .15s}
 .cb-cancel:hover{border-color:var(--border2);color:var(--text)}
 .cb-submit{padding:.45rem 1.1rem;border-radius:8px;border:none;background:var(--c1);color:#060f1a;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:.35rem}
@@ -245,7 +245,7 @@ function renderCommentBox(parentId=null, onCancel=null){
   const id='cb'+(parentId||'root')
   return `
   <div class="comment-box" id="${id}" style="${parentId?'margin-top:.6rem':''}">
-    <textarea placeholder="${parentId?'Write a reply…':'Join the discussion…'}" id="ta${id}" rows="${parentId?3:4}"></textarea>
+    <textarea placeholder="${parentId?'Reply to u/${currentUser?.user_metadata?.username||'user'}…':'Join the discussion…'}" id="ta${id}" rows="2"></textarea>
     <div class="cb-footer">
       ${onCancel?`<button class="cb-cancel" onclick="${onCancel}">Cancel</button>`:''}
       <button class="cb-submit" onclick="submitComment(${parentId?parentId:'null'},'${id}')">
