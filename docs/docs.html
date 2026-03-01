@@ -128,12 +128,12 @@ nav{position:sticky;top:0;z-index:999;display:flex;align-items:center;justify-co
 
 /* ── FEATURE LIST ── */
 .feat-list{display:flex;flex-direction:column;gap:.55rem;margin-top:.5rem}
-.feat-row{display:flex;align-items:flex-start;gap:.75rem;padding:.78rem .9rem;background:var(--bg);border:1px solid var(--border);border-radius:10px;transition:border-color .2s}
-.feat-row:hover{border-color:var(--border2)}
+.feat-row{display:flex;align-items:flex-start;gap:.75rem;padding:.9rem 1rem;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:12px;transition:border-color .2s,background .2s}
+.feat-row:hover{border-color:var(--border2);background:#122540}
 .feat-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
 .feat-body{flex:1}
-.feat-name{font-size:.83rem;font-weight:600;color:var(--text);margin-bottom:.12rem}
-.feat-desc{font-size:.72rem;color:var(--text3);line-height:1.5}
+.feat-name{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:.14rem}
+.feat-desc{font-size:.76rem;color:var(--text2);line-height:1.6}
 
 /* ── ROADMAP ── */
 .roadmap-phases{display:flex;flex-direction:column;gap:1.5rem}
@@ -210,7 +210,6 @@ footer{position:fixed!important;bottom:0;left:0;right:0;z-index:998;background:r
   <a class="logo" href="/"><img class="logo-img" src="/prestilon.logo.png" alt="Prestilon"></a>
   <div class="nav-r">
     <a class="nl" href="/">Home</a>
-    <a class="nl" href="/pricing">Pricing</a>
     <a class="nl" href="/community">Community</a>
     <a class="nl" href="/support">Support</a>
     <a class="nc" id="navCta" href="/login">Get Started →</a>
@@ -408,10 +407,10 @@ footer{position:fixed!important;bottom:0;left:0;right:0;z-index:998;background:r
             </div>
           </div>
           <div class="feat-row">
-            <div class="feat-icon" style="background:rgba(245,158,11,.1)">🔔</div>
+            <div class="feat-icon" style="background:rgba(38,112,255,.12)">✈️</div>
             <div class="feat-body">
-              <div class="feat-name">Configure email alerts</div>
-              <div class="feat-desc">Go to <strong style="color:var(--text)">Settings → Notifications</strong> to turn on email alerts for anomalies, errors, and job completions. Alerts go to your account email.</div>
+              <div class="feat-name">Configure Telegram alerts</div>
+              <div class="feat-desc">Go to <strong style="color:var(--text)">Settings → Notifications</strong> to connect your Telegram account and receive instant alerts for anomalies, errors, and job completions directly in Telegram.</div>
             </div>
           </div>
           <div class="feat-row">
