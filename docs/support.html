@@ -128,7 +128,8 @@ select.ff{cursor:pointer}
 .info-box a:hover{text-decoration:underline}
 
 /* FOOTER */
-footer{border-top:1px solid var(--border);padding:2rem var(--r);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;position:relative;z-index:1}
+body{padding-bottom:52px}
+footer{position:fixed!important;bottom:0;left:0;right:0;z-index:998;border-top:1px solid var(--border);background:rgba(6,15,26,.95);backdrop-filter:blur(12px);padding:.75rem var(--r);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
 .fc{font-size:.7rem;color:var(--text3);margin-top:.2rem}
 .fl-links{display:flex;gap:1.4rem;flex-wrap:wrap}
 .fl-links a{color:var(--text);text-decoration:none;font-size:.74rem;transition:color .2s}
@@ -166,6 +167,8 @@ footer{border-top:1px solid var(--border);padding:2rem var(--r);display:flex;ali
   <a class="logo" href="/"><img class="logo-img" src="/prestilon.logo.png" alt="Prestilon"></a>
   <div class="nav-r">
     <a class="nl" href="/">Home</a>
+    <a class="nl" href="/community">Community</a>
+    <a class="nl" href="/support">Support</a>
     <a class="nc" id="navCta" href="/login">Sign In →</a>
   </div>
 </nav>
@@ -210,7 +213,7 @@ footer{border-top:1px solid var(--border);padding:2rem var(--r);display:flex;ali
 <footer>
   <div class="fc">© 2026 PRESTILON. All rights reserved.</div>
   <div class="fl-links">
-    <a href="/support">Support</a>
+    <a href="/community" style="color:var(--c1)">Community</a>
     <a href="/privacy">Privacy Policy</a>
     <a href="/refund">Refund Policy</a>
     <a href="/terms">Terms of Service</a>

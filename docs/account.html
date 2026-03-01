@@ -181,7 +181,8 @@ canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.3}
 .tip{padding:.78rem .95rem;background:rgba(0,212,180,.05);border:1px solid var(--border2);border-radius:10px;font-size:.76rem;color:var(--text2);line-height:1.6;margin-top:.9rem}
 
 /* ── Footer ── */
-footer{border-top:1px solid var(--border);padding:1.55rem var(--r);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;position:relative;z-index:1}
+body{padding-bottom:52px}
+footer{position:fixed!important;bottom:0;left:0;right:0;z-index:998;border-top:1px solid var(--border);background:rgba(6,15,26,.95);backdrop-filter:blur(12px);padding:.75rem var(--r);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
 .fc{font-size:.67rem;color:var(--text3)}
 .fl-links{display:flex;gap:1.25rem}
 .fl-links a{color:var(--text3);text-decoration:none;font-size:.69rem;transition:color .2s}
@@ -226,6 +227,7 @@ footer{border-top:1px solid var(--border);padding:1.55rem var(--r);display:flex;
     <a class="logo" href="/"><img class="logo-img" src="/prestilon.logo.png" alt="Prestilon"></a>
     <div class="nav-right">
       <a class="nav-lnk" href="/">Home</a>
+      <a class="nav-lnk" href="/community">Community</a>
       <a class="nav-lnk" href="/support">Support</a>
       <button class="signout-btn" onclick="doLogout()">Sign Out</button>
     </div>
@@ -473,8 +475,7 @@ AI        → local inference (zero cloud latency)</div>
 <footer>
   <div class="fc">© 2026 PRESTILON. All rights reserved.</div>
   <div class="fl-links">
-    <a href="/">Home</a>
-    <a href="/support">Support</a>
+    <a href="/community" style="color:var(--c1)">Community</a>
     <a href="/privacy">Privacy Policy</a>
     <a href="/refund">Refund Policy</a>
     <a href="/terms">Terms of Service</a>
@@ -817,10 +818,10 @@ window.doLogout=async()=>{
 }
 </script>
 
-<footer style="position:relative;z-index:1;border-top:1px solid var(--border);padding:1.5rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">
-  <div style="font-size:.75rem;color:var(--text3);font-family:'JetBrains Mono',monospace">© 2026 PRESTILON. All rights reserved.</div>
+<footer style="position:fixed;bottom:0;left:0;right:0;z-index:998;border-top:1px solid rgba(255,255,255,.07);background:rgba(6,15,26,.95);backdrop-filter:blur(12px);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
+  <div style="font-size:.75rem;color:#3d5a70;font-family:'JetBrains Mono',monospace">© 2026 PRESTILON. All rights reserved.</div>
   <div style="display:flex;gap:1.2rem;flex-wrap:wrap">
-    <a href="/support" style="font-size:.75rem;color:#10d48a;text-decoration:none">Support</a>
+    <a href="/community" style="font-size:.75rem;color:#00d4b4;text-decoration:none">Community</a>
     <a href="/privacy" style="font-size:.75rem;color:#f0f6ff;text-decoration:none">Privacy Policy</a>
     <a href="/refund" style="font-size:.75rem;color:#f0f6ff;text-decoration:none">Refund Policy</a>
     <a href="/terms" style="font-size:.75rem;color:#f0f6ff;text-decoration:none">Terms of Service</a>
