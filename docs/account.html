@@ -263,7 +263,7 @@ footer{
     </div>
   </div>
   <div class="topbar-tabs">
-    <button class="tab-btn on" id="tbSub"      onclick="showTab('sub',this)">💳 Subscription</button>
+    <button class="tab-btn on" id="tbSub" onclick="showTab('sub',this)">💳 Subscription</button>
     <button class="tab-btn" id="tbHardware" disabled title="Coming soon — Hardware management is under development" style="opacity:.45;cursor:not-allowed;pointer-events:none">🖥️ Hardware <span class="tab-nb" id="hwBadge" style="display:none">0</span> <span style="font-size:.55rem;font-family:'JetBrains Mono',monospace;color:var(--amber);margin-left:.2rem">SOON</span></button>
     <button class="tab-btn"    id="tbProfile"  onclick="showTab('profile',this)">👤 Profile &amp; Security</button>
   </div>
@@ -282,8 +282,27 @@ footer{
     <span id="userBadge" class="u-badge" style="display:none"></span>
   </div>
 
+  <!-- ══ SUBSCRIPTION UNDER CONSTRUCTION OVERLAY ══ -->
+  <div id="subOverlay" style="
+    position:fixed;inset:0;z-index:500;
+    display:flex;align-items:center;justify-content:center;padding:1rem;
+    background:rgba(6,15,26,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  ">
+    <div style="
+      width:100%;max-width:420px;border-radius:18px;
+      border:1px solid rgba(245,158,11,.35);background:rgba(6,15,26,.97);
+      padding:2.2rem 2rem;text-align:center;
+      box-shadow:0 0 60px rgba(245,158,11,.12);
+    ">
+      <div style="width:56px;height:56px;border-radius:14px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.1rem;font-size:1.6rem">🚧</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;color:#fff;margin-bottom:.5rem">Under Construction</div>
+      <div style="font-size:.8rem;color:rgba(251,191,36,.8);line-height:1.6;margin-bottom:.35rem">The Subscription page is currently in development.</div>
+      <div style="font-size:.72rem;color:var(--text3)">Payments and plan management will be available at launch.</div>
+    </div>
+  </div>
+
   <!-- ══ SUBSCRIPTION ══ -->
-  <div class="pnl on" id="pnlSub">
+  <div class="pnl on" id="pnlSub" style="pointer-events:none;user-select:none;opacity:.45">
     <div class="card">
       <div class="clbl">SUBSCRIPTION</div>
       <div class="ctitle">📋 Your Plan</div>
@@ -525,6 +544,9 @@ window.showTab=function(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'))
   document.getElementById('pnl'+tab[0].toUpperCase()+tab.slice(1))?.classList.add('on')
   if(btn) btn.classList.add('on')
+  // Rāda overlay tikai Subscription tabā
+  const ov=document.getElementById('subOverlay')
+  if(ov) ov.style.display=tab==='sub'?'flex':'none'
 }
 function showAlert(id,msg,type){
   const el=document.getElementById(id);if(!el)return
