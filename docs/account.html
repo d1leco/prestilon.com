@@ -949,6 +949,19 @@ window.doLogout=async()=>{
 }
 
 // ── Telegram ──────────────────────────────────────────────────────────────────
+async function loadTelegramStatus(){
+  try{
+    const session=(await sb.auth.getSession()).data.session
+    if(!session)return
+    const{data:{user}}=await sb.auth.getUser()
+    if(!user)return
+    const{data:profile}=await sb.from('profiles').select('telegram_bot_token,telegram_chat_id').eq('id',user.id).maybeSingle()
+    const connected=!!(profile?.telegram_bot_token&&profile?.telegram_chat_id)
+    document.getElementById('tgStateConnected').style.display=connected?'':'none'
+    document.getElementById('tgStateDisconnected').style.display=connected?'none':''
+  }catch(e){console.warn('Telegram status error',e)}
+}
+
 window.connectTelegram=async function(){
   const token=document.getElementById('tgBotToken').value.trim()
   const chatId=document.getElementById('tgChatId').value.trim()
