@@ -733,19 +733,6 @@ sb.auth.onAuthStateChange(async(e,s)=>{
   }
 })
 
-async function loadTelegramStatus(){ // v2
-  try{
-    const session=(await sb.auth.getSession()).data.session
-    if(!session)return
-    const{data:{user}}=await sb.auth.getUser()
-    if(!user)return
-    const{data:profile}=await sb.from('profiles').select('telegram_bot_token,telegram_chat_id').eq('id',user.id).maybeSingle()
-    const connected=!!(profile?.telegram_bot_token&&profile?.telegram_chat_id)
-    document.getElementById('tgStateConnected').style.display=connected?'':'none'
-    document.getElementById('tgStateDisconnected').style.display=connected?'none':''
-  }catch(e){console.warn('Telegram status error',e)}
-}
-
 async function loadAccount(u){
   const name=u.user_metadata?.full_name||u.email?.split('@')[0]||'User'
   const email=u.email||''
