@@ -961,12 +961,16 @@ window.connectTelegram=async function(){
     // 1. Verify token with Telegram API directly
     const tgRes=await fetch(`https://api.telegram.org/bot${token}/getMe`)
     const tgJson=await tgRes.json()
-    if(!tgJson.ok){showAlert('tgAlert','Invalid bot token — Telegram rejected it. Check the token from @BotFather.','error');setLoad('tgConnectBtn',false,'Verify & Connect');return}
+    if(!tgJson.ok){showAlert('tgAlert','Invalid bot token — Telegram rejected it. Check the token from @BotFather.','error');return}
     // 2. Save to Supabase profiles
     const{data:{user}}=await sb.auth.getUser()
-    if(!user){showAlert('tgAlert','Session expired. Please reload.','error');setLoad('tgConnectBtn',false,'Verify & Connect');return}
-    const{error}=await sb.from('profiles').update({telegram_bot_token:token,telegram_chat_id:chatId}).eq('id',user.id)
-    if(error){showAlert('tgAlert','Failed to save: '+error.message,'error');setLoad('tgConnectBtn',false,'Verify & Connect');return}
+    if(!user){showAlert('tgAlert','Session expired. Please reload.','error');return}
+    const{error:updateError}=await sb.from('profiles').update({telegram_bot_token:token,telegram_chat_id:chatId}).eq('id',user.id)
+    if(updateError){
+      console.error('Supabase update error:',updateError)
+      showAlert('tgAlert','Failed to save: '+updateError.message+' (code: '+updateError.code+')','error')
+      return
+    }
     // 3. Send welcome message via user's own bot
     const botUsername=tgJson.result?.username||'your bot'
     await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
@@ -977,8 +981,12 @@ window.connectTelegram=async function(){
     document.getElementById('tgChatId').value=''
     showAlert('tgAlert',`✅ Connected! @${botUsername} linked. Check your Telegram for a welcome message.`,'success')
     await loadTelegramStatus()
-  }catch(e){showAlert('tgAlert','Network error. Try again.','error');console.error(e)}
-  setLoad('tgConnectBtn',false,'Verify & Connect')
+  }catch(e){
+    showAlert('tgAlert','Network error: '+e.message,'error')
+    console.error('connectTelegram error:',e)
+  }finally{
+    setLoad('tgConnectBtn',false,'Verify & Connect')
+  }
 }
 
 window.disconnectTelegram=async function(){
