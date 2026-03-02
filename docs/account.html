@@ -672,19 +672,6 @@ const sb=createClient(
 )
 const overlay=document.getElementById('loadingOverlay')
 
-window.loadTelegramStatus=async function(){
-  try{
-    const session=(await sb.auth.getSession()).data.session
-    if(!session)return
-    const{data:{user}}=await sb.auth.getUser()
-    if(!user)return
-    const{data:profile}=await sb.from('profiles').select('telegram_bot_token,telegram_chat_id').eq('id',user.id).maybeSingle()
-    const connected=!!(profile?.telegram_bot_token&&profile?.telegram_chat_id)
-    document.getElementById('tgStateConnected').style.display=connected?'':'none'
-    document.getElementById('tgStateDisconnected').style.display=connected?'none':''
-  }catch(e){console.warn('Telegram status error',e)}
-}
-
 /* ── Initial session check ── */
 let _initSession
 try{const r=await sb.auth.getSession();_initSession=r.data?.session}catch(e){console.error('getSession error',e)}
@@ -746,6 +733,19 @@ sb.auth.onAuthStateChange(async(e,s)=>{
   }
 })
 
+async function loadTelegramStatus(){
+  try{
+    const session=(await sb.auth.getSession()).data.session
+    if(!session)return
+    const{data:{user}}=await sb.auth.getUser()
+    if(!user)return
+    const{data:profile}=await sb.from('profiles').select('telegram_bot_token,telegram_chat_id').eq('id',user.id).maybeSingle()
+    const connected=!!(profile?.telegram_bot_token&&profile?.telegram_chat_id)
+    document.getElementById('tgStateConnected').style.display=connected?'':'none'
+    document.getElementById('tgStateDisconnected').style.display=connected?'none':''
+  }catch(e){console.warn('Telegram status error',e)}
+}
+
 async function loadAccount(u){
   const name=u.user_metadata?.full_name||u.email?.split('@')[0]||'User'
   const email=u.email||''
@@ -780,7 +780,7 @@ async function loadAccount(u){
 
   await loadHardware(u.id)
   renderEmailState()
-  await window.loadTelegramStatus()
+  await loadTelegramStatus()
 }
 
 async function loadHardware(uid){
@@ -979,7 +979,7 @@ window.connectTelegram=async function(){
     document.getElementById('tgBotToken').value=''
     document.getElementById('tgChatId').value=''
     showAlert('tgAlert',`✅ Connected! @${botUsername} linked. Check your Telegram for a welcome message.`,'success')
-    await window.loadTelegramStatus()
+    await loadTelegramStatus()
   }catch(e){
     showAlert('tgAlert','Network error: '+e.message,'error')
     console.error('connectTelegram error:',e)
@@ -995,7 +995,7 @@ window.disconnectTelegram=async function(){
     if(!user){setLoad('tgDisconnectBtn',false,'Disconnect');return}
     await sb.from('profiles').update({telegram_bot_token:null,telegram_chat_id:null}).eq('id',user.id)
     showAlert('tgAlert','Telegram disconnected.','info')
-    await window.loadTelegramStatus()
+    await loadTelegramStatus()
   }catch{showAlert('tgAlert','Failed to disconnect.','error')}
   setLoad('tgDisconnectBtn',false,'Disconnect')
 }
