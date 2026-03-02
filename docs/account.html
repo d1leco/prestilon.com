@@ -940,9 +940,11 @@ window.loadTelegramStatus=async function(){
   try{
     const session=(await sb.auth.getSession()).data.session
     if(!session)return
-    const res=await fetch('/api/telegram/status',{headers:{'Authorization':`Bearer ${session.access_token}`}})
-    const{data}=await res.json()
-    const connected=data?.connected??false
+    // Read telegram_bot_token + telegram_chat_id directly from Supabase profiles
+    const{data:{user}}=await sb.auth.getUser()
+    if(!user)return
+    const{data:profile}=await sb.from('profiles').select('telegram_bot_token,telegram_chat_id').eq('id',user.id).maybeSingle()
+    const connected=!!(profile?.telegram_bot_token&&profile?.telegram_chat_id)
     document.getElementById('tgStateConnected').style.display=connected?'':'none'
     document.getElementById('tgStateDisconnected').style.display=connected?'none':''
   }catch(e){console.warn('Telegram status error',e)}
@@ -953,30 +955,38 @@ window.connectTelegram=async function(){
   const chatId=document.getElementById('tgChatId').value.trim()
   if(!token){showAlert('tgAlert','Please enter your Bot Token.','error');return}
   if(!chatId){showAlert('tgAlert','Please enter your Chat ID.','error');return}
-  if(!/^\-?\d+$/.test(chatId)){showAlert('tgAlert','Chat ID must be a number (e.g. 123456789).','error');return}
+  if(!/^-?\d+$/.test(chatId)){showAlert('tgAlert','Chat ID must be a number (e.g. 123456789).','error');return}
   setLoad('tgConnectBtn',true,'Verifying…')
   try{
-    const session=(await sb.auth.getSession()).data.session
-    const res=await fetch('/api/telegram/connect',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${session?.access_token}`},
-      body:JSON.stringify({bot_token:token,chat_id:chatId})
+    // 1. Verify token with Telegram API directly
+    const tgRes=await fetch(`https://api.telegram.org/bot${token}/getMe`)
+    const tgJson=await tgRes.json()
+    if(!tgJson.ok){showAlert('tgAlert','Invalid bot token — Telegram rejected it. Check the token from @BotFather.','error');setLoad('tgConnectBtn',false,'Verify & Connect');return}
+    // 2. Save to Supabase profiles
+    const{data:{user}}=await sb.auth.getUser()
+    if(!user){showAlert('tgAlert','Session expired. Please reload.','error');setLoad('tgConnectBtn',false,'Verify & Connect');return}
+    const{error}=await sb.from('profiles').update({telegram_bot_token:token,telegram_chat_id:chatId}).eq('id',user.id)
+    if(error){showAlert('tgAlert','Failed to save: '+error.message,'error');setLoad('tgConnectBtn',false,'Verify & Connect');return}
+    // 3. Send welcome message via user's own bot
+    const botUsername=tgJson.result?.username||'your bot'
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:chatId,parse_mode:'HTML',text:`👋 <b>Bot Connected!</b>\n\n<code>@${botUsername}</code> is now linked to your PRESTILON account.\n\nYou will receive:\n• 🖨️ Print completion alerts\n• ⚠️ Printer error warnings\n• 🔧 Maintenance reminders\n• 💰 Monthly cost reports\n\n<i>PRESTILON Dashboard</i>`})
     })
-    const json=await res.json()
-    if(!json.success){showAlert('tgAlert',json.error||'Connection failed.','error');setLoad('tgConnectBtn',false,'Verify & Connect');return}
     document.getElementById('tgBotToken').value=''
     document.getElementById('tgChatId').value=''
-    showAlert('tgAlert','✅ Connected! Check your Telegram for a welcome message.','success')
+    showAlert('tgAlert',`✅ Connected! @${botUsername} linked. Check your Telegram for a welcome message.`,'success')
     await loadTelegramStatus()
-  }catch{showAlert('tgAlert','Network error. Try again.','error')}
+  }catch(e){showAlert('tgAlert','Network error. Try again.','error');console.error(e)}
   setLoad('tgConnectBtn',false,'Verify & Connect')
 }
 
 window.disconnectTelegram=async function(){
   setLoad('tgDisconnectBtn',true,'Disconnecting…')
   try{
-    const session=(await sb.auth.getSession()).data.session
-    await fetch('/api/telegram/disconnect',{method:'POST',headers:{'Authorization':`Bearer ${session?.access_token}`}})
+    const{data:{user}}=await sb.auth.getUser()
+    if(!user){setLoad('tgDisconnectBtn',false,'Disconnect');return}
+    await sb.from('profiles').update({telegram_bot_token:null,telegram_chat_id:null}).eq('id',user.id)
     showAlert('tgAlert','Telegram disconnected.','info')
     await loadTelegramStatus()
   }catch{showAlert('tgAlert','Failed to disconnect.','error')}
@@ -986,10 +996,19 @@ window.disconnectTelegram=async function(){
 window.sendTestMessage=async function(){
   setLoad('tgTestBtn',true,'Sending…')
   try{
-    const session=(await sb.auth.getSession()).data.session
-    const res=await fetch('/api/telegram/test',{method:'POST',headers:{'Authorization':`Bearer ${session?.access_token}`}})
+    const{data:{user}}=await sb.auth.getUser()
+    if(!user){setLoad('tgTestBtn',false,'📨 Send Test Message');return}
+    const{data:profile}=await sb.from('profiles').select('telegram_bot_token,telegram_chat_id').eq('id',user.id).maybeSingle()
+    if(!profile?.telegram_bot_token||!profile?.telegram_chat_id){
+      showAlert('tgAlert','No Telegram bot connected.','error')
+      setLoad('tgTestBtn',false,'📨 Send Test Message');return
+    }
+    const res=await fetch(`https://api.telegram.org/bot${profile.telegram_bot_token}/sendMessage`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:profile.telegram_chat_id,parse_mode:'HTML',text:'✅ <b>Test Notification</b>\n\nYour PRESTILON Telegram bot is working!\n\n<i>PRESTILON Dashboard</i>'})
+    })
     const json=await res.json()
-    showAlert('tgAlert',json.success?'✅ Test message sent! Check Telegram.':'Failed to send.',json.success?'success':'error')
+    showAlert('tgAlert',json.ok?'✅ Test message sent! Check Telegram.':'Failed to send. Check your bot token & chat ID.', json.ok?'success':'error')
   }catch{showAlert('tgAlert','Network error.','error')}
   setLoad('tgTestBtn',false,'📨 Send Test Message')
 }
