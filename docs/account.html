@@ -767,7 +767,7 @@ async function loadAccount(u){
 
   await loadHardware(u.id)
   renderEmailState()
-  await loadTelegramStatus()
+  await window.loadTelegramStatus()
 }
 
 async function loadHardware(uid){
@@ -980,7 +980,7 @@ window.connectTelegram=async function(){
     document.getElementById('tgBotToken').value=''
     document.getElementById('tgChatId').value=''
     showAlert('tgAlert',`✅ Connected! @${botUsername} linked. Check your Telegram for a welcome message.`,'success')
-    await loadTelegramStatus()
+    await window.loadTelegramStatus()
   }catch(e){
     showAlert('tgAlert','Network error: '+e.message,'error')
     console.error('connectTelegram error:',e)
@@ -996,7 +996,7 @@ window.disconnectTelegram=async function(){
     if(!user){setLoad('tgDisconnectBtn',false,'Disconnect');return}
     await sb.from('profiles').update({telegram_bot_token:null,telegram_chat_id:null}).eq('id',user.id)
     showAlert('tgAlert','Telegram disconnected.','info')
-    await loadTelegramStatus()
+    await window.loadTelegramStatus()
   }catch{showAlert('tgAlert','Failed to disconnect.','error')}
   setLoad('tgDisconnectBtn',false,'Disconnect')
 }
