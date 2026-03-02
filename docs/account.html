@@ -672,6 +672,19 @@ const sb=createClient(
 )
 const overlay=document.getElementById('loadingOverlay')
 
+window.loadTelegramStatus=async function(){
+  try{
+    const session=(await sb.auth.getSession()).data.session
+    if(!session)return
+    const{data:{user}}=await sb.auth.getUser()
+    if(!user)return
+    const{data:profile}=await sb.from('profiles').select('telegram_bot_token,telegram_chat_id').eq('id',user.id).maybeSingle()
+    const connected=!!(profile?.telegram_bot_token&&profile?.telegram_chat_id)
+    document.getElementById('tgStateConnected').style.display=connected?'':'none'
+    document.getElementById('tgStateDisconnected').style.display=connected?'none':''
+  }catch(e){console.warn('Telegram status error',e)}
+}
+
 /* ── Initial session check ── */
 let _initSession
 try{const r=await sb.auth.getSession();_initSession=r.data?.session}catch(e){console.error('getSession error',e)}
@@ -767,7 +780,7 @@ async function loadAccount(u){
 
   await loadHardware(u.id)
   renderEmailState()
-  await loadTelegramStatus()
+  await window.loadTelegramStatus()
 }
 
 async function loadHardware(uid){
@@ -936,19 +949,6 @@ window.doLogout=async()=>{
 }
 
 // ── Telegram ──────────────────────────────────────────────────────────────────
-async function loadTelegramStatus(){
-  try{
-    const session=(await sb.auth.getSession()).data.session
-    if(!session)return
-    const{data:{user}}=await sb.auth.getUser()
-    if(!user)return
-    const{data:profile}=await sb.from('profiles').select('telegram_bot_token,telegram_chat_id').eq('id',user.id).maybeSingle()
-    const connected=!!(profile?.telegram_bot_token&&profile?.telegram_chat_id)
-    document.getElementById('tgStateConnected').style.display=connected?'':'none'
-    document.getElementById('tgStateDisconnected').style.display=connected?'none':''
-  }catch(e){console.warn('Telegram status error',e)}
-}
-
 window.connectTelegram=async function(){
   const token=document.getElementById('tgBotToken').value.trim()
   const chatId=document.getElementById('tgChatId').value.trim()
