@@ -997,23 +997,22 @@ window.disconnectTelegram=async function(){
   setLoad('tgDisconnectBtn',true,'Disconnecting…')
   try{
     const{data:{user}}=await sb.auth.getUser()
-    if(!user){setLoad('tgDisconnectBtn',false,'Disconnect');return}
+    if(!user){showAlert('tgAlert','Session expired.','error');return}
     await sb.from('profiles').update({telegram_bot_token:null,telegram_chat_id:null}).eq('id',user.id)
     showAlert('tgAlert','Telegram disconnected.','info')
     await loadTelegramStatus()
-  }catch{showAlert('tgAlert','Failed to disconnect.','error')}
-  setLoad('tgDisconnectBtn',false,'Disconnect')
+  }catch(e){showAlert('tgAlert','Failed to disconnect: '+e.message,'error')}
+  finally{setLoad('tgDisconnectBtn',false,'Disconnect')}
 }
 
 window.sendTestMessage=async function(){
   setLoad('tgTestBtn',true,'Sending…')
   try{
     const{data:{user}}=await sb.auth.getUser()
-    if(!user){setLoad('tgTestBtn',false,'📨 Send Test Message');return}
+    if(!user){showAlert('tgAlert','Session expired.','error');return}
     const{data:profile}=await sb.from('profiles').select('telegram_bot_token,telegram_chat_id').eq('id',user.id).maybeSingle()
     if(!profile?.telegram_bot_token||!profile?.telegram_chat_id){
-      showAlert('tgAlert','No Telegram bot connected.','error')
-      setLoad('tgTestBtn',false,'📨 Send Test Message');return
+      showAlert('tgAlert','No Telegram bot connected.','error');return
     }
     const res=await fetch(`https://api.telegram.org/bot${profile.telegram_bot_token}/sendMessage`,{
       method:'POST',headers:{'Content-Type':'application/json'},
@@ -1021,8 +1020,8 @@ window.sendTestMessage=async function(){
     })
     const json=await res.json()
     showAlert('tgAlert',json.ok?'✅ Test message sent! Check Telegram.':'Failed to send. Check your bot token & chat ID.', json.ok?'success':'error')
-  }catch{showAlert('tgAlert','Network error.','error')}
-  setLoad('tgTestBtn',false,'📨 Send Test Message')
+  }catch(e){showAlert('tgAlert','Network error: '+e.message,'error')}
+  finally{setLoad('tgTestBtn',false,'📨 Send Test Message')}
 }
 </script>
 
