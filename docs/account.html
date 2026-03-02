@@ -266,6 +266,7 @@ footer{
     <button class="tab-btn on" id="tbSub" onclick="showTab('sub',this)">💳 Subscription</button>
     <button class="tab-btn" id="tbHardware" disabled title="Coming soon — Hardware management is under development" style="opacity:.45;cursor:not-allowed;pointer-events:none">🖥️ Hardware <span class="tab-nb" id="hwBadge" style="display:none">0</span> <span style="font-size:.55rem;font-family:'JetBrains Mono',monospace;color:var(--amber);margin-left:.2rem">SOON</span></button>
     <button class="tab-btn"    id="tbProfile"  onclick="showTab('profile',this)">👤 Profile &amp; Security</button>
+    <button class="tab-btn" id="tbNotifications" onclick="showTab('notifications',this)">🔔 Notifications</button>
   </div>
 </div>
 
@@ -385,6 +386,84 @@ AI        → local inference (zero cloud latency)</div>
       <div class="lic-row"><span style="color:var(--text2)">Plan</span><span id="dlPlan" style="font-family:'JetBrains Mono',monospace;color:var(--c1);font-size:.76rem">—</span></div>
       <div class="lic-row"><span style="color:var(--text2)">Printer Limit</span><span id="dlLimit" style="font-family:'JetBrains Mono',monospace;color:var(--c1);font-size:.76rem">—</span></div>
       <div class="lic-row"><span style="color:var(--text2)">Valid Until</span><span id="dlValid" style="font-family:'JetBrains Mono',monospace;color:var(--text2);font-size:.76rem">—</span></div>
+    </div>
+
+  </div>
+
+  <!-- ══ NOTIFICATIONS ══ -->
+  <div class="pnl" id="pnlNotifications">
+
+    <div class="card">
+      <div class="clbl">TELEGRAM</div>
+      <div class="ctitle">📱 Telegram Notifications</div>
+      <p style="font-size:.8rem;color:var(--text2);line-height:1.7;margin-bottom:1.1rem">Connect your own Telegram bot to receive real-time alerts — print completions, errors, AI anomalies and maintenance reminders — straight to your Telegram.</p>
+      <div id="tgAlert" style="margin-bottom:.5rem"></div>
+
+      <!-- DISCONNECTED -->
+      <div id="tgStateDisconnected">
+        <div style="display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;border-radius:11px;background:var(--bg);border:1px solid var(--border);margin-bottom:1.1rem">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0"></div>
+          <span style="font-size:.78rem;color:var(--text2)">No Telegram bot connected</span>
+          <span style="margin-left:auto;font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--text3);background:rgba(100,100,120,.1);padding:.15rem .45rem;border-radius:4px;border:1px solid var(--border)">DISCONNECTED</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.6rem;padding:1rem;border-radius:11px;background:rgba(0,212,180,.03);border:1px solid rgba(0,212,180,.1);margin-bottom:1.1rem">
+          <div style="font-size:.68rem;font-weight:700;color:var(--c1);letter-spacing:.06em;margin-bottom:.1rem">HOW TO SET UP</div>
+          <div style="display:flex;gap:.7rem;font-size:.78rem;color:var(--text2);line-height:1.55">
+            <span style="color:var(--c1);font-weight:800;font-family:'JetBrains Mono',monospace;flex-shrink:0">1.</span>
+            Open Telegram → search <b style="color:var(--text)">@BotFather</b> → send <code style="background:var(--bg3);padding:.1rem .35rem;border-radius:4px;font-size:.73rem">/newbot</code> → copy your <b style="color:var(--text)">Bot Token</b>
+          </div>
+          <div style="display:flex;gap:.7rem;font-size:.78rem;color:var(--text2);line-height:1.55">
+            <span style="color:var(--c1);font-weight:800;font-family:'JetBrains Mono',monospace;flex-shrink:0">2.</span>
+            Search <b style="color:var(--text)">@userinfobot</b> in Telegram → send any message → copy the <b style="color:var(--text)">Id</b> number (your Chat ID)
+          </div>
+          <div style="display:flex;gap:.7rem;font-size:.78rem;color:var(--text2);line-height:1.55">
+            <span style="color:var(--c1);font-weight:800;font-family:'JetBrains Mono',monospace;flex-shrink:0">3.</span>
+            Paste both below → click <b style="color:var(--text)">Verify &amp; Connect</b>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl">Bot Token <span style="color:var(--text3);font-weight:400;text-transform:none">(from @BotFather)</span></label>
+          <div class="fi-wrap">
+            <input type="password" id="tgBotToken" class="fi" placeholder="1234567890:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+            <button class="eye" type="button" onclick="togglePw('tgBotToken')" tabindex="-1"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle stroke="currentColor" stroke-width="2" cx="12" cy="12" r="3"/></svg></button>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl">Your Chat ID <span style="color:var(--text3);font-weight:400;text-transform:none">(from @userinfobot)</span></label>
+          <input type="text" id="tgChatId" class="fi" placeholder="123456789" autocomplete="off" onkeydown="if(event.key==='Enter')connectTelegram()"/>
+        </div>
+        <div class="btn-row">
+          <button class="btn-p" id="tgConnectBtn" onclick="connectTelegram()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Verify &amp; Connect
+          </button>
+        </div>
+      </div>
+
+      <!-- CONNECTED -->
+      <div id="tgStateConnected" style="display:none">
+        <div style="display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;border-radius:11px;background:rgba(16,212,138,.04);border:1px solid rgba(16,212,138,.18);margin-bottom:1.1rem">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0;animation:pulse 2s infinite"></div>
+          <span style="font-size:.78rem;font-weight:600;color:var(--text)">Telegram connected</span>
+          <span style="margin-left:auto;font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--green);background:rgba(16,212,138,.1);padding:.15rem .45rem;border-radius:4px;border:1px solid rgba(16,212,138,.25)">ACTIVE</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn-g" id="tgTestBtn" onclick="sendTestMessage()">📨 Send Test Message</button>
+          <button class="btn-d" id="tgDisconnectBtn" onclick="disconnectTelegram()">Disconnect</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="clbl">NOTIFICATION TYPES</div>
+      <div class="ctitle">🔔 What You'll Receive</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem">
+        <div class="lic-row"><span style="color:var(--text2)">🖨️ Print Complete</span><span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--green)">Instant</span></div>
+        <div class="lic-row"><span style="color:var(--text2)">⚠️ Printer Error</span><span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--green)">Instant</span></div>
+        <div class="lic-row"><span style="color:var(--text2)">🚨 AI Anomaly Alert</span><span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--green)">Instant</span></div>
+        <div class="lic-row"><span style="color:var(--text2)">🔧 Maintenance Reminder</span><span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--amber)">Scheduled</span></div>
+        <div class="lic-row" style="border-bottom:none;margin-bottom:0"><span style="color:var(--text2)">💰 Monthly Cost Report</span><span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--amber)">Monthly</span></div>
+      </div>
     </div>
 
   </div>
@@ -688,6 +767,7 @@ async function loadAccount(u){
 
   await loadHardware(u.id)
   renderEmailState()
+  await loadTelegramStatus()
 }
 
 async function loadHardware(uid){
@@ -853,6 +933,65 @@ window.signOutAll=async()=>{
 window.doLogout=async()=>{
   await sb.auth.signOut()
   window.location.href='/'
+}
+
+// ── Telegram ──────────────────────────────────────────────────────────────────
+window.loadTelegramStatus=async function(){
+  try{
+    const session=(await sb.auth.getSession()).data.session
+    if(!session)return
+    const res=await fetch('/api/telegram/status',{headers:{'Authorization':`Bearer ${session.access_token}`}})
+    const{data}=await res.json()
+    const connected=data?.connected??false
+    document.getElementById('tgStateConnected').style.display=connected?'':'none'
+    document.getElementById('tgStateDisconnected').style.display=connected?'none':''
+  }catch(e){console.warn('Telegram status error',e)}
+}
+
+window.connectTelegram=async function(){
+  const token=document.getElementById('tgBotToken').value.trim()
+  const chatId=document.getElementById('tgChatId').value.trim()
+  if(!token){showAlert('tgAlert','Please enter your Bot Token.','error');return}
+  if(!chatId){showAlert('tgAlert','Please enter your Chat ID.','error');return}
+  if(!/^\-?\d+$/.test(chatId)){showAlert('tgAlert','Chat ID must be a number (e.g. 123456789).','error');return}
+  setLoad('tgConnectBtn',true,'Verifying…')
+  try{
+    const session=(await sb.auth.getSession()).data.session
+    const res=await fetch('/api/telegram/connect',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${session?.access_token}`},
+      body:JSON.stringify({bot_token:token,chat_id:chatId})
+    })
+    const json=await res.json()
+    if(!json.success){showAlert('tgAlert',json.error||'Connection failed.','error');setLoad('tgConnectBtn',false,'Verify & Connect');return}
+    document.getElementById('tgBotToken').value=''
+    document.getElementById('tgChatId').value=''
+    showAlert('tgAlert','✅ Connected! Check your Telegram for a welcome message.','success')
+    await loadTelegramStatus()
+  }catch{showAlert('tgAlert','Network error. Try again.','error')}
+  setLoad('tgConnectBtn',false,'Verify & Connect')
+}
+
+window.disconnectTelegram=async function(){
+  setLoad('tgDisconnectBtn',true,'Disconnecting…')
+  try{
+    const session=(await sb.auth.getSession()).data.session
+    await fetch('/api/telegram/disconnect',{method:'POST',headers:{'Authorization':`Bearer ${session?.access_token}`}})
+    showAlert('tgAlert','Telegram disconnected.','info')
+    await loadTelegramStatus()
+  }catch{showAlert('tgAlert','Failed to disconnect.','error')}
+  setLoad('tgDisconnectBtn',false,'Disconnect')
+}
+
+window.sendTestMessage=async function(){
+  setLoad('tgTestBtn',true,'Sending…')
+  try{
+    const session=(await sb.auth.getSession()).data.session
+    const res=await fetch('/api/telegram/test',{method:'POST',headers:{'Authorization':`Bearer ${session?.access_token}`}})
+    const json=await res.json()
+    showAlert('tgAlert',json.success?'✅ Test message sent! Check Telegram.':'Failed to send.',json.success?'success':'error')
+  }catch{showAlert('tgAlert','Network error.','error')}
+  setLoad('tgTestBtn',false,'📨 Send Test Message')
 }
 </script>
 
