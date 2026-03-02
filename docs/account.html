@@ -964,10 +964,15 @@ window.connectTelegram=async function(){
     // 2. Save to Supabase profiles
     const{data:{user}}=await sb.auth.getUser()
     if(!user){showAlert('tgAlert','Session expired. Please reload.','error');return}
-    const{error:updateError}=await sb.from('profiles').update({telegram_bot_token:token,telegram_chat_id:chatId}).eq('id',user.id)
+    const{data:updateData,error:updateError}=await sb.from('profiles').update({telegram_bot_token:token,telegram_chat_id:chatId}).eq('id',user.id).select()
+    console.log('Supabase update result:',{updateData,updateError,userId:user.id})
     if(updateError){
       console.error('Supabase update error:',updateError)
       showAlert('tgAlert','Failed to save: '+updateError.message+' (code: '+updateError.code+')','error')
+      return
+    }
+    if(!updateData||updateData.length===0){
+      showAlert('tgAlert','❌ RLS bloķē saglabāšanu — profila rinda neeksistē vai nav atļauja. Pārbaud Supabase profiles tabulu.','error')
       return
     }
     // 3. Send welcome message via user's own bot
