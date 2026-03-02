@@ -733,7 +733,7 @@ sb.auth.onAuthStateChange(async(e,s)=>{
   }
 })
 
-async function loadTelegramStatus(){
+async function loadTelegramStatus(){ // v2
   try{
     const session=(await sb.auth.getSession()).data.session
     if(!session)return
