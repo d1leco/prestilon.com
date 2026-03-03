@@ -3,720 +3,594 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mērkaķis — Dzimis Spēlēt</title>
-  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Fredoka+One&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+  <title>Mērkaķis — Spēļu Aparāts</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
       --gold: #FFD700;
+      --gold-dark: #B8860B;
       --neon-green: #39FF14;
       --hot-pink: #FF2D78;
-      --deep-purple: #1A0030;
-      --jungle-green: #1B4D1F;
+      --deep-purple: #0D0020;
       --orange: #FF6B00;
       --cream: #FFF5D6;
     }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      background-color: var(--deep-purple);
-      font-family: 'Boogaloo', cursive;
+      background: radial-gradient(ellipse at 50% 0%, #2d0050 0%, var(--deep-purple) 65%);
+      min-height: 100vh;
+      font-family: 'Fredoka One', cursive;
+      display: flex; flex-direction: column; align-items: center;
       overflow-x: hidden;
-      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ctext y='28' font-size='28'%3E🐒%3C/text%3E%3C/svg%3E"), auto;
     }
 
-    /* STARS BACKGROUND */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
+    /* stars */
+    .stars {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
       background-image:
-        radial-gradient(1px 1px at 10% 20%, rgba(255,215,0,0.6) 0%, transparent 100%),
-        radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
-        radial-gradient(1px 1px at 55% 15%, rgba(255,215,0,0.5) 0%, transparent 100%),
-        radial-gradient(1px 1px at 75% 45%, rgba(255,255,255,0.3) 0%, transparent 100%),
-        radial-gradient(1px 1px at 90% 80%, rgba(255,215,0,0.4) 0%, transparent 100%),
-        radial-gradient(1px 1px at 20% 85%, rgba(255,255,255,0.5) 0%, transparent 100%),
-        radial-gradient(1px 1px at 65% 70%, rgba(255,215,0,0.3) 0%, transparent 100%),
-        radial-gradient(2px 2px at 42% 35%, rgba(255,215,0,0.7) 0%, transparent 100%);
-      pointer-events: none;
-      z-index: 0;
+        radial-gradient(1.5px 1.5px at 8%  15%, rgba(255,215,0,.7) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 25% 55%, rgba(255,255,255,.5) 0%, transparent 100%),
+        radial-gradient(2px   2px   at 45% 10%, rgba(255,215,0,.6) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 70% 40%, rgba(255,255,255,.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 88% 75%, rgba(255,215,0,.5) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 15% 90%, rgba(255,255,255,.6) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 60% 65%, rgba(255,215,0,.4) 0%, transparent 100%);
     }
 
-    /* MARQUEE HEADER */
-    .marquee-wrap {
-      background: repeating-linear-gradient(90deg, var(--gold) 0px, var(--gold) 2px, transparent 2px, transparent 18px);
-      border-top: 3px solid var(--gold);
-      border-bottom: 3px solid var(--gold);
-      overflow: hidden;
-      padding: 6px 0;
-      position: relative;
-      z-index: 10;
+    /* title */
+    .page-title {
+      position: relative; z-index: 5; margin-top: 36px;
+      font-size: clamp(2.8rem, 10vw, 6rem); color: var(--gold);
+      text-shadow: 3px 3px 0 var(--orange), 0 0 60px rgba(255,215,0,.35);
+      letter-spacing: 2px; animation: sway 4s ease-in-out infinite;
     }
-    .marquee-track {
-      display: flex;
-      width: max-content;
-      animation: marquee 18s linear infinite;
-      gap: 60px;
+    .page-sub {
+      position: relative; z-index: 5;
+      font-family: 'Caveat', cursive; font-size: 1.2rem;
+      color: var(--neon-green); text-shadow: 0 0 16px var(--neon-green);
+      margin-bottom: 28px;
     }
-    .marquee-track span {
-      font-family: 'Fredoka One', cursive;
-      font-size: 1.1rem;
-      color: var(--deep-purple);
-      white-space: nowrap;
-      letter-spacing: 2px;
-    }
-    @keyframes marquee {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
-    }
+    @keyframes sway { 0%,100%{transform:rotate(-1deg)} 50%{transform:rotate(1deg)} }
 
-    /* HERO */
-    .hero {
-      position: relative;
-      z-index: 5;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 60px 20px 20px;
-      text-align: center;
+    /* machine */
+    .machine {
+      position: relative; z-index: 5;
+      width: min(420px, 96vw);
+      background: linear-gradient(160deg, #8B1A1A 0%, #5a0f0f 40%, #3d0a0a 100%);
+      border: 5px solid var(--gold); border-radius: 28px;
+      padding: 22px 22px 28px;
+      box-shadow: 0 0 60px rgba(255,215,0,.18), inset 0 0 30px rgba(0,0,0,.4);
     }
+    .light-strip { display:flex; justify-content:space-between; margin-bottom:16px; }
+    .bulb {
+      width:16px; height:16px; border-radius:50%;
+      background:var(--gold); box-shadow:0 0 8px var(--gold);
+      animation:blink .7s ease-in-out infinite alternate;
+    }
+    .bulb:nth-child(even){animation-delay:.35s}
+    @keyframes blink{from{opacity:1;box-shadow:0 0 10px var(--gold)}to{opacity:.3;box-shadow:none}}
 
-    .title-badge {
-      background: var(--hot-pink);
-      color: var(--cream);
-      font-family: 'Fredoka One', cursive;
-      font-size: 0.85rem;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      padding: 6px 20px;
-      border-radius: 100px;
-      margin-bottom: 18px;
-      box-shadow: 0 0 20px var(--hot-pink);
-      animation: pulse-badge 2s ease-in-out infinite;
+    .machine-plate {
+      text-align:center; background:linear-gradient(to bottom,#1a0030,#0d001a);
+      border:3px solid var(--gold); border-radius:10px; padding:6px 0 4px;
+      margin-bottom:18px; box-shadow:0 0 20px rgba(255,215,0,.2);
     }
-    @keyframes pulse-badge {
-      0%, 100% { box-shadow: 0 0 20px var(--hot-pink); }
-      50% { box-shadow: 0 0 45px var(--hot-pink), 0 0 80px rgba(255,45,120,0.3); }
-    }
+    .machine-plate span { font-size:1.5rem; color:var(--gold); text-shadow:0 0 12px var(--gold); letter-spacing:4px; }
 
-    .main-title {
-      font-family: 'Fredoka One', cursive;
-      font-size: clamp(3.5rem, 12vw, 9rem);
-      color: var(--gold);
-      line-height: 0.9;
-      text-shadow:
-        4px 4px 0 var(--orange),
-        8px 8px 0 rgba(255,107,0,0.4),
-        0 0 80px rgba(255,215,0,0.3);
-      animation: title-wobble 4s ease-in-out infinite;
+    /* reels */
+    .reels-frame {
+      background:#080010; border:4px solid var(--gold); border-radius:14px;
+      padding:12px; margin-bottom:16px;
+      box-shadow:inset 0 0 24px rgba(0,0,0,.7), 0 0 20px rgba(255,215,0,.1);
+      position:relative;
     }
-    @keyframes title-wobble {
-      0%, 100% { transform: rotate(-1deg); }
-      50% { transform: rotate(1deg); }
+    .win-line {
+      position:absolute; left:12px; right:12px; top:50%; transform:translateY(-50%);
+      height:3px; background:rgba(255,215,0,.25); border-radius:2px; pointer-events:none;
     }
+    .reels-row { display:flex; gap:10px; }
+    .reel-wrap {
+      flex:1; height:110px; overflow:hidden; border-radius:8px;
+      background:#0a0018; border:2px solid #333; position:relative;
+    }
+    .reel-inner { display:flex; flex-direction:column; }
+    .reel-symbol {
+      height:110px; display:flex; align-items:center; justify-content:center;
+      font-size:3.2rem; flex-shrink:0; user-select:none;
+    }
+    .reel-wrap.winner {
+      border-color:var(--gold);
+      box-shadow:0 0 20px var(--gold), inset 0 0 10px rgba(255,215,0,.2);
+      animation:wflash .4s ease-in-out 6;
+    }
+    @keyframes wflash{0%,100%{border-color:var(--gold)}50%{border-color:var(--hot-pink);box-shadow:0 0 30px var(--hot-pink)}}
 
-    .subtitle {
-      font-family: 'Caveat', cursive;
-      font-size: clamp(1.2rem, 4vw, 1.8rem);
-      color: var(--neon-green);
-      margin-top: 10px;
-      letter-spacing: 1px;
-      text-shadow: 0 0 20px var(--neon-green);
+    /* info */
+    .info-row { display:flex; gap:10px; margin-bottom:14px; }
+    .info-box {
+      flex:1; background:#0a0018; border:2px solid var(--gold-dark);
+      border-radius:10px; padding:8px 6px 6px; text-align:center;
     }
+    .info-label { font-family:'Caveat',cursive; font-size:.75rem; color:rgba(255,245,214,.5); letter-spacing:1px; text-transform:uppercase; }
+    .info-value { font-size:1.5rem; color:var(--gold); text-shadow:0 0 10px rgba(255,215,0,.5); margin-top:2px; }
 
-    /* MONKEY HERO */
-    .monkey-stage {
-      position: relative;
-      margin: 40px auto 0;
-      width: min(500px, 90vw);
-      height: 380px;
+    /* message */
+    .msg-box {
+      height:42px; background:#0a0018; border:2px solid var(--gold-dark);
+      border-radius:10px; display:flex; align-items:center; justify-content:center;
+      font-family:'Caveat',cursive; font-size:1.15rem; color:var(--cream);
+      margin-bottom:14px; transition:all .3s;
     }
+    .msg-box.win    { border-color:var(--neon-green); color:var(--neon-green); text-shadow:0 0 10px var(--neon-green); }
+    .msg-box.jackpot{ border-color:var(--gold); color:var(--gold); text-shadow:0 0 20px var(--gold); animation:mpulse .4s infinite alternate; }
+    .msg-box.lose   { border-color:var(--hot-pink); color:var(--hot-pink); }
+    @keyframes mpulse{from{box-shadow:none}to{box-shadow:0 0 20px var(--gold)}}
 
-    .jungle-backdrop {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 50% 100%, var(--jungle-green) 0%, rgba(27,77,31,0.2) 60%, transparent 80%);
-      border-radius: 50%;
+    /* bet */
+    .bet-row { display:flex; gap:8px; align-items:center; margin-bottom:14px; }
+    .bet-label { font-family:'Caveat',cursive; font-size:.9rem; color:rgba(255,245,214,.6); flex-shrink:0; }
+    .bet-btn {
+      flex:1; background:linear-gradient(to bottom,#3a1a00,#1e0e00);
+      border:2px solid var(--gold-dark); border-radius:8px; color:var(--gold);
+      font-family:'Fredoka One',cursive; font-size:1rem; padding:6px 0; cursor:pointer; transition:all .15s;
     }
+    .bet-btn:hover:not(:disabled) { background:linear-gradient(to bottom,#6a3300,#3a1a00); border-color:var(--gold); }
+    .bet-btn.active { background:linear-gradient(to bottom,#8B5500,#4a2a00); border-color:var(--gold); color:var(--cream); box-shadow:0 0 10px rgba(255,215,0,.4); }
+    .bet-btn:disabled { opacity:.4; cursor:not-allowed; }
 
-    /* Slot machine */
-    .slot-machine {
-      position: absolute;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 200px;
+    /* spin */
+    .spin-btn {
+      width:100%; padding:14px 0;
+      background:linear-gradient(to bottom,#FF2D78,#9B003A);
+      border:4px solid var(--gold); border-radius:14px; color:var(--gold);
+      font-family:'Fredoka One',cursive; font-size:1.7rem; letter-spacing:2px;
+      cursor:pointer; box-shadow:0 6px 0 #5a001f, 0 0 30px rgba(255,45,120,.3);
+      transition:all .1s; position:relative; overflow:hidden;
     }
-
-    .slot-body {
-      background: linear-gradient(145deg, #C0392B, #8B1A1A);
-      border-radius: 16px;
-      padding: 12px;
-      border: 4px solid var(--gold);
-      box-shadow: 0 0 30px rgba(255,215,0,0.4), inset 0 0 20px rgba(0,0,0,0.3);
+    .spin-btn::after {
+      content:''; position:absolute; top:0; left:-100%; width:60%; height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
+      animation:shimmer 2.5s linear infinite;
     }
+    @keyframes shimmer{to{left:160%}}
+    .spin-btn:hover:not(:disabled)  { transform:translateY(-2px); box-shadow:0 8px 0 #5a001f,0 0 50px rgba(255,45,120,.5); }
+    .spin-btn:active:not(:disabled) { transform:translateY(4px); box-shadow:0 2px 0 #5a001f; }
+    .spin-btn:disabled { opacity:.6; cursor:not-allowed; }
 
-    .slot-screen {
-      background: #0a0a0a;
-      border-radius: 8px;
-      border: 3px solid var(--gold);
-      display: flex;
-      gap: 4px;
-      padding: 8px;
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-
-    .reel {
-      flex: 1;
-      background: #111;
-      border-radius: 4px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      border: 1px solid #333;
-      animation: reel-spin 0.3s steps(1) infinite;
-      position: relative;
-      overflow: hidden;
-    }
-    .reel:nth-child(1) { animation-duration: 0.25s; }
-    .reel:nth-child(2) { animation-duration: 0.3s; animation-delay: 0.05s; }
-    .reel:nth-child(3) { animation-duration: 0.35s; animation-delay: 0.1s; }
-
-    @keyframes reel-spin {
-      0%   { content: '🐒'; }
-      14%  { filter: brightness(1.4); }
-      28%  { filter: brightness(0.8); }
-      42%  { filter: brightness(1.2); }
-      57%  { filter: brightness(0.9); }
-      71%  { filter: brightness(1.3); }
-      85%  { filter: brightness(0.7); }
-      100% { filter: brightness(1); }
-    }
-
-    .slot-lever-wrap {
-      position: absolute;
-      right: -28px;
-      top: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    /* lever */
+    .lever-wrap {
+      position:absolute; right:-42px; top:55px;
+      display:flex; flex-direction:column; align-items:center; cursor:pointer;
+      transition:transform .2s;
     }
     .lever-ball {
-      width: 18px; height: 18px;
-      background: radial-gradient(circle at 35% 35%, #FFD700, #B8860B);
-      border-radius: 50%;
-      border: 2px solid var(--gold);
-      box-shadow: 0 0 10px rgba(255,215,0,0.6);
-      animation: lever-pull 1.5s ease-in-out infinite;
+      width:26px; height:26px;
+      background:radial-gradient(circle at 35% 35%,#FFE566,#B8860B);
+      border-radius:50%; border:2px solid var(--gold); box-shadow:0 0 12px rgba(255,215,0,.6);
+      transition:transform .3s;
     }
-    .lever-stick {
-      width: 5px; height: 55px;
-      background: linear-gradient(to bottom, #888, #555);
-      border-radius: 3px;
-      animation: lever-pull 1.5s ease-in-out infinite;
+    .lever-rod {
+      width:7px; height:70px;
+      background:linear-gradient(to right,#aaa,#555,#aaa);
+      border-radius:4px; transform-origin:bottom center; transition:transform .3s ease-in-out;
     }
-    @keyframes lever-pull {
-      0%, 100% { transform: rotate(-20deg); transform-origin: bottom center; }
-      50% { transform: rotate(20deg); transform-origin: bottom center; }
-    }
+    .lever-base { width:22px; height:10px; background:linear-gradient(to bottom,#888,#444); border-radius:4px; }
+    .lever-wrap.pulled .lever-rod  { transform:rotate(30deg); }
+    .lever-wrap.pulled .lever-ball { transform:translateX(14px); }
 
-    .slot-btn {
-      display: block;
-      width: 100%;
-      background: linear-gradient(to bottom, #FF2D78, #C0003C);
-      border: 3px solid var(--gold);
-      border-radius: 8px;
-      padding: 6px;
-      color: var(--gold);
-      font-family: 'Fredoka One', cursive;
-      font-size: 0.9rem;
-      letter-spacing: 1px;
-      cursor: pointer;
-      box-shadow: 0 4px 0 #8B0022;
+    /* paytable */
+    .paytable {
+      position:relative; z-index:5; width:min(420px,96vw);
+      margin-top:28px; background:rgba(255,215,0,.04);
+      border:2px solid rgba(255,215,0,.2); border-radius:18px; padding:18px 20px;
     }
+    .pt-title { text-align:center; font-size:1.2rem; color:var(--gold); margin-bottom:12px; letter-spacing:2px; }
+    .pt-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:5px 0; border-bottom:1px solid rgba(255,215,0,.08);
+      font-family:'Caveat',cursive; font-size:1rem; color:var(--cream);
+    }
+    .pt-row:last-child{border:none}
+    .pt-syms { font-size:1.3rem; letter-spacing:4px; }
+    .pt-prize { color:var(--gold); }
 
-    .slot-coins {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 6px;
+    /* confetti */
+    .confetti-wrap { position:fixed; inset:0; pointer-events:none; z-index:100; overflow:hidden; }
+    .cp {
+      position:absolute; top:-20px; width:10px; height:10px; border-radius:2px;
+      animation:cfall linear forwards;
+      animation-duration:var(--dur); animation-delay:var(--delay);
+      left:var(--left); background:var(--col); transform:rotate(var(--rot));
     }
-    .coin {
-      width: 22px; height: 22px;
-      background: radial-gradient(circle at 35% 35%, #FFE566, #CC9900);
-      border-radius: 50%;
-      border: 2px solid #B8860B;
-      animation: coin-bounce var(--d, 0.8s) ease-in-out infinite;
-      animation-delay: var(--delay, 0s);
-    }
-    @keyframes coin-bounce {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-12px) rotate(180deg); }
-    }
+    @keyframes cfall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
 
-    /* MONKEY SVG */
-    .monkey-svg {
-      position: absolute;
-      bottom: 85px;
-      left: 50%;
-      transform: translateX(-65%);
-      font-size: 6rem;
-      animation: monkey-dance 1.2s ease-in-out infinite;
-      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5));
-      z-index: 5;
-    }
-    @keyframes monkey-dance {
-      0%, 100% { transform: translateX(-65%) rotate(-5deg) scale(1); }
-      50% { transform: translateX(-65%) rotate(8deg) scale(1.05); }
-    }
+    @keyframes credit-flash{0%,100%{color:var(--gold)}50%{color:var(--hot-pink);text-shadow:0 0 20px var(--hot-pink)}}
+    .credit-low{animation:credit-flash .6s infinite}
 
-    /* SPARKS */
-    .sparks {
-      position: absolute;
-      top: 60px;
-      right: 60px;
-      pointer-events: none;
+    footer {
+      position:relative; z-index:5; margin:30px 0 50px;
+      font-family:'Caveat',cursive; font-size:1rem; color:rgba(255,245,214,.3); text-align:center;
     }
-    .spark {
-      position: absolute;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      animation: spark-fly var(--dur, 1.2s) ease-out infinite;
-      animation-delay: var(--delay, 0s);
-    }
-    .spark:nth-child(1) { background: var(--gold); --dur: 1.1s; --delay: 0s; top: 0; left: 0; }
-    .spark:nth-child(2) { background: var(--hot-pink); --dur: 1.4s; --delay: 0.3s; top: -10px; left: 20px; }
-    .spark:nth-child(3) { background: var(--neon-green); --dur: 0.9s; --delay: 0.6s; top: 10px; left: 35px; }
-    .spark:nth-child(4) { background: var(--orange); --dur: 1.2s; --delay: 0.9s; top: -20px; left: 50px; }
+    footer strong{color:var(--gold)}
 
-    @keyframes spark-fly {
-      0% { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(-60px) scale(0); opacity: 0; }
-    }
-
-    /* STORY SECTION */
-    .story-section {
-      position: relative;
-      z-index: 5;
-      max-width: 700px;
-      margin: 60px auto 0;
-      padding: 0 20px;
-    }
-
-    .story-card {
-      background: linear-gradient(135deg, rgba(255,107,0,0.08), rgba(255,45,120,0.05));
-      border: 2px solid rgba(255,215,0,0.3);
-      border-radius: 24px;
-      padding: 40px;
-      backdrop-filter: blur(10px);
-      position: relative;
-      overflow: hidden;
-    }
-    .story-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -30%;
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(255,215,0,0.06) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .chapter-label {
-      font-family: 'Caveat', cursive;
-      font-size: 1rem;
-      color: var(--hot-pink);
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      text-shadow: 0 0 15px var(--hot-pink);
-      margin-bottom: 12px;
-    }
-
-    .story-heading {
-      font-family: 'Fredoka One', cursive;
-      font-size: clamp(1.8rem, 5vw, 2.8rem);
-      color: var(--gold);
-      line-height: 1.1;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 0 rgba(255,107,0,0.5);
-    }
-
-    .story-text {
-      font-family: 'Caveat', cursive;
-      font-size: 1.25rem;
-      color: var(--cream);
-      line-height: 1.7;
-      opacity: 0.9;
-    }
-    .story-text strong {
-      color: var(--neon-green);
-      text-shadow: 0 0 10px rgba(57,255,20,0.4);
-    }
-
-    /* TIMELINE */
-    .timeline {
-      position: relative;
-      z-index: 5;
-      max-width: 700px;
-      margin: 50px auto 0;
-      padding: 0 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .tl-item {
-      display: flex;
-      gap: 20px;
-      align-items: flex-start;
-      padding: 0 0 40px 0;
-      position: relative;
-    }
-    .tl-item::before {
-      content: '';
-      position: absolute;
-      left: 27px;
-      top: 52px;
-      bottom: 0;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--gold), transparent);
-    }
-    .tl-item:last-child::before { display: none; }
-
-    .tl-icon {
-      flex-shrink: 0;
-      width: 56px; height: 56px;
-      background: linear-gradient(135deg, var(--deep-purple), #2d0050);
-      border: 2px solid var(--gold);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-      box-shadow: 0 0 20px rgba(255,215,0,0.3);
-      animation: icon-glow 2s ease-in-out infinite;
-      animation-delay: var(--tl-delay, 0s);
-    }
-    @keyframes icon-glow {
-      0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.3); }
-      50% { box-shadow: 0 0 40px rgba(255,215,0,0.7), 0 0 60px rgba(255,215,0,0.2); }
-    }
-
-    .tl-content {
-      padding-top: 8px;
-    }
-    .tl-title {
-      font-family: 'Fredoka One', cursive;
-      font-size: 1.3rem;
-      color: var(--gold);
-      margin-bottom: 6px;
-    }
-    .tl-desc {
-      font-family: 'Caveat', cursive;
-      font-size: 1.1rem;
-      color: rgba(255,245,214,0.8);
-      line-height: 1.5;
-    }
-    .tl-desc strong { color: var(--neon-green); }
-
-    /* WIN BANNER */
-    .win-banner {
-      position: relative;
-      z-index: 5;
-      margin: 50px 20px;
-      background: linear-gradient(135deg, #1A0030, #2d0050);
-      border: 3px solid var(--gold);
-      border-radius: 20px;
-      padding: 40px;
+    /* HERO QUOTE */
+    .hero-quote {
+      position: relative; z-index: 5;
       text-align: center;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-      overflow: hidden;
+      margin: 0 20px 32px;
+      padding: 30px 28px 24px;
+      background: linear-gradient(135deg, rgba(255,107,0,.07), rgba(255,45,120,.05));
+      border: 2px solid rgba(255,215,0,.25);
+      border-radius: 24px;
+      max-width: 420px;
+      width: min(420px, 96vw);
+      backdrop-filter: blur(6px);
     }
-    .win-banner::before,
-    .win-banner::after {
-      content: '★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★';
-      position: absolute;
-      font-size: 1.2rem;
-      color: var(--gold);
-      opacity: 0.2;
-      left: 0; right: 0;
-      letter-spacing: 8px;
-    }
-    .win-banner::before { top: 8px; }
-    .win-banner::after { bottom: 8px; }
-
-    .jackpot-text {
+    .hq-top {
       font-family: 'Fredoka One', cursive;
-      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-size: clamp(2rem, 9vw, 3.8rem);
+      color: var(--gold);
+      text-shadow: 3px 3px 0 var(--orange), 0 0 40px rgba(255,215,0,.4);
+      letter-spacing: 4px;
+      line-height: 1;
+      animation: sway 3s ease-in-out infinite;
+    }
+    .hq-mid {
+      font-family: 'Caveat', cursive;
+      font-size: clamp(1.3rem, 5vw, 2rem);
+      color: var(--neon-green);
+      text-shadow: 0 0 18px var(--neon-green);
+      margin: 6px 0 10px;
+    }
+    .hq-divider {
+      font-size: 1rem;
+      color: rgba(255,215,0,.4);
+      letter-spacing: 8px;
+      margin-bottom: 10px;
+    }
+    .hq-bot {
+      font-family: 'Caveat', cursive;
+      font-size: clamp(1rem, 4vw, 1.4rem);
+      color: var(--cream);
+      opacity: .75;
+      margin-bottom: 4px;
+      font-style: italic;
+    }
+    .hq-big {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(2.2rem, 10vw, 4.2rem);
+      line-height: 1;
       background: linear-gradient(to bottom, #FFE566, #FF6B00, #FF2D78);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      animation: jackpot-pulse 1.5s ease-in-out infinite;
-      text-shadow: none;
-      line-height: 1;
+      filter: drop-shadow(0 0 14px rgba(255,107,0,.5));
+      animation: bigpulse 2s ease-in-out infinite;
+    }
+    @keyframes bigpulse {
+      0%,100% { filter: drop-shadow(0 0 10px rgba(255,107,0,.4)); transform: scale(1); }
+      50%      { filter: drop-shadow(0 0 28px rgba(255,107,0,.9)); transform: scale(1.03); }
+    }
+    .hq-monkey {
+      font-size: 2.8rem;
+      margin-top: 8px;
       display: block;
+      animation: monkeyBounce 1s ease-in-out infinite;
     }
-    @keyframes jackpot-pulse {
-      0%, 100% { filter: brightness(1) drop-shadow(0 0 10px rgba(255,215,0,0.5)); transform: scale(1); }
-      50% { filter: brightness(1.3) drop-shadow(0 0 30px rgba(255,215,0,0.9)); transform: scale(1.03); }
+    @keyframes monkeyBounce {
+      0%,100% { transform: translateY(0) rotate(-5deg); }
+      50%      { transform: translateY(-8px) rotate(6deg); }
     }
-
-    .jackpot-sub {
-      font-family: 'Caveat', cursive;
-      font-size: 1.4rem;
-      color: var(--cream);
-      margin-top: 12px;
-    }
-
-    .slot-row {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin: 20px 0;
-    }
-    .big-reel {
-      width: 80px; height: 80px;
-      background: #111;
-      border: 3px solid var(--gold);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      animation: big-reel-flash 0.6s steps(1) infinite;
-      box-shadow: 0 0 20px rgba(255,215,0,0.3);
-    }
-    .big-reel:nth-child(2) { animation-delay: 0.2s; }
-    .big-reel:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes big-reel-flash {
-      0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.3); }
-      50% { box-shadow: 0 0 50px rgba(255,215,0,0.9), 0 0 80px rgba(255,215,0,0.4); }
-    }
-
-    /* COINS RAIN */
-    .coins-rain {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 1;
-      overflow: hidden;
-    }
-    .falling-coin {
-      position: absolute;
-      top: -40px;
-      font-size: 1.4rem;
-      animation: fall linear infinite;
-      animation-duration: var(--fall-dur, 4s);
-      animation-delay: var(--fall-delay, 0s);
-      left: var(--fall-left, 50%);
-      opacity: 0.4;
-    }
-    @keyframes fall {
-      to { transform: translateY(110vh) rotate(720deg); }
-    }
-
-    /* FOOTER */
-    footer {
-      position: relative;
-      z-index: 5;
-      text-align: center;
-      padding: 40px 20px 60px;
-      font-family: 'Caveat', cursive;
-      font-size: 1.1rem;
-      color: rgba(255,245,214,0.4);
-    }
-    footer strong { color: var(--gold); }
   </style>
 </head>
 <body>
 
-  <!-- FALLING COINS -->
-  <div class="coins-rain" id="coinsRain"></div>
+<div class="stars"></div>
+<div class="confetti-wrap" id="confettiWrap"></div>
 
-  <!-- MARQUEE -->
-  <div class="marquee-wrap">
-    <div class="marquee-track" id="marquee"></div>
+<h1 class="page-title">🐒 MĒRKAĶIS</h1>
+<p class="page-sub">Dzimis spēlēt aparātus ✦ Prestilon.com</p>
+
+<div class="hero-quote">
+  <div class="hq-top">DIMITRIJEN</div>
+  <div class="hq-mid">mazais mērķēns!</div>
+  <div class="hq-divider">— ✦ —</div>
+  <div class="hq-bot">esi kā es —</div>
+  <div class="hq-big">mazais<br>PERTĒĶENS!</div>
+  <div class="hq-monkey">🐒</div>
+</div>
+
+<div class="machine" id="machine">
+
+  <!-- LEVER -->
+  <div class="lever-wrap" id="lever" title="Velc sviru!">
+    <div class="lever-ball"></div>
+    <div class="lever-rod"></div>
+    <div class="lever-base"></div>
   </div>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="title-badge">🎰 Izcelsmes stāsts 🎰</div>
-    <h1 class="main-title">MĒRKAĶIS</h1>
-    <p class="subtitle">Dzimis spēlēt aparātus ✦ Dzīvo spēlēt aparātus</p>
-
-    <!-- MONKEY + SLOT STAGE -->
-    <div class="monkey-stage">
-      <div class="jungle-backdrop"></div>
-
-      <!-- sparks -->
-      <div class="sparks">
-        <div class="spark"></div>
-        <div class="spark"></div>
-        <div class="spark"></div>
-        <div class="spark"></div>
-      </div>
-
-      <!-- monkey -->
-      <div class="monkey-svg">🐒</div>
-
-      <!-- slot machine -->
-      <div class="slot-machine">
-        <div class="slot-body">
-          <div class="slot-screen">
-            <div class="reel" id="r1">🍒</div>
-            <div class="reel" id="r2">🍋</div>
-            <div class="reel" id="r3">🍒</div>
-          </div>
-          <button class="slot-btn" onclick="spin()">🎰 GRIEZT!</button>
-        </div>
-
-        <!-- lever -->
-        <div class="slot-lever-wrap">
-          <div class="lever-ball"></div>
-          <div class="lever-stick"></div>
-        </div>
-      </div>
-
-      <!-- coins under slot -->
-      <div class="slot-coins">
-        <div class="coin" style="--d:0.7s; --delay:0s"></div>
-        <div class="coin" style="--d:0.9s; --delay:0.2s"></div>
-        <div class="coin" style="--d:0.8s; --delay:0.4s"></div>
-        <div class="coin" style="--d:1.0s; --delay:0.1s"></div>
-        <div class="coin" style="--d:0.75s; --delay:0.3s"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- STORY -->
-  <section class="story-section">
-    <div class="story-card">
-      <p class="chapter-label">✦ Nodaļa I ✦</p>
-      <h2 class="story-heading">Kā Mērkaķis nāca pasaulē</h2>
-      <p class="story-text">
-        Saka, ka viņš <strong>nedzima kā parasts mērkaķis</strong>.<br><br>
-        Nē — viņš parādījās tajā naktī, kad kāds aizmirsa izslēgt 
-        spēļu aparātu džungļu vidū. Trīs ķirši. Trīs reizes pēc kārtas. 
-        <strong>DŽEKPOTS.</strong><br><br>
-        Un no tā zelta gaismas blāzmas — iznāca viņš. Mazs. Pūkains. 
-        Ar rokām jau izstieptām pret sviru.
-      </p>
-    </div>
-  </section>
-
-  <!-- TIMELINE -->
-  <section class="timeline">
-
-    <div class="tl-item">
-      <div class="tl-icon" style="--tl-delay:0s">🌴</div>
-      <div class="tl-content">
-        <div class="tl-title">Pirmā diena — Džungļi zvana</div>
-        <div class="tl-desc">Mērkaķis atver acis. Viss zaļš. Viss grezns. Bet viņš <strong>jūt tikai vienu lietu</strong> — kur ir aparāts?</div>
-      </div>
-    </div>
-
-    <div class="tl-item">
-      <div class="tl-icon" style="--tl-delay:0.4s">🎰</div>
-      <div class="tl-content">
-        <div class="tl-title">Pirmā spēle — Mīlestība no pirmā grieza</div>
-        <div class="tl-desc">Viņš atrod veco aparātu. Ievelk sviru. Ripa griežas. <strong>🍒 🍒 🍒</strong> — monētas klaudz kā krusa.</div>
-      </div>
-    </div>
-
-    <div class="tl-item">
-      <div class="tl-icon" style="--tl-delay:0.8s">💰</div>
-      <div class="tl-content">
-        <div class="tl-title">Leģenda aug — Citi mērkaķi klausās</div>
-        <div class="tl-desc">Baumas izplatās: <strong>"Ir kāds, kas nekad nezaudē."</strong> Visi nāk skatīties. Viņš tikai smaida un velk sviru vēlreiz.</div>
-      </div>
-    </div>
-
-    <div class="tl-item">
-      <div class="tl-icon" style="--tl-delay:1.2s">👑</div>
-      <div class="tl-content">
-        <div class="tl-title">Kronēšana — Džungļu Karaļs</div>
-        <div class="tl-desc">Viņi deva viņam kroni no <strong>zelta monētām</strong>. Viņš to uzlika, pagriezās, un vēlreiz ievelka sviru.</div>
-      </div>
-    </div>
-
-    <div class="tl-item">
-      <div class="tl-icon" style="--tl-delay:1.6s">🌟</div>
-      <div class="tl-content">
-        <div class="tl-title">Šodien — Leģenda turpinās</div>
-        <div class="tl-desc">Mērkaķis joprojām spēlē. Katru ritu. Katru vakaru. <strong>Jo viņš nedzima lai atpūstos — viņš dzima lai spēlētu.</strong></div>
-      </div>
-    </div>
-
-  </section>
-
-  <!-- WIN BANNER -->
-  <div class="win-banner">
-    <div class="slot-row">
-      <div class="big-reel">🐒</div>
-      <div class="big-reel">🐒</div>
-      <div class="big-reel">🐒</div>
-    </div>
-    <span class="jackpot-text">DŽEKPOTS!</span>
-    <p class="jackpot-sub">Trīs mērkaķi = bezmaksas dzīve 🎉</p>
+  <!-- lights -->
+  <div class="light-strip">
+    <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
+    <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
+    <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
   </div>
 
-  <!-- FOOTER -->
-  <footer>
-    <strong>MĒRKAĶIS</strong> · Dzimis spēlēt aparātus · Prestilon.com
-  </footer>
+  <div class="machine-plate"><span>🎰 MĒRKAĶIS 777 🎰</span></div>
+
+  <!-- REELS -->
+  <div class="reels-frame">
+    <div class="win-line"></div>
+    <div class="reels-row">
+      <div class="reel-wrap" id="reel0"><div class="reel-inner" id="inner0"><div class="reel-symbol">🍒</div></div></div>
+      <div class="reel-wrap" id="reel1"><div class="reel-inner" id="inner1"><div class="reel-symbol">🍋</div></div></div>
+      <div class="reel-wrap" id="reel2"><div class="reel-inner" id="inner2"><div class="reel-symbol">🍇</div></div></div>
+    </div>
+  </div>
+
+  <!-- info -->
+  <div class="info-row">
+    <div class="info-box">
+      <div class="info-label">💰 Kredīti</div>
+      <div class="info-value" id="creditsVal">100</div>
+    </div>
+    <div class="info-box">
+      <div class="info-label">🎯 Likme</div>
+      <div class="info-value" id="betVal">5</div>
+    </div>
+    <div class="info-box">
+      <div class="info-label">🏆 Uzvara</div>
+      <div class="info-value" id="wonVal">0</div>
+    </div>
+  </div>
+
+  <div class="msg-box" id="msgBox">🐒 Velc sviru vai nospied GRIEZT!</div>
+
+  <div class="bet-row">
+    <span class="bet-label">LIKME:</span>
+    <button class="bet-btn" data-bet="1"  id="bet1"  onclick="setBet(1)">×1</button>
+    <button class="bet-btn active" data-bet="5"  id="bet5"  onclick="setBet(5)">×5</button>
+    <button class="bet-btn" data-bet="10" id="bet10" onclick="setBet(10)">×10</button>
+    <button class="bet-btn" data-bet="25" id="bet25" onclick="setBet(25)">MAX</button>
+  </div>
+
+  <button class="spin-btn" id="spinBtn" onclick="doSpin()">🎰 GRIEZT!</button>
+</div>
+
+<!-- PAYTABLE -->
+<div class="paytable">
+  <div class="pt-title">📋 IZMAKSAS</div>
+  <div class="pt-row"><span class="pt-syms">🐒🐒🐒</span><span class="pt-prize">DŽEKPOTS ×50</span></div>
+  <div class="pt-row"><span class="pt-syms">7️⃣7️⃣7️⃣</span><span class="pt-prize">×30</span></div>
+  <div class="pt-row"><span class="pt-syms">💎💎💎</span><span class="pt-prize">×20</span></div>
+  <div class="pt-row"><span class="pt-syms">🔔🔔🔔</span><span class="pt-prize">×15</span></div>
+  <div class="pt-row"><span class="pt-syms">⭐⭐⭐</span><span class="pt-prize">×10</span></div>
+  <div class="pt-row"><span class="pt-syms">🍇🍇🍇</span><span class="pt-prize">×8</span></div>
+  <div class="pt-row"><span class="pt-syms">🍋🍋🍋</span><span class="pt-prize">×6</span></div>
+  <div class="pt-row"><span class="pt-syms">🍒🍒🍒</span><span class="pt-prize">×4</span></div>
+  <div class="pt-row"><span class="pt-syms">🍒🍒 ✦</span><span class="pt-prize">×2</span></div>
+</div>
+
+<footer><strong>MĒRKAĶIS</strong> · Tikai izklaidei · Prestilon.com</footer>
 
 <script>
-  // MARQUEE
-  const items = ['🎰 MĒRKAĶIS', '🍒 DŽEKPOTS', '💰 MONĒTAS', '🐒 SPĒLĒT', '⭐ PRESTILON', '🎲 APARĀTI', '🌴 DŽUNGĻI'];
-  const track = document.getElementById('marquee');
-  [...items, ...items, ...items].forEach(t => {
-    const s = document.createElement('span');
-    s.textContent = t;
-    track.appendChild(s);
-  });
+// ── CONFIG ───────────────────────────────────────────────────────────────────
+// weighted symbol pool: more 🍒 = appears more often, 🐒 = rarest
+const POOL = [
+  '🍒','🍒','🍒','🍒',
+  '🍋','🍋','🍋',
+  '🍇','🍇','🍇',
+  '🔔','🔔',
+  '⭐','⭐',
+  '💎',
+  '7️⃣',
+  '🐒'
+];
 
-  // COINS RAIN
-  const rain = document.getElementById('coinsRain');
-  const coinEmojis = ['🪙','💰','✨','⭐'];
-  for (let i = 0; i < 18; i++) {
-    const c = document.createElement('div');
-    c.className = 'falling-coin';
-    c.textContent = coinEmojis[Math.floor(Math.random() * coinEmojis.length)];
-    c.style.setProperty('--fall-dur', (3 + Math.random() * 5) + 's');
-    c.style.setProperty('--fall-delay', (Math.random() * 8) + 's');
-    c.style.setProperty('--fall-left', (Math.random() * 100) + '%');
-    rain.appendChild(c);
-  }
+const MULTIPLIERS = {
+  '🐒': 50, '7️⃣': 30, '💎': 20,
+  '🔔': 15, '⭐': 10,  '🍇': 8,
+  '🍋': 6,  '🍒': 4
+};
 
-  // SLOT SPIN
-  const symbols = ['🍒','🍋','🔔','⭐','💎','🐒','7️⃣','🍇'];
-  let spinning = false;
-  function spin() {
-    if (spinning) return;
-    spinning = true;
-    const reels = [document.getElementById('r1'), document.getElementById('r2'), document.getElementById('r3')];
-    let ticks = 0;
-    const interval = setInterval(() => {
-      reels.forEach(r => r.textContent = symbols[Math.floor(Math.random() * symbols.length)]);
-      ticks++;
-      if (ticks > 14) {
-        clearInterval(interval);
-        // small chance of jackpot
-        if (Math.random() < 0.25) reels.forEach(r => r.textContent = '🐒');
-        spinning = false;
+// ── STATE ────────────────────────────────────────────────────────────────────
+let credits  = 100;
+let bet      = 5;
+let busy     = false;
+
+// ── AUDIO ────────────────────────────────────────────────────────────────────
+let audioCtx = null;
+function ac() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function beep(freq, type, dur, vol = 0.12) {
+  try {
+    const c = ac(), o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination);
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+    o.start(); o.stop(c.currentTime + dur);
+  } catch(e) {}
+}
+function sfxSpin()    { beep(220, 'square', .05, .07); }
+function sfxStop()    { beep(440, 'sine',   .12, .12); }
+function sfxWin()     { [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,'sine',.2,.14),i*80)); }
+function sfxJackpot() { [523,659,784,1047,1568].forEach((f,i)=>setTimeout(()=>beep(f,'square',.3,.18),i*70)); }
+function sfxLose()    { beep(180, 'sawtooth', .28, .09); }
+
+// ── REEL ANIMATION ───────────────────────────────────────────────────────────
+// We animate using translateY and swap symbols each frame
+function animateReel(reelIdx, finalSym, stopDelay) {
+  return new Promise(resolve => {
+    const inner = document.getElementById('inner' + reelIdx);
+    let tick = 0;
+    const maxTicks = Math.floor(stopDelay / 60);
+
+    const run = setInterval(() => {
+      const rand = POOL[Math.floor(Math.random() * POOL.length)];
+      inner.children[0].textContent = rand;
+      tick++;
+      sfxSpin();
+      if (tick >= maxTicks) {
+        clearInterval(run);
+        inner.children[0].textContent = finalSym;
+        sfxStop();
+        resolve();
       }
-    }, 80);
+    }, 60);
+  });
+}
+
+// ── SET BET ──────────────────────────────────────────────────────────────────
+function setBet(val) {
+  if (busy) return;
+  bet = val;
+  document.getElementById('betVal').textContent = val;
+  document.querySelectorAll('.bet-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.bet) === val);
+  });
+}
+
+// ── MAIN SPIN ────────────────────────────────────────────────────────────────
+async function doSpin() {
+  if (busy) return;
+  if (credits < bet) {
+    setMsg('❌ Nav pietiekami kredītu!', 'lose');
+    return;
   }
+
+  busy = true;
+  setControls(true);
+  credits -= bet;
+  updateUI(0);
+  setMsg('🎲 Griežas...', '');
+
+  // clear winners
+  for (let i = 0; i < 3; i++) document.getElementById('reel' + i).classList.remove('winner');
+
+  // pick results
+  const r = [rand(), rand(), rand()];
+
+  // animate reels sequentially with overlap
+  await Promise.all([
+    animateReel(0, r[0], 900),
+    animateReel(1, r[1], 1300),
+    animateReel(2, r[2], 1700)
+  ]);
+
+  // evaluate
+  await evaluate(r);
+
+  busy = false;
+  setControls(false);
+}
+
+function rand() { return POOL[Math.floor(Math.random() * POOL.length)]; }
+
+// ── EVALUATE ─────────────────────────────────────────────────────────────────
+async function evaluate(r) {
+  const [a, b, c] = r;
+  let mult = 0, msg = '', type = '', isJackpot = false;
+
+  if (a === b && b === c) {
+    mult = MULTIPLIERS[a] ?? 4;
+    if (a === '🐒') {
+      isJackpot = true;
+      msg  = `🎉 DŽEKPOTS! +${mult * bet} kredīti!`;
+      type = 'jackpot';
+    } else {
+      msg  = `✨ ${a}${b}${c} — Uzvara! +${mult * bet}`;
+      type = 'win';
+    }
+    for (let i = 0; i < 3; i++) document.getElementById('reel' + i).classList.add('winner');
+  } else if (a === '🍒' && b === '🍒') {
+    mult = 2;
+    msg  = `🍒🍒 Divi ķirši! +${mult * bet}`;
+    type = 'win';
+    document.getElementById('reel0').classList.add('winner');
+    document.getElementById('reel1').classList.add('winner');
+  } else {
+    msg  = '😔 Neveicas! Mēģini vēlreiz!';
+    type = 'lose';
+    sfxLose();
+  }
+
+  let won = 0;
+  if (mult > 0) {
+    won = mult * bet;
+    credits += won;
+    isJackpot ? sfxJackpot() : sfxWin();
+    spawnConfetti(isJackpot ? 90 : (mult >= 10 ? 35 : 0));
+  }
+
+  updateUI(won);
+  setMsg(msg, type);
+
+  if (credits <= 0) {
+    await delay(2500);
+    credits = 100;
+    updateUI(0);
+    setMsg('🐒 Papildināts! Mēģini vēlreiz!', '');
+  }
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function updateUI(won) {
+  const cv = document.getElementById('creditsVal');
+  cv.textContent = credits;
+  cv.className   = 'info-value' + (credits < 10 ? ' credit-low' : '');
+  document.getElementById('wonVal').textContent = won;
+}
+
+function setMsg(text, type) {
+  const b = document.getElementById('msgBox');
+  b.textContent = text;
+  b.className   = 'msg-box ' + type;
+}
+
+function setControls(disabled) {
+  document.getElementById('spinBtn').disabled = disabled;
+  document.querySelectorAll('.bet-btn').forEach(b => b.disabled = disabled);
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── LEVER ────────────────────────────────────────────────────────────────────
+document.getElementById('lever').addEventListener('click', () => {
+  if (busy) return;
+  const lv = document.getElementById('lever');
+  lv.classList.add('pulled');
+  setTimeout(() => lv.classList.remove('pulled'), 500);
+  doSpin();
+});
+
+// ── KEYBOARD ─────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); doSpin(); }
+});
+
+// ── CONFETTI ─────────────────────────────────────────────────────────────────
+const COLS = ['#FFD700','#FF2D78','#39FF14','#FF6B00','#00CFFF','#fff','#a855f7'];
+function spawnConfetti(n) {
+  if (n === 0) return;
+  const wrap = document.getElementById('confettiWrap');
+  wrap.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const el = document.createElement('div');
+    el.className = 'cp';
+    el.style.cssText = `
+      --left:${Math.random()*100}%;
+      --dur:${1.4+Math.random()*2}s;
+      --delay:${Math.random()*.9}s;
+      --col:${COLS[Math.floor(Math.random()*COLS.length)]};
+      --rot:${Math.random()*360}deg;
+    `;
+    wrap.appendChild(el);
+  }
+  setTimeout(() => wrap.innerHTML = '', 4500);
+}
 </script>
 </body>
 </html>
