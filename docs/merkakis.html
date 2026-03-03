@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mērkaķis — Dzimis Spēlēt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Fredoka+One&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #FFD700;
+      --neon-green: #39FF14;
+      --hot-pink: #FF2D78;
+      --deep-purple: #1A0030;
+      --jungle-green: #1B4D1F;
+      --orange: #FF6B00;
+      --cream: #FFF5D6;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: var(--deep-purple);
+      font-family: 'Boogaloo', cursive;
+      overflow-x: hidden;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ctext y='28' font-size='28'%3E🐒%3C/text%3E%3C/svg%3E"), auto;
+    }
+
+    /* STARS BACKGROUND */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 20%, rgba(255,215,0,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 15%, rgba(255,215,0,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 45%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 80%, rgba(255,215,0,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 20% 85%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 65% 70%, rgba(255,215,0,0.3) 0%, transparent 100%),
+        radial-gradient(2px 2px at 42% 35%, rgba(255,215,0,0.7) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* MARQUEE HEADER */
+    .marquee-wrap {
+      background: repeating-linear-gradient(90deg, var(--gold) 0px, var(--gold) 2px, transparent 2px, transparent 18px);
+      border-top: 3px solid var(--gold);
+      border-bottom: 3px solid var(--gold);
+      overflow: hidden;
+      padding: 6px 0;
+      position: relative;
+      z-index: 10;
+    }
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee 18s linear infinite;
+      gap: 60px;
+    }
+    .marquee-track span {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem;
+      color: var(--deep-purple);
+      white-space: nowrap;
+      letter-spacing: 2px;
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px 20px;
+      text-align: center;
+    }
+
+    .title-badge {
+      background: var(--hot-pink);
+      color: var(--cream);
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.85rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      padding: 6px 20px;
+      border-radius: 100px;
+      margin-bottom: 18px;
+      box-shadow: 0 0 20px var(--hot-pink);
+      animation: pulse-badge 2s ease-in-out infinite;
+    }
+    @keyframes pulse-badge {
+      0%, 100% { box-shadow: 0 0 20px var(--hot-pink); }
+      50% { box-shadow: 0 0 45px var(--hot-pink), 0 0 80px rgba(255,45,120,0.3); }
+    }
+
+    .main-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(3.5rem, 12vw, 9rem);
+      color: var(--gold);
+      line-height: 0.9;
+      text-shadow:
+        4px 4px 0 var(--orange),
+        8px 8px 0 rgba(255,107,0,0.4),
+        0 0 80px rgba(255,215,0,0.3);
+      animation: title-wobble 4s ease-in-out infinite;
+    }
+    @keyframes title-wobble {
+      0%, 100% { transform: rotate(-1deg); }
+      50% { transform: rotate(1deg); }
+    }
+
+    .subtitle {
+      font-family: 'Caveat', cursive;
+      font-size: clamp(1.2rem, 4vw, 1.8rem);
+      color: var(--neon-green);
+      margin-top: 10px;
+      letter-spacing: 1px;
+      text-shadow: 0 0 20px var(--neon-green);
+    }
+
+    /* MONKEY HERO */
+    .monkey-stage {
+      position: relative;
+      margin: 40px auto 0;
+      width: min(500px, 90vw);
+      height: 380px;
+    }
+
+    .jungle-backdrop {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 100%, var(--jungle-green) 0%, rgba(27,77,31,0.2) 60%, transparent 80%);
+      border-radius: 50%;
+    }
+
+    /* Slot machine */
+    .slot-machine {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+    }
+
+    .slot-body {
+      background: linear-gradient(145deg, #C0392B, #8B1A1A);
+      border-radius: 16px;
+      padding: 12px;
+      border: 4px solid var(--gold);
+      box-shadow: 0 0 30px rgba(255,215,0,0.4), inset 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    .slot-screen {
+      background: #0a0a0a;
+      border-radius: 8px;
+      border: 3px solid var(--gold);
+      display: flex;
+      gap: 4px;
+      padding: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .reel {
+      flex: 1;
+      background: #111;
+      border-radius: 4px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      border: 1px solid #333;
+      animation: reel-spin 0.3s steps(1) infinite;
+      position: relative;
+      overflow: hidden;
+    }
+    .reel:nth-child(1) { animation-duration: 0.25s; }
+    .reel:nth-child(2) { animation-duration: 0.3s; animation-delay: 0.05s; }
+    .reel:nth-child(3) { animation-duration: 0.35s; animation-delay: 0.1s; }
+
+    @keyframes reel-spin {
+      0%   { content: '🐒'; }
+      14%  { filter: brightness(1.4); }
+      28%  { filter: brightness(0.8); }
+      42%  { filter: brightness(1.2); }
+      57%  { filter: brightness(0.9); }
+      71%  { filter: brightness(1.3); }
+      85%  { filter: brightness(0.7); }
+      100% { filter: brightness(1); }
+    }
+
+    .slot-lever-wrap {
+      position: absolute;
+      right: -28px;
+      top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .lever-ball {
+      width: 18px; height: 18px;
+      background: radial-gradient(circle at 35% 35%, #FFD700, #B8860B);
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 10px rgba(255,215,0,0.6);
+      animation: lever-pull 1.5s ease-in-out infinite;
+    }
+    .lever-stick {
+      width: 5px; height: 55px;
+      background: linear-gradient(to bottom, #888, #555);
+      border-radius: 3px;
+      animation: lever-pull 1.5s ease-in-out infinite;
+    }
+    @keyframes lever-pull {
+      0%, 100% { transform: rotate(-20deg); transform-origin: bottom center; }
+      50% { transform: rotate(20deg); transform-origin: bottom center; }
+    }
+
+    .slot-btn {
+      display: block;
+      width: 100%;
+      background: linear-gradient(to bottom, #FF2D78, #C0003C);
+      border: 3px solid var(--gold);
+      border-radius: 8px;
+      padding: 6px;
+      color: var(--gold);
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #8B0022;
+    }
+
+    .slot-coins {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+    }
+    .coin {
+      width: 22px; height: 22px;
+      background: radial-gradient(circle at 35% 35%, #FFE566, #CC9900);
+      border-radius: 50%;
+      border: 2px solid #B8860B;
+      animation: coin-bounce var(--d, 0.8s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+    @keyframes coin-bounce {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(180deg); }
+    }
+
+    /* MONKEY SVG */
+    .monkey-svg {
+      position: absolute;
+      bottom: 85px;
+      left: 50%;
+      transform: translateX(-65%);
+      font-size: 6rem;
+      animation: monkey-dance 1.2s ease-in-out infinite;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5));
+      z-index: 5;
+    }
+    @keyframes monkey-dance {
+      0%, 100% { transform: translateX(-65%) rotate(-5deg) scale(1); }
+      50% { transform: translateX(-65%) rotate(8deg) scale(1.05); }
+    }
+
+    /* SPARKS */
+    .sparks {
+      position: absolute;
+      top: 60px;
+      right: 60px;
+      pointer-events: none;
+    }
+    .spark {
+      position: absolute;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      animation: spark-fly var(--dur, 1.2s) ease-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+    .spark:nth-child(1) { background: var(--gold); --dur: 1.1s; --delay: 0s; top: 0; left: 0; }
+    .spark:nth-child(2) { background: var(--hot-pink); --dur: 1.4s; --delay: 0.3s; top: -10px; left: 20px; }
+    .spark:nth-child(3) { background: var(--neon-green); --dur: 0.9s; --delay: 0.6s; top: 10px; left: 35px; }
+    .spark:nth-child(4) { background: var(--orange); --dur: 1.2s; --delay: 0.9s; top: -20px; left: 50px; }
+
+    @keyframes spark-fly {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-60px) scale(0); opacity: 0; }
+    }
+
+    /* STORY SECTION */
+    .story-section {
+      position: relative;
+      z-index: 5;
+      max-width: 700px;
+      margin: 60px auto 0;
+      padding: 0 20px;
+    }
+
+    .story-card {
+      background: linear-gradient(135deg, rgba(255,107,0,0.08), rgba(255,45,120,0.05));
+      border: 2px solid rgba(255,215,0,0.3);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+    .story-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -30%;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255,215,0,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .chapter-label {
+      font-family: 'Caveat', cursive;
+      font-size: 1rem;
+      color: var(--hot-pink);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-shadow: 0 0 15px var(--hot-pink);
+      margin-bottom: 12px;
+    }
+
+    .story-heading {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      color: var(--gold);
+      line-height: 1.1;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 0 rgba(255,107,0,0.5);
+    }
+
+    .story-text {
+      font-family: 'Caveat', cursive;
+      font-size: 1.25rem;
+      color: var(--cream);
+      line-height: 1.7;
+      opacity: 0.9;
+    }
+    .story-text strong {
+      color: var(--neon-green);
+      text-shadow: 0 0 10px rgba(57,255,20,0.4);
+    }
+
+    /* TIMELINE */
+    .timeline {
+      position: relative;
+      z-index: 5;
+      max-width: 700px;
+      margin: 50px auto 0;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .tl-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      padding: 0 0 40px 0;
+      position: relative;
+    }
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: 27px;
+      top: 52px;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+    }
+    .tl-item:last-child::before { display: none; }
+
+    .tl-icon {
+      flex-shrink: 0;
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, var(--deep-purple), #2d0050);
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      box-shadow: 0 0 20px rgba(255,215,0,0.3);
+      animation: icon-glow 2s ease-in-out infinite;
+      animation-delay: var(--tl-delay, 0s);
+    }
+    @keyframes icon-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.3); }
+      50% { box-shadow: 0 0 40px rgba(255,215,0,0.7), 0 0 60px rgba(255,215,0,0.2); }
+    }
+
+    .tl-content {
+      padding-top: 8px;
+    }
+    .tl-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.3rem;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .tl-desc {
+      font-family: 'Caveat', cursive;
+      font-size: 1.1rem;
+      color: rgba(255,245,214,0.8);
+      line-height: 1.5;
+    }
+    .tl-desc strong { color: var(--neon-green); }
+
+    /* WIN BANNER */
+    .win-banner {
+      position: relative;
+      z-index: 5;
+      margin: 50px 20px;
+      background: linear-gradient(135deg, #1A0030, #2d0050);
+      border: 3px solid var(--gold);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      overflow: hidden;
+    }
+    .win-banner::before,
+    .win-banner::after {
+      content: '★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★';
+      position: absolute;
+      font-size: 1.2rem;
+      color: var(--gold);
+      opacity: 0.2;
+      left: 0; right: 0;
+      letter-spacing: 8px;
+    }
+    .win-banner::before { top: 8px; }
+    .win-banner::after { bottom: 8px; }
+
+    .jackpot-text {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      background: linear-gradient(to bottom, #FFE566, #FF6B00, #FF2D78);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: jackpot-pulse 1.5s ease-in-out infinite;
+      text-shadow: none;
+      line-height: 1;
+      display: block;
+    }
+    @keyframes jackpot-pulse {
+      0%, 100% { filter: brightness(1) drop-shadow(0 0 10px rgba(255,215,0,0.5)); transform: scale(1); }
+      50% { filter: brightness(1.3) drop-shadow(0 0 30px rgba(255,215,0,0.9)); transform: scale(1.03); }
+    }
+
+    .jackpot-sub {
+      font-family: 'Caveat', cursive;
+      font-size: 1.4rem;
+      color: var(--cream);
+      margin-top: 12px;
+    }
+
+    .slot-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .big-reel {
+      width: 80px; height: 80px;
+      background: #111;
+      border: 3px solid var(--gold);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      animation: big-reel-flash 0.6s steps(1) infinite;
+      box-shadow: 0 0 20px rgba(255,215,0,0.3);
+    }
+    .big-reel:nth-child(2) { animation-delay: 0.2s; }
+    .big-reel:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes big-reel-flash {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.3); }
+      50% { box-shadow: 0 0 50px rgba(255,215,0,0.9), 0 0 80px rgba(255,215,0,0.4); }
+    }
+
+    /* COINS RAIN */
+    .coins-rain {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .falling-coin {
+      position: absolute;
+      top: -40px;
+      font-size: 1.4rem;
+      animation: fall linear infinite;
+      animation-duration: var(--fall-dur, 4s);
+      animation-delay: var(--fall-delay, 0s);
+      left: var(--fall-left, 50%);
+      opacity: 0.4;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(720deg); }
+    }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 5;
+      text-align: center;
+      padding: 40px 20px 60px;
+      font-family: 'Caveat', cursive;
+      font-size: 1.1rem;
+      color: rgba(255,245,214,0.4);
+    }
+    footer strong { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+  <!-- FALLING COINS -->
+  <div class="coins-rain" id="coinsRain"></div>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track" id="marquee"></div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="title-badge">🎰 Izcelsmes stāsts 🎰</div>
+    <h1 class="main-title">MĒRKAĶIS</h1>
+    <p class="subtitle">Dzimis spēlēt aparātus ✦ Dzīvo spēlēt aparātus</p>
+
+    <!-- MONKEY + SLOT STAGE -->
+    <div class="monkey-stage">
+      <div class="jungle-backdrop"></div>
+
+      <!-- sparks -->
+      <div class="sparks">
+        <div class="spark"></div>
+        <div class="spark"></div>
+        <div class="spark"></div>
+        <div class="spark"></div>
+      </div>
+
+      <!-- monkey -->
+      <div class="monkey-svg">🐒</div>
+
+      <!-- slot machine -->
+      <div class="slot-machine">
+        <div class="slot-body">
+          <div class="slot-screen">
+            <div class="reel" id="r1">🍒</div>
+            <div class="reel" id="r2">🍋</div>
+            <div class="reel" id="r3">🍒</div>
+          </div>
+          <button class="slot-btn" onclick="spin()">🎰 GRIEZT!</button>
+        </div>
+
+        <!-- lever -->
+        <div class="slot-lever-wrap">
+          <div class="lever-ball"></div>
+          <div class="lever-stick"></div>
+        </div>
+      </div>
+
+      <!-- coins under slot -->
+      <div class="slot-coins">
+        <div class="coin" style="--d:0.7s; --delay:0s"></div>
+        <div class="coin" style="--d:0.9s; --delay:0.2s"></div>
+        <div class="coin" style="--d:0.8s; --delay:0.4s"></div>
+        <div class="coin" style="--d:1.0s; --delay:0.1s"></div>
+        <div class="coin" style="--d:0.75s; --delay:0.3s"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY -->
+  <section class="story-section">
+    <div class="story-card">
+      <p class="chapter-label">✦ Nodaļa I ✦</p>
+      <h2 class="story-heading">Kā Mērkaķis nāca pasaulē</h2>
+      <p class="story-text">
+        Saka, ka viņš <strong>nedzima kā parasts mērkaķis</strong>.<br><br>
+        Nē — viņš parādījās tajā naktī, kad kāds aizmirsa izslēgt 
+        spēļu aparātu džungļu vidū. Trīs ķirši. Trīs reizes pēc kārtas. 
+        <strong>DŽEKPOTS.</strong><br><br>
+        Un no tā zelta gaismas blāzmas — iznāca viņš. Mazs. Pūkains. 
+        Ar rokām jau izstieptām pret sviru.
+      </p>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-icon" style="--tl-delay:0s">🌴</div>
+      <div class="tl-content">
+        <div class="tl-title">Pirmā diena — Džungļi zvana</div>
+        <div class="tl-desc">Mērkaķis atver acis. Viss zaļš. Viss grezns. Bet viņš <strong>jūt tikai vienu lietu</strong> — kur ir aparāts?</div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-icon" style="--tl-delay:0.4s">🎰</div>
+      <div class="tl-content">
+        <div class="tl-title">Pirmā spēle — Mīlestība no pirmā grieza</div>
+        <div class="tl-desc">Viņš atrod veco aparātu. Ievelk sviru. Ripa griežas. <strong>🍒 🍒 🍒</strong> — monētas klaudz kā krusa.</div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-icon" style="--tl-delay:0.8s">💰</div>
+      <div class="tl-content">
+        <div class="tl-title">Leģenda aug — Citi mērkaķi klausās</div>
+        <div class="tl-desc">Baumas izplatās: <strong>"Ir kāds, kas nekad nezaudē."</strong> Visi nāk skatīties. Viņš tikai smaida un velk sviru vēlreiz.</div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-icon" style="--tl-delay:1.2s">👑</div>
+      <div class="tl-content">
+        <div class="tl-title">Kronēšana — Džungļu Karaļs</div>
+        <div class="tl-desc">Viņi deva viņam kroni no <strong>zelta monētām</strong>. Viņš to uzlika, pagriezās, un vēlreiz ievelka sviru.</div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-icon" style="--tl-delay:1.6s">🌟</div>
+      <div class="tl-content">
+        <div class="tl-title">Šodien — Leģenda turpinās</div>
+        <div class="tl-desc">Mērkaķis joprojām spēlē. Katru ritu. Katru vakaru. <strong>Jo viņš nedzima lai atpūstos — viņš dzima lai spēlētu.</strong></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- WIN BANNER -->
+  <div class="win-banner">
+    <div class="slot-row">
+      <div class="big-reel">🐒</div>
+      <div class="big-reel">🐒</div>
+      <div class="big-reel">🐒</div>
+    </div>
+    <span class="jackpot-text">DŽEKPOTS!</span>
+    <p class="jackpot-sub">Trīs mērkaķi = bezmaksas dzīve 🎉</p>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <strong>MĒRKAĶIS</strong> · Dzimis spēlēt aparātus · Prestilon.com
+  </footer>
+
+<script>
+  // MARQUEE
+  const items = ['🎰 MĒRKAĶIS', '🍒 DŽEKPOTS', '💰 MONĒTAS', '🐒 SPĒLĒT', '⭐ PRESTILON', '🎲 APARĀTI', '🌴 DŽUNGĻI'];
+  const track = document.getElementById('marquee');
+  [...items, ...items, ...items].forEach(t => {
+    const s = document.createElement('span');
+    s.textContent = t;
+    track.appendChild(s);
+  });
+
+  // COINS RAIN
+  const rain = document.getElementById('coinsRain');
+  const coinEmojis = ['🪙','💰','✨','⭐'];
+  for (let i = 0; i < 18; i++) {
+    const c = document.createElement('div');
+    c.className = 'falling-coin';
+    c.textContent = coinEmojis[Math.floor(Math.random() * coinEmojis.length)];
+    c.style.setProperty('--fall-dur', (3 + Math.random() * 5) + 's');
+    c.style.setProperty('--fall-delay', (Math.random() * 8) + 's');
+    c.style.setProperty('--fall-left', (Math.random() * 100) + '%');
+    rain.appendChild(c);
+  }
+
+  // SLOT SPIN
+  const symbols = ['🍒','🍋','🔔','⭐','💎','🐒','7️⃣','🍇'];
+  let spinning = false;
+  function spin() {
+    if (spinning) return;
+    spinning = true;
+    const reels = [document.getElementById('r1'), document.getElementById('r2'), document.getElementById('r3')];
+    let ticks = 0;
+    const interval = setInterval(() => {
+      reels.forEach(r => r.textContent = symbols[Math.floor(Math.random() * symbols.length)]);
+      ticks++;
+      if (ticks > 14) {
+        clearInterval(interval);
+        // small chance of jackpot
+        if (Math.random() < 0.25) reels.forEach(r => r.textContent = '🐒');
+        spinning = false;
+      }
+    }, 80);
+  }
+</script>
+</body>
+</html>
