@@ -297,6 +297,21 @@
       animation:trailFade .6s forwards;
     }
     @keyframes trailFade{to{opacity:0;transform:scale(0) translateY(-20px);}}
+
+    /* DODGE */
+    .spin-btn{transition:left .18s cubic-bezier(.34,1.56,.64,1), top .18s cubic-bezier(.34,1.56,.64,1), transform .1s !important;}
+    .machine{position:relative;} /* ensure absolute children work */
+    .taunt-pop{
+      position:absolute; z-index:30; pointer-events:none;
+      font-family:'Fredoka One',cursive; font-size:1.1rem;
+      color:var(--neon); text-shadow:0 0 12px var(--neon);
+      white-space:nowrap; animation:tauntAnim .9s ease-out forwards;
+    }
+    @keyframes tauntAnim{
+      0%{transform:scale(0) rotate(-10deg);opacity:1;}
+      30%{transform:scale(1.3) rotate(5deg);opacity:1;}
+      100%{transform:scale(1) translateY(-40px) rotate(-3deg);opacity:0;}
+    }
   </style>
 </head>
 <body id="mainBody">
@@ -627,6 +642,72 @@ document.addEventListener('mousemove',e=>{
   document.body.appendChild(el);
   setTimeout(()=>el.remove(),700);
 });
+
+// ─── DODGE BUTTON ─────────────────────────────────────────────────────────
+const spinBtn2 = document.getElementById('spinBtn');
+let dodgeCount = 0;
+let dodging = false;
+const taunts = [
+  'HAHA NETRAPIJI! 😂','AI AI AI! 🙈','PAR LĒTU! 🐒',
+  'VĒLREIZ MĒĢINI! 😝','PERTĒĶENS NEVAR! 🤣','NEEEE! 😂',
+  'ĀTRĀK! 🐒💨','DIMIT NETRAP! 😂','HAHAHA! 🍌',
+  'SKRIEN ĀTRĀK! 🏃','MĒRKAAĶIS! 😂','PAĶER MĀ! 😈'
+];
+
+function getRandomBtnPos(){
+  const machine=document.getElementById('machine');
+  const bw=spinBtn2.offsetWidth||360, bh=spinBtn2.offsetHeight||54;
+  const pad=14;
+  const maxX=machine.offsetWidth-bw-pad*2;
+  const maxY=machine.offsetHeight-bh-pad;
+  return{x:pad+Math.random()*maxX, y:Math.max(130,100+Math.random()*(maxY-100))};
+}
+
+function showTaunt(x,y){
+  const el=document.createElement('div');
+  el.className='taunt-pop';
+  el.textContent=taunts[Math.floor(Math.random()*taunts.length)];
+  el.style.left=x+'px';
+  el.style.top=(y-40)+'px';
+  document.getElementById('machine').appendChild(el);
+  setTimeout(()=>el.remove(),1100);
+}
+
+function dodgeBtn(mouseX, mouseY){
+  if(busy||dodging)return;
+  const machine=document.getElementById('machine');
+  const rect=machine.getBoundingClientRect();
+  const br=spinBtn2.getBoundingClientRect();
+  const cx=mouseX-rect.left, cy=mouseY-rect.top;
+  const bx=br.left-rect.left+br.width/2, by=br.top-rect.top+br.height/2;
+  if(Math.hypot(cx-bx,cy-by)>160)return;
+
+  dodgeCount++;
+  dodging=true;
+
+  const pos=getRandomBtnPos();
+  spinBtn2.style.position='absolute';
+  spinBtn2.style.left=pos.x+'px';
+  spinBtn2.style.top=pos.y+'px';
+  spinBtn2.style.width=(br.width)+'px';
+  spinBtn2.style.zIndex='20';
+  showTaunt(pos.x, pos.y);
+
+  if(dodgeCount>=4){
+    spinBtn2.textContent='😤 LABI LABI... 🎰';
+    setTimeout(()=>{ resetBtnPos(); spinBtn2.textContent='🎰 GRIEZT!'; dodgeCount=0; },700);
+  }
+  setTimeout(()=>{ dodging=false; },180);
+}
+
+function resetBtnPos(){
+  spinBtn2.style.position='';spinBtn2.style.left='';
+  spinBtn2.style.top='';spinBtn2.style.width='';spinBtn2.style.zIndex='';
+}
+
+document.getElementById('machine').addEventListener('mousemove',e=>{ if(!busy) dodgeBtn(e.clientX,e.clientY); });
+document.getElementById('machine').addEventListener('touchmove',e=>{ if(!busy&&e.touches[0]) dodgeBtn(e.touches[0].clientX,e.touches[0].clientY); },{passive:true});
+spinBtn2.addEventListener('click',()=>{ resetBtnPos(); dodgeCount=0; });
 </script>
 </body>
 </html>
