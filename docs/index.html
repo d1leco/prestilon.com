@@ -122,7 +122,54 @@ nav{
 .dash-screenshot{
   display:block;width:100%;height:auto;
   border-radius:12px;
+  transition:transform .25s,filter .25s;
 }
+.dash-screenshot-wrap{
+  cursor:zoom-in;
+  position:relative;
+}
+.dash-screenshot-wrap:hover .dash-screenshot{
+  transform:scale(1.02);
+  filter:brightness(1.08);
+}
+.dash-zoom-hint{
+  position:absolute;bottom:.6rem;right:.7rem;
+  background:rgba(0,0,0,.65);backdrop-filter:blur(8px);
+  color:var(--c1);font-family:'JetBrains Mono',monospace;
+  font-size:.58rem;letter-spacing:.06em;
+  padding:.22rem .55rem;border-radius:6px;
+  border:1px solid rgba(0,212,180,.25);
+  pointer-events:none;
+  opacity:0;transition:opacity .22s;
+}
+.dash-screenshot-wrap:hover .dash-zoom-hint{opacity:1}
+
+/* LIGHTBOX */
+@keyframes lb-in{from{opacity:0}to{opacity:1}}
+@keyframes lb-img-in{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.lightbox{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(4,10,18,.92);backdrop-filter:blur(18px);
+  align-items:center;justify-content:center;
+  animation:lb-in .22s ease;
+  padding:2rem;
+}
+.lightbox.open{display:flex}
+.lb-img{
+  max-width:min(1300px,94vw);max-height:88vh;
+  border-radius:14px;display:block;
+  box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 0 1px rgba(0,212,180,.2);
+  animation:lb-img-in .28s ease;
+  cursor:default;
+}
+.lb-close{
+  position:absolute;top:1.1rem;right:1.2rem;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+  color:var(--text2);font-size:1.1rem;width:38px;height:38px;
+  border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .18s,color .18s;
+}
+.lb-close:hover{background:rgba(255,255,255,.16);color:var(--text)}
 .dash-top{
   height:42px;background:var(--bg3);border-bottom:1px solid var(--border);
   display:flex;align-items:center;padding:0 1rem;gap:.55rem;
@@ -588,7 +635,7 @@ footer{
 
   <!-- DASHBOARD SCREENSHOT -->
   <div class="hero-right">
-    <div class="dash-screenshot-wrap">
+    <div class="dash-screenshot-wrap" onclick="openLightbox()">
       <img
         class="dash-screenshot"
         src="/dashboard-screenshot.png"
@@ -596,7 +643,14 @@ footer{
         loading="eager"
         decoding="async"
       />
+      <div class="dash-zoom-hint">🔍 Click to expand</div>
     </div>
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lb-close" onclick="closeLightbox()">✕</button>
+    <img class="lb-img" src="/dashboard-screenshot.png" alt="Prestilon Dashboard" onclick="event.stopPropagation()"/>
   </div>
 </section>
 
@@ -910,7 +964,11 @@ window.wlSubmit=async()=>{
 (()=>{try{const s=localStorage.getItem('sb-ryftlimrjhhoymyfzusq-auth-token');if(s){const p=JSON.parse(s);if(p?.access_token){const el=document.getElementById('mobCta');if(el){el.textContent='Dashboard →';el.href='/account'}}}}catch(e){}})();
 function openMob(){document.getElementById('mobMenu').classList.add('open');document.body.style.overflow='hidden'}
 function closeMob(){document.getElementById('mobMenu').classList.remove('open');document.body.style.overflow=''}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMob()})
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeMob();closeLightbox()}
+})
+function openLightbox(){document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden'}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow=''}
 </script>
 </body>
 </html>
