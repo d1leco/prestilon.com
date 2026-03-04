@@ -144,6 +144,9 @@ nav{
 }
 .dash-screenshot-wrap:hover .dash-zoom-hint{opacity:1}
 
+/* LIGHTBOX — hide entire page when open */
+body.lb-open > *:not(#lightbox){visibility:hidden!important;pointer-events:none!important}
+#lightbox{visibility:visible!important}
 /* LIGHTBOX */
 @keyframes lb-in{from{opacity:0}to{opacity:1}}
 @keyframes lb-img-in{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
@@ -1000,22 +1003,14 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeMob();closeLightbox()}
 })
 function openLightbox(){
-  const lb=document.getElementById('lightbox');
-  lb.classList.add('open');
+  document.getElementById('lightbox').classList.add('open');
+  document.body.classList.add('lb-open');
   document.body.style.overflow='hidden';
-  // Hide fixed footer & nav so nothing bleeds through
-  document.querySelectorAll('footer,nav,.mob-menu').forEach(el=>{
-    el._lbZ=el.style.zIndex;
-    el.style.zIndex='-1';
-  });
 }
 function closeLightbox(){
-  const lb=document.getElementById('lightbox');
-  lb.classList.remove('open');
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.classList.remove('lb-open');
   document.body.style.overflow='';
-  document.querySelectorAll('footer,nav,.mob-menu').forEach(el=>{
-    el.style.zIndex=el._lbZ||'';
-  });
 }
 </script>
 </body>
