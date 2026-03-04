@@ -160,7 +160,8 @@ nav{
 
 /* LIGHTBOX — hide entire page when open */
 body.lb-open > *:not(#lightbox){visibility:hidden!important;pointer-events:none!important}
-#lightbox{visibility:visible!important}
+#lightbox{visibility:visible!important;pointer-events:auto!important}
+body.lb-open{overflow:hidden!important}
 /* LIGHTBOX */
 @keyframes lb-in{from{opacity:0}to{opacity:1}}
 @keyframes lb-img-in{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
@@ -692,19 +693,20 @@ footer{
     </div>
   </div>
 
-  <!-- LIGHTBOX -->
-  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-    <button class="lb-close" onclick="closeLightbox()" aria-label="Close">✕</button>
-    <div class="lb-inner" onclick="closeLightbox()">
-      <img class="lb-img" src="/dashboard-screenshot.png" alt="Prestilon AI Insights Dashboard" onclick="closeLightbox()"/>
-      <div class="lb-caption">
-        <span class="lb-caption-dot"></span>
-        DEMO PREVIEW · Visual design and layout may differ at release
-      </div>
-      <div class="lb-hint">Click anywhere or press Esc to close</div>
-    </div>
-  </div>
 </section>
+
+<!-- LIGHTBOX (direct child of body so visibility CSS works) -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()" aria-label="Close">✕</button>
+  <div class="lb-inner">
+    <img class="lb-img" src="/dashboard-screenshot.png" alt="Prestilon AI Insights Dashboard"/>
+    <div class="lb-caption">
+      <span class="lb-caption-dot"></span>
+      DEMO PREVIEW · Visual design and layout may differ at release
+    </div>
+    <div class="lb-hint">Click anywhere or press Esc to close</div>
+  </div>
+</div>
 
 <!-- TICKER -->
 <div class="ticker-wrap">
