@@ -113,6 +113,20 @@ nav{
 /* ── DASHBOARD SCREENSHOT ── */
 .hero-right{display:flex;align-items:center;justify-content:center;animation:up .55s ease .2s both}
 @media(max-width:940px){.hero-right{display:none}}
+.mob-preview-btn{
+  display:none;
+}
+@media(max-width:940px){
+  .mob-preview-btn{
+    display:inline-flex;align-items:center;gap:.5rem;
+    padding:.42rem .95rem;border-radius:8px;
+    background:rgba(0,212,180,.08);border:1px solid rgba(0,212,180,.25);
+    color:var(--c1);font-family:'JetBrains Mono',monospace;font-size:.65rem;
+    font-weight:600;letter-spacing:.04em;cursor:pointer;
+    margin-top:.15rem;transition:background .2s,border-color .2s;
+  }
+  .mob-preview-btn:hover{background:rgba(0,212,180,.15);border-color:rgba(0,212,180,.45)}
+}
 .dash-screenshot-wrap{
   border-radius:12px;overflow:hidden;
   box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(0,212,180,.15),0 0 40px rgba(0,212,180,.06);
@@ -166,7 +180,7 @@ body.lb-open > *:not(#lightbox){visibility:hidden!important;pointer-events:none!
 .lightbox.open{display:flex}
 .lb-inner{
   display:flex;flex-direction:column;align-items:center;gap:.75rem;
-  cursor:default;
+  cursor:zoom-out;
 }
 .lb-img{
   max-width:min(1280px,94vw);max-height:80vh;
@@ -645,6 +659,9 @@ footer{
       <a class="btn btn-p" href="/login">Get Started Free →</a>
       <a class="btn btn-s" href="/pricing">See Pricing</a>
     </div>
+    <button class="mob-preview-btn" onclick="openLightbox()">
+        🔍 Preview Dashboard
+      </button>
     <div class="hero-trust">
       <div class="trust-i">
         <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -679,7 +696,7 @@ footer{
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <button class="lb-close" onclick="closeLightbox()" aria-label="Close">✕</button>
     <div class="lb-inner" onclick="closeLightbox()">
-      <img class="lb-img" src="/dashboard-screenshot.png" alt="Prestilon AI Insights Dashboard"/>
+      <img class="lb-img" src="/dashboard-screenshot.png" alt="Prestilon AI Insights Dashboard" onclick="closeLightbox()"/>
       <div class="lb-caption">
         <span class="lb-caption-dot"></span>
         DEMO PREVIEW · Visual design and layout may differ at release
