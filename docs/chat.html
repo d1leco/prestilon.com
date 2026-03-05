@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="PRESTILON AI Assistant — Ask anything about your 3D printer fleet."/>
+<link rel="icon" type="image/png" href="prestilon.logo.png">
+<title>AI Assistant — PRESTILON</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060f1a;--bg2:#0a1929;--bg3:#0e2035;--bg4:#122540;
+  --c1:#00d4b4;--c2:#00a896;--purple:#6c5ce7;
+  --text:#f0f6ff;--text2:#8eaabf;--text3:#3d5a70;
+  --border:rgba(255,255,255,.07);--border2:rgba(0,212,180,.25);
+  --red:#ef4444;--green:#10d48a;--amber:#f59e0b;
+  --r:max(1.5rem,calc(50vw - 660px));
+}
+html,body{height:100%;background:var(--bg);overflow:hidden}
+body{font-family:'DM Sans',sans-serif;color:var(--text);display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 70% 0%,rgba(0,212,180,.05),transparent 55%),
+             radial-gradient(ellipse 55% 40% at 0% 85%,rgba(108,92,231,.04),transparent 50%)}
+canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.25}
+
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes _sp{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes shimmer{to{background-position:200% center}}
+@keyframes typing{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ══ NAV ══ */
+nav{
+  position:relative;z-index:999;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.5rem 0 0;height:52px;flex-shrink:0;
+  background:rgba(6,15,26,.95);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+}
+.logo{display:flex;align-items:center;text-decoration:none;transition:opacity .2s;padding-left:1rem;overflow:hidden;height:52px}
+.logo:hover{opacity:.85}
+.logo-img{height:34px;width:auto;mix-blend-mode:screen;display:block;object-fit:contain}
+.nav-r{display:flex;align-items:center;gap:.15rem}
+.nl{padding:.3rem .65rem;color:var(--text2);font-size:.8rem;font-weight:500;text-decoration:none;border-radius:7px;transition:color .18s,background .18s}
+.nl:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.nl.active{color:var(--c1)}
+.nav-btn{margin-left:.4rem;padding:.38rem .95rem;border-radius:7px;border:none;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.3rem;text-decoration:none}
+.nav-btn-red{background:var(--red);color:#fff;box-shadow:0 0 18px rgba(239,68,68,.2)}
+.nav-btn-red:hover{box-shadow:0 0 28px rgba(239,68,68,.38);transform:translateY(-1px)}
+
+/* ══ CHAT LAYOUT ══ */
+.chat-layout{
+  display:flex;flex:1;min-height:0;position:relative;z-index:1;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:260px;flex-shrink:0;
+  background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+@media(max-width:700px){.sidebar{display:none}}
+.sidebar-head{
+  padding:1rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sidebar-title{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.12em;color:var(--text3);text-transform:uppercase}
+.new-chat-btn{
+  display:inline-flex;align-items:center;gap:.3rem;
+  padding:.3rem .7rem;border-radius:7px;border:1px solid var(--border2);
+  background:rgba(0,212,180,.06);color:var(--c1);
+  font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;
+  cursor:pointer;transition:all .18s;
+}
+.new-chat-btn:hover{background:rgba(0,212,180,.12);border-color:rgba(0,212,180,.4)}
+.conv-list{flex:1;overflow-y:auto;padding:.5rem;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.conv-item{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.5rem .65rem;border-radius:8px;cursor:pointer;
+  transition:background .15s,border-color .15s;
+  border:1px solid transparent;margin-bottom:.2rem;
+}
+.conv-item:hover{background:rgba(255,255,255,.04);border-color:var(--border)}
+.conv-item.active{background:rgba(0,212,180,.07);border-color:rgba(0,212,180,.2)}
+.conv-icon{font-size:.8rem;flex-shrink:0;opacity:.6}
+.conv-text{flex:1;min-width:0}
+.conv-title{font-size:.75rem;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv-item.active .conv-title{color:var(--text)}
+.conv-time{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--text3)}
+
+/* Tier badge in sidebar */
+.sidebar-footer{padding:.75rem 1rem;border-top:1px solid var(--border)}
+.tier-badge{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.5rem .7rem;border-radius:9px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+}
+.tier-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.tier-info{flex:1;min-width:0}
+.tier-name{font-size:.72rem;font-weight:600;color:var(--text)}
+.tier-tokens{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3)}
+.tier-upgrade{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--c1);text-decoration:none;transition:color .15s}
+.tier-upgrade:hover{color:var(--c2)}
+
+/* ── MAIN CHAT ── */
+.chat-main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+
+/* Messages area */
+.messages-area{
+  flex:1;overflow-y:auto;padding:1.5rem;
+  display:flex;flex-direction:column;gap:1rem;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+.messages-area::-webkit-scrollbar{width:4px}
+.messages-area::-webkit-scrollbar-track{background:transparent}
+.messages-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* Welcome screen */
+.welcome{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:2rem;animation:up .5s ease both;
+}
+.welcome-icon{
+  width:64px;height:64px;border-radius:18px;
+  background:linear-gradient(135deg,rgba(0,212,180,.15),rgba(108,92,231,.15));
+  border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;margin-bottom:1.2rem;
+  box-shadow:0 0 40px rgba(0,212,180,.08);
+}
+.welcome h2{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;
+  margin-bottom:.5rem;
+  background:linear-gradient(100deg,var(--c1) 0%,var(--purple) 55%,var(--c1) 100%);
+  background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;animation:shimmer 6s linear infinite;
+}
+.welcome p{color:var(--text2);font-size:.83rem;line-height:1.65;max-width:420px;margin-bottom:1.5rem}
+.suggestions{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;max-width:520px}
+.sug-btn{
+  padding:.45rem .9rem;border-radius:9px;
+  background:var(--bg2);border:1px solid var(--border);
+  color:var(--text2);font-size:.75rem;cursor:pointer;
+  transition:all .18s;text-align:left;
+}
+.sug-btn:hover{border-color:var(--border2);color:var(--text);background:var(--bg3)}
+
+/* Messages */
+.msg{display:flex;gap:.75rem;animation:fadeIn .3s ease both;max-width:780px;width:100%}
+.msg.user{flex-direction:row-reverse;align-self:flex-end}
+.msg.assistant{align-self:flex-start}
+.msg-avatar{
+  width:32px;height:32px;border-radius:9px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;
+  margin-top:2px;
+}
+.msg.user .msg-avatar{background:linear-gradient(135deg,var(--c1),var(--purple))}
+.msg.assistant .msg-avatar{background:var(--bg3);border:1px solid var(--border);font-size:.75rem}
+.msg-body{flex:1;min-width:0}
+.msg-bubble{
+  padding:.7rem .95rem;border-radius:12px;
+  font-size:.82rem;line-height:1.65;word-break:break-word;
+}
+.msg.user .msg-bubble{
+  background:linear-gradient(135deg,rgba(0,212,180,.15),rgba(108,92,231,.1));
+  border:1px solid rgba(0,212,180,.2);color:var(--text);
+  border-radius:12px 4px 12px 12px;
+}
+.msg.assistant .msg-bubble{
+  background:var(--bg2);border:1px solid var(--border);color:var(--text2);
+  border-radius:4px 12px 12px 12px;
+}
+.msg.assistant .msg-bubble code{
+  font-family:'JetBrains Mono',monospace;font-size:.75rem;
+  background:rgba(0,212,180,.08);padding:.1rem .35rem;border-radius:4px;color:var(--c1);
+}
+.msg.assistant .msg-bubble pre{
+  background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:8px;
+  padding:.75rem 1rem;overflow-x:auto;margin:.5rem 0;
+  font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.6;color:var(--text);
+}
+.msg-time{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--text3);margin-top:.3rem;padding:0 .2rem}
+.msg.user .msg-time{text-align:right}
+
+/* Typing indicator */
+.typing-indicator{display:flex;gap:4px;align-items:center;padding:.7rem .95rem}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--c1);animation:typing 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+
+/* ── INPUT AREA ── */
+.input-area{
+  padding:1rem 1.5rem;border-top:1px solid var(--border);
+  background:rgba(6,15,26,.85);backdrop-filter:blur(12px);
+  flex-shrink:0;
+}
+.input-wrap{
+  display:flex;gap:.6rem;align-items:flex-end;
+  background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+  padding:.6rem .7rem .6rem 1rem;transition:border-color .2s,box-shadow .2s;
+}
+.input-wrap:focus-within{border-color:rgba(0,212,180,.4);box-shadow:0 0 0 3px rgba(0,212,180,.07)}
+.chat-input{
+  flex:1;background:none;border:none;outline:none;resize:none;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;line-height:1.5;
+  max-height:160px;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+.chat-input::placeholder{color:var(--text3)}
+.send-btn{
+  width:36px;height:36px;border-radius:9px;border:none;
+  background:var(--c1);color:#060f1a;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:all .18s;
+  box-shadow:0 0 18px rgba(0,212,180,.25);
+}
+.send-btn:hover:not(:disabled){box-shadow:0 0 30px rgba(0,212,180,.45);transform:scale(1.05)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.input-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:.5rem;
+}
+.input-hint{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--text3)}
+.token-counter{
+  display:flex;align-items:center;gap:.4rem;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3);
+}
+.tc-bar{width:60px;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.tc-fill{height:100%;background:var(--c1);border-radius:2px;transition:width .5s ease}
+
+/* Error bar */
+.error-bar{
+  display:none;margin:.5rem 0 0;padding:.5rem .8rem;border-radius:8px;
+  background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);
+  color:#fca5a5;font-family:'JetBrains Mono',monospace;font-size:.68rem;
+}
+.error-bar.show{display:block}
+
+/* Guest banner */
+.guest-banner{
+  margin:.5rem 0 0;padding:.55rem .85rem;border-radius:9px;
+  background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);
+  display:flex;align-items:center;gap:.6rem;justify-content:space-between;
+}
+.gb-text{font-size:.72rem;color:#fbbf24;font-family:'JetBrains Mono',monospace}
+.gb-link{font-size:.72rem;color:var(--c1);text-decoration:none;font-weight:600;white-space:nowrap}
+.gb-link:hover{text-decoration:underline}
+
+/* ── MOBILE SIDEBAR TOGGLE ── */
+.mob-sidebar-btn{
+  display:none;
+  padding:.35rem .6rem;border-radius:7px;border:1px solid var(--border);
+  background:none;color:var(--text2);font-size:.8rem;cursor:pointer;
+  align-items:center;gap:.3rem;font-family:'DM Sans',sans-serif;font-size:.75rem;
+}
+@media(max-width:700px){.mob-sidebar-btn{display:inline-flex}}
+
+/* ── LOADING ── */
+.loading-overlay{
+  position:fixed;inset:0;z-index:9999;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;
+  transition:opacity .4s;
+}
+.loading-overlay.hidden{opacity:0;pointer-events:none}
+.l-spin{width:28px;height:28px;border:2px solid rgba(0,212,180,.15);border-top-color:var(--c1);border-radius:50%;animation:_sp .7s linear infinite}
+.l-txt{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text3);letter-spacing:.08em}
+
+/* ── MEMORY TOGGLE ── */
+.mem-btn{
+  display:inline-flex;align-items:center;gap:.3rem;
+  padding:.28rem .65rem;border-radius:6px;border:1px solid var(--border);
+  background:none;color:var(--text3);
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;
+  cursor:pointer;transition:all .18s;
+}
+.mem-btn.on{border-color:rgba(0,212,180,.3);color:var(--c1);background:rgba(0,212,180,.06)}
+.mem-btn:hover{border-color:rgba(0,212,180,.25);color:var(--text2)}
+.mem-dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse 2s infinite}
+
+/* Live indicator */
+.live-ind{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--green);
+}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 1.8s infinite;box-shadow:0 0 5px var(--green)}
+
+/* Chat header */
+.chat-header{
+  padding:.6rem 1.5rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+  background:rgba(6,15,26,.6);backdrop-filter:blur(8px);
+}
+.ch-left{display:flex;align-items:center;gap:.75rem}
+.ch-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:var(--text)}
+.ch-right{display:flex;align-items:center;gap:.5rem}
+
+/* Mobile hamburger */
+.ham{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;background:none;border:none;cursor:pointer;padding:4px;border-radius:7px;transition:background .18s;flex-shrink:0}
+.ham:hover{background:rgba(255,255,255,.07)}
+.ham span{display:block;width:20px;height:2px;background:var(--text2);border-radius:2px;transition:all .25s;transform-origin:center}
+@media(max-width:640px){
+  .ham{display:flex}
+  .nav-r .nl{display:none}
+  .nav-r .nav-btn{display:none}
+}
+.mob-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:rgba(6,15,26,.97);backdrop-filter:blur(24px);flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
+.mob-menu.open{display:flex}
+.mob-menu a{font-family:'Syne',sans-serif;font-weight:700;font-size:1.4rem;color:var(--text2);text-decoration:none;transition:color .18s}
+.mob-menu a:hover{color:var(--c1)}
+.mob-menu a.mob-cta{color:#060f1a;background:var(--c1);padding:.6rem 2rem;border-radius:10px}
+.mob-close{position:absolute;top:1.1rem;right:1.1rem;background:none;border:none;color:var(--text2);font-size:1.5rem;cursor:pointer;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .18s}
+.mob-close:hover{background:rgba(255,255,255,.07)}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="l-spin"></div>
+  <div class="l-txt">INITIALIZING AI</div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="/">
+    <img class="logo-img" src="/prestilon.logo.png" alt="Prestilon">
+  </a>
+  <div class="nav-r">
+    <a class="nl" href="/docs">Docs</a>
+    <a class="nl" href="/community">Community</a>
+    <a class="nl active" href="/chat">AI Chat</a>
+    <a class="nl" href="/account">Account</a>
+    <button class="nav-btn nav-btn-red" id="signOutBtn" style="display:none" onclick="signOut()">Sign Out</button>
+    <a class="nl" href="/login" id="signInLink">Sign In</a>
+    <button class="ham" onclick="openMob()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- CHAT LAYOUT -->
+<div class="chat-layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <span class="sidebar-title">Conversations</span>
+      <button class="new-chat-btn" onclick="newConversation()">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>
+        New
+      </button>
+    </div>
+    <div class="conv-list" id="convList">
+      <!-- populated by JS -->
+    </div>
+    <div class="sidebar-footer">
+      <div class="tier-badge" id="tierBadge">
+        <div class="tier-dot" id="tierDot" style="background:var(--text3)"></div>
+        <div class="tier-info">
+          <div class="tier-name" id="tierName">Loading...</div>
+          <div class="tier-tokens" id="tierTokens">— tokens</div>
+        </div>
+        <a class="tier-upgrade" href="/pricing" id="tierUpgrade" style="display:none">Upgrade →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CHAT -->
+  <div class="chat-main">
+
+    <!-- Chat header -->
+    <div class="chat-header">
+      <div class="ch-left">
+        <button class="mob-sidebar-btn" onclick="toggleSidebar()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M3 6h18M3 12h18M3 18h18"/></svg>
+          History
+        </button>
+        <span class="ch-title">PRESTILON AI</span>
+        <span class="live-ind" id="liveInd" style="display:none">
+          <span class="live-dot"></span>LIVE
+        </span>
+      </div>
+      <div class="ch-right">
+        <button class="mem-btn" id="memBtn" onclick="toggleMemory()" title="Toggle memory">
+          <span class="mem-dot"></span>
+          <span id="memTxt">Memory</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-area" id="messagesArea">
+      <div class="welcome" id="welcomeScreen">
+        <div class="welcome-icon">🧠</div>
+        <h2>PRESTILON AI Assistant</h2>
+        <p>Ask me anything about your 3D printer fleet — anomaly detection, maintenance predictions, diagnostics, or how to get the most from PRESTILON.</p>
+        <div class="suggestions">
+          <button class="sug-btn" onclick="useSuggestion(this)">Why is my printer health score low?</button>
+          <button class="sug-btn" onclick="useSuggestion(this)">What does a 3.2σ anomaly mean?</button>
+          <button class="sug-btn" onclick="useSuggestion(this)">Explain predictive maintenance</button>
+          <button class="sug-btn" onclick="useSuggestion(this)">How do I add a new printer?</button>
+          <button class="sug-btn" onclick="useSuggestion(this)">What is CUSUM detection?</button>
+          <button class="sug-btn" onclick="useSuggestion(this)">Difference between Free and Pro?</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="input-area">
+      <div class="input-wrap">
+        <textarea
+          id="chatInput"
+          class="chat-input"
+          placeholder="Ask about your fleet, diagnostics, anomalies…"
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+      <div class="input-footer">
+        <span class="input-hint">Enter to send · Shift+Enter new line</span>
+        <div class="token-counter" id="tokenCounter" style="display:none">
+          <span id="tcUsed">0</span>/<span id="tcLimit">500</span>
+          <div class="tc-bar"><div class="tc-fill" id="tcFill" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="error-bar" id="errorBar"></div>
+      <div class="guest-banner" id="guestBanner" style="display:none">
+        <span class="gb-text">⚡ Sign in for memory, history &amp; more tokens</span>
+        <a class="gb-link" href="/login">Sign In Free →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE MENU -->
+<div class="mob-menu" id="mobMenu">
+  <button class="mob-close" onclick="closeMob()">✕</button>
+  <a href="/" onclick="closeMob()">Home</a>
+  <a href="/docs" onclick="closeMob()">Docs</a>
+  <a href="/community" onclick="closeMob()">Community</a>
+  <a href="/pricing" onclick="closeMob()">Pricing</a>
+  <a href="/account" onclick="closeMob()">Account</a>
+  <a href="/login" id="mobSignIn" class="mob-cta" onclick="closeMob()">Sign In →</a>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+const SUPABASE_URL  = 'https://ryftlimrjhhoymyfzusq.supabase.co'
+const SUPABASE_ANON = 'sb_publishable_NCaK6GQdtf7vuhyHPLs1Fw_wE89uJ86'
+const BACKEND_URL   = 'https://ai-sistema-backend-embseccpcqf6ddda.swedencentral-01.azurewebsites.net'
+
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { autoRefreshToken: true, persistSession: true }
+})
+
+/* ── State ── */
+let currentConvId  = generateUUID()
+let isSending      = false
+let userSession    = null
+let memoryEnabled  = true
+let tokenData      = null
+let conversations  = [] // {id, title, time}
+
+/* ── UUID ── */
+function generateUUID() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID()
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+  })
+}
+
+/* ── Init ── */
+async function init() {
+  const { data: { session } } = await sb.auth.getSession()
+  userSession = session
+
+  if (session) {
+    document.getElementById('signOutBtn').style.display = 'inline-flex'
+    document.getElementById('signInLink').style.display = 'none'
+    const mobEl = document.getElementById('mobSignIn')
+    if (mobEl) { mobEl.textContent = 'Sign Out'; mobEl.onclick = () => signOut() }
+    await Promise.all([loadTokenData(), loadMemoryStatus(), loadConversations()])
+  } else {
+    document.getElementById('guestBanner').style.display = 'flex'
+    setTierDisplay('guest', 0, 0)
+  }
+
+  document.getElementById('chatInput').disabled = false
+  document.getElementById('sendBtn').disabled = false
+  document.getElementById('loadingOverlay').classList.add('hidden')
+  document.getElementById('chatInput').focus()
+}
+
+/* ── Token data ── */
+async function loadTokenData() {
+  try {
+    const token = userSession?.access_token
+    const r = await fetch(`${BACKEND_URL}/user/tokens`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (r.ok) {
+      tokenData = await r.json()
+      const used  = tokenData.tokens_used  || 0
+      const limit = tokenData.tokens_limit || 500
+      const tier  = tokenData.tier || (limit > 500 ? 'pro' : 'free')
+      setTierDisplay(tier, used, limit)
+    }
+  } catch(e) { console.warn('token load:', e) }
+}
+
+function setTierDisplay(tier, used, limit) {
+  const dot    = document.getElementById('tierDot')
+  const name   = document.getElementById('tierName')
+  const tokens = document.getElementById('tierTokens')
+  const upg    = document.getElementById('tierUpgrade')
+  const counter= document.getElementById('tokenCounter')
+  const tcUsed = document.getElementById('tcUsed')
+  const tcLimit= document.getElementById('tcLimit')
+  const tcFill = document.getElementById('tcFill')
+
+  if (tier === 'pro') {
+    dot.style.background = 'var(--c1)'
+    dot.style.boxShadow  = '0 0 6px var(--c1)'
+    name.textContent = 'PRO'
+    name.style.color = 'var(--c1)'
+    upg.style.display = 'none'
+  } else if (tier === 'free') {
+    dot.style.background = 'var(--purple)'
+    name.textContent = 'FREE'
+    name.style.color = 'var(--text)'
+    upg.style.display = 'block'
+  } else {
+    dot.style.background = 'var(--text3)'
+    name.textContent = 'GUEST'
+    name.style.color = 'var(--text2)'
+    upg.style.display = 'none'
+    tokens.textContent = '300 tokens / request'
+    return
+  }
+
+  const remaining = limit - used
+  tokens.textContent = `${remaining.toLocaleString()} / ${limit.toLocaleString()} tokens`
+  counter.style.display = 'flex'
+  tcUsed.textContent  = used
+  tcLimit.textContent = limit
+  const pct = Math.min((used / limit) * 100, 100)
+  tcFill.style.width = pct + '%'
+  if (pct > 80) tcFill.style.background = 'var(--amber)'
+  if (pct > 95) tcFill.style.background = 'var(--red)'
+}
+
+/* ── Memory ── */
+async function loadMemoryStatus() {
+  if (!userSession) return
+  try {
+    const r = await fetch(`${BACKEND_URL}/memory/status`, {
+      headers: { Authorization: `Bearer ${userSession.access_token}` }
+    })
+    if (r.ok) {
+      const d = await r.json()
+      memoryEnabled = d.memory_enabled
+      updateMemBtn()
+    }
+  } catch(e) {}
+}
+
+function updateMemBtn() {
+  const btn = document.getElementById('memBtn')
+  const txt = document.getElementById('memTxt')
+  if (memoryEnabled) {
+    btn.classList.add('on')
+    txt.textContent = 'Memory ON'
+  } else {
+    btn.classList.remove('on')
+    txt.textContent = 'Memory OFF'
+  }
+}
+
+window.toggleMemory = async () => {
+  if (!userSession) { showError('Sign in to use memory features.'); return }
+  try {
+    const r = await fetch(`${BACKEND_URL}/memory/toggle`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${userSession.access_token}` }
+    })
+    if (r.ok) {
+      const d = await r.json()
+      memoryEnabled = d.memory_enabled
+      updateMemBtn()
+    }
+  } catch(e) { showError('Memory toggle failed.') }
+}
+
+/* ── Conversations ── */
+async function loadConversations() {
+  if (!userSession) return
+  try {
+    const r = await sb.from('conversations_meta')
+      .select('cosmos_thread_id,title,last_message_at')
+      .eq('user_id', userSession.user.id)
+      .order('last_message_at', { ascending: false })
+      .limit(20)
+    if (r.data) {
+      conversations = r.data.map(c => ({
+        id: c.cosmos_thread_id,
+        title: c.title || 'Untitled conversation',
+        time: c.last_message_at
+      }))
+      renderConvList()
+    }
+  } catch(e) {}
+}
+
+function renderConvList() {
+  const list = document.getElementById('convList')
+  if (!conversations.length) {
+    list.innerHTML = '<div style="padding:.75rem;font-family:JetBrains Mono,monospace;font-size:.62rem;color:var(--text3);text-align:center">No conversations yet</div>'
+    return
+  }
+  list.innerHTML = conversations.map(c => `
+    <div class="conv-item${c.id === currentConvId ? ' active' : ''}" onclick="switchConv('${c.id}','${escHtml(c.title)}')">
+      <span class="conv-icon">💬</span>
+      <div class="conv-text">
+        <div class="conv-title">${escHtml(c.title)}</div>
+        <div class="conv-time">${relTime(c.time)}</div>
+      </div>
+    </div>`).join('')
+}
+
+window.switchConv = (id, title) => {
+  currentConvId = id
+  document.getElementById('messagesArea').innerHTML = ''
+  const welcome = document.createElement('div')
+  welcome.className = 'welcome'
+  welcome.id = 'welcomeScreen'
+  welcome.innerHTML = `
+    <div class="welcome-icon">💬</div>
+    <h2>${escHtml(title)}</h2>
+    <p style="color:var(--text2);font-size:.82rem">Continue this conversation or start typing below.</p>`
+  document.getElementById('messagesArea').appendChild(welcome)
+  renderConvList()
+}
+
+function relTime(iso) {
+  if (!iso) return ''
+  const diff = Date.now() - new Date(iso).getTime()
+  const m = Math.floor(diff / 60000)
+  if (m < 1)  return 'just now'
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  return `${Math.floor(h/24)}d ago`
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
+/* ── New conversation ── */
+window.newConversation = () => {
+  currentConvId = generateUUID()
+  const area = document.getElementById('messagesArea')
+  area.innerHTML = ''
+  const w = document.createElement('div')
+  w.className = 'welcome'; w.id = 'welcomeScreen'
+  w.innerHTML = `
+    <div class="welcome-icon">🧠</div>
+    <h2>New Conversation</h2>
+    <p>Start a new conversation with PRESTILON AI.</p>`
+  area.appendChild(w)
+  renderConvList()
+  document.getElementById('chatInput').focus()
+}
+
+/* ── Suggestions ── */
+window.useSuggestion = (btn) => {
+  document.getElementById('chatInput').value = btn.textContent
+  autoResize(document.getElementById('chatInput'))
+  sendMessage()
+}
+
+/* ── Send message ── */
+window.sendMessage = async (_retryCount = 0) => {
+  if (isSending && _retryCount === 0) return
+  const input = document.getElementById('chatInput')
+  const msg   = input.value.trim()
+  if (!msg) return
+
+  isSending = true
+  document.getElementById('sendBtn').disabled = true
+  hideError()
+
+  // Remove welcome screen
+  const welcome = document.getElementById('welcomeScreen')
+  if (welcome) welcome.remove()
+
+  // Add user message
+  appendMessage('user', msg)
+  input.value = ''
+  autoResize(input)
+
+  // Add typing indicator
+  const typingId = appendTyping()
+
+  // Live indicator
+  document.getElementById('liveInd').style.display = 'inline-flex'
+
+  try {
+    const token = userSession?.access_token
+
+    let response
+    try {
+      const controller = new AbortController()
+      const timeoutId  = setTimeout(() => controller.abort(), 60000)
+      try {
+        response = await fetch(`${BACKEND_URL}/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type':  'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+          },
+          body:   JSON.stringify({ message: msg, conversation_id: currentConvId }),
+          signal: controller.signal
+        })
+      } finally {
+        clearTimeout(timeoutId)
+      }
+    } catch(e) {
+      removeTyping(typingId)
+      if (e.name === 'AbortError') showError('Request timed out (60s). Please try again.')
+      else showError('Connection error. Check your internet connection.')
+      return
+    }
+
+    // Token refresh retry
+    if (response.status === 401) {
+      removeTyping(typingId)
+      if (_retryCount >= 1) {
+        showError('Session expired. Please sign in again.')
+        await sb.auth.signOut()
+        setTimeout(() => window.location.href = '/login', 1500)
+        return
+      }
+      const { error } = await sb.auth.refreshSession()
+      if (error) {
+        showError('Session expired. Please sign in again.')
+        await sb.auth.signOut()
+        setTimeout(() => window.location.href = '/login', 1500)
+        return
+      }
+      const { data: { session } } = await sb.auth.getSession()
+      userSession = session
+      isSending = false
+      document.getElementById('sendBtn').disabled = false
+      input.value = msg
+      autoResize(input)
+      sendMessage(_retryCount + 1)
+      return
+    }
+
+    if (!response.ok) {
+      removeTyping(typingId)
+      const err = await response.json().catch(() => ({}))
+      if (response.status === 429) {
+        showError(`Token limit reached. Remaining: ${err.remaining || 0}. ${err.error === 'insufficient_tokens' ? 'Upgrade to Pro for more tokens.' : ''}`)
+      } else {
+        showError(`Error ${response.status}. Please try again.`)
+      }
+      return
+    }
+
+    // Stream response
+    removeTyping(typingId)
+    const assistantMsgEl = appendMessage('assistant', '')
+    const bubbleEl = assistantMsgEl.querySelector('.msg-bubble')
+
+    const reader  = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+    let currentEventType = 'message'
+    let fullText = ''
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      const parts = buffer.split('\n\n')
+      buffer = parts.pop()
+      for (const part of parts) {
+        currentEventType = 'message'
+        for (const line of part.split('\n')) {
+          if (line.startsWith('event: ')) {
+            currentEventType = line.slice(7).trim()
+          } else if (line.startsWith('data: ')) {
+            const data = line.slice(6).replace(/\r$/, '')
+            if (currentEventType === 'error') {
+              showError(data)
+            } else {
+              fullText += data + (data ? '' : '\n')
+              bubbleEl.innerHTML = formatText(fullText)
+              scrollToBottom()
+            }
+          }
+        }
+      }
+    }
+
+    // Update conversations list
+    if (userSession) {
+      await new Promise(r => setTimeout(r, 500))
+      await loadConversations()
+      await loadTokenData()
+    }
+
+  } finally {
+    isSending = false
+    document.getElementById('sendBtn').disabled = false
+    document.getElementById('liveInd').style.display = 'none'
+  }
+}
+
+/* ── Helpers ── */
+function formatText(text) {
+  // Simple markdown-like formatting
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>')
+}
+
+function appendMessage(role, text) {
+  const area  = document.getElementById('messagesArea')
+  const div   = document.createElement('div')
+  div.className = `msg ${role}`
+  const time  = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})
+  div.innerHTML = `
+    <div class="msg-avatar">${role === 'user' ? '👤' : '🧠'}</div>
+    <div class="msg-body">
+      <div class="msg-bubble">${role === 'assistant' ? formatText(text) : escHtml(text)}</div>
+      <div class="msg-time">${time}</div>
+    </div>`
+  area.appendChild(div)
+  scrollToBottom()
+  return div
+}
+
+function appendTyping() {
+  const area = document.getElementById('messagesArea')
+  const div  = document.createElement('div')
+  div.className = 'msg assistant'
+  div.id = 'typingIndicator'
+  div.innerHTML = `
+    <div class="msg-avatar">🧠</div>
+    <div class="msg-body">
+      <div class="msg-bubble">
+        <div class="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+    </div>`
+  area.appendChild(div)
+  scrollToBottom()
+  return div.id
+}
+
+function removeTyping(id) {
+  const el = document.getElementById(id)
+  if (el) el.remove()
+}
+
+function scrollToBottom() {
+  const area = document.getElementById('messagesArea')
+  area.scrollTop = area.scrollHeight
+}
+
+function showError(msg) {
+  const bar = document.getElementById('errorBar')
+  bar.textContent = '⚠ ' + msg
+  bar.classList.add('show')
+  if (window._errTimer) clearTimeout(window._errTimer)
+  window._errTimer = setTimeout(hideError, 8000)
+}
+
+function hideError() {
+  const bar = document.getElementById('errorBar')
+  bar.classList.remove('show')
+}
+
+/* ── Sign out ── */
+window.signOut = async () => {
+  await sb.auth.signOut()
+  window.location.href = '/'
+}
+
+/* ── Keyboard ── */
+window.handleKey = (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
+}
+
+window.autoResize = (el) => {
+  el.style.height = 'auto'
+  el.style.height = Math.min(el.scrollHeight, 160) + 'px'
+}
+
+/* ── Mobile sidebar ── */
+window.toggleSidebar = () => {
+  const sb = document.getElementById('sidebar')
+  sb.style.display = sb.style.display === 'flex' ? 'none' : 'flex'
+}
+
+/* ── Mobile menu ── */
+window.openMob = () => { document.getElementById('mobMenu').classList.add('open'); document.body.style.overflow = 'hidden' }
+window.closeMob = () => { document.getElementById('mobMenu').classList.remove('open'); document.body.style.overflow = '' }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMob() })
+
+/* ── Canvas BG ── */
+;(()=>{
+  const c = document.getElementById('bg'), x = c.getContext('2d'); let W,H,P=[]
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  function init(){P=[];for(let i=0;i<40;i++)P.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15})}
+  function draw(){
+    x.clearRect(0,0,W,H)
+    P.forEach((a,i)=>{
+      P.slice(i+1).forEach(b=>{
+        const dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy)
+        if(d<110){x.beginPath();x.strokeStyle=`rgba(0,212,180,${.03*(1-d/110)})`;x.lineWidth=.5;x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()}
+      })
+      x.beginPath();x.arc(a.x,a.y,.9,0,Math.PI*2);x.fillStyle='rgba(0,212,180,.12)';x.fill()
+      a.x+=a.vx;a.y+=a.vy
+      if(a.x<0||a.x>W)a.vx*=-1;if(a.y<0||a.y>H)a.vy*=-1
+    })
+    requestAnimationFrame(draw)
+  }
+  window.addEventListener('resize',()=>{resize();init()})
+  resize();init();draw()
+})()
+
+init()
+</script>
+</body>
+</html>
